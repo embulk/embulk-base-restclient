@@ -1,0 +1,3 @@
+rootProject.name = 'embulk-input-web_api'
+include 'embulk-input-web_api_template'
+include 'embulk-input-web_api'

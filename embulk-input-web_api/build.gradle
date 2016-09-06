@@ -1,0 +1,4 @@
+dependencies {
+  compile project(':embulk-input-web_api_template')
+  testCompile project(':embulk-input-web_api_template').sourceSets.test.output
+}
