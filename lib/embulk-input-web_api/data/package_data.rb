@@ -1,4 +1,7 @@
-module EmbulkPluginBuilder
+module Embulk
+module Input
+module WebApi
+class Builder
   class PackageData
     def initialize(base_name, dest_dir, erb_binding=nil)
       require 'fileutils'
@@ -8,7 +11,7 @@ module EmbulkPluginBuilder
     end
 
     def path(src)
-      EmbulkPluginBuilder.lib_path("embulk_plugin_builder/data/#{@base_name}/#{src}")
+      Embulk::Input::WebApi.lib_path("embulk-input-web_api/data/#{@base_name}/#{src}")
     end
 
     def content(src)
@@ -54,5 +57,7 @@ module EmbulkPluginBuilder
       File.chmod(File.stat(dest).mode | 0111, dest)
     end
   end
-
-end
+end # Builder
+end # WebApi
+end # Input
+end # Embulk

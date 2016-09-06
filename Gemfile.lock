@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    embulk-plugin-builder (0.0.0.1-java)
+    embulk-input-web_api (0.0.0.1-java)
       bundler (>= 1.10.6)
       liquid (~> 3.0.6)
       msgpack (~> 0.7.3)
@@ -30,7 +30,7 @@ PLATFORMS
 
 DEPENDENCIES
   embulk (>= 0.8.8)
-  embulk-plugin-builder!
+  embulk-input-web_api!
   kramdown (~> 1.5.0)
   rake (>= 0.10.0)
   test-unit (~> 3.0.9)

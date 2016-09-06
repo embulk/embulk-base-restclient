@@ -1,18 +1,20 @@
 require 'embulk'
 require 'embulk/version'
 
-module EmbulkPluginBuilder
-  class Runner
+module Embulk
+module Input
+module WebApi
+  class Builder
     def initialize
     end
 
     def run(argv)
       require 'java'
       require 'optparse'
-      require 'embulk_plugin_builder/version'
+      require 'embulk-input-web_api/version'
 
       op = OptionParser.new
-      op.version = EmbulkPluginBuilder::VERSION
+      op.version = Embulk::Input::WebApi::VERSION
       op.banner = "Usage: embulk_plugin_builder <config.yml>"
 
       require 'yaml'
@@ -31,7 +33,7 @@ module EmbulkPluginBuilder
       end
 
       require 'fileutils'
-      require 'embulk_plugin_builder/data/package_data'
+      require 'embulk-input-web_api/data/package_data'
 
       embulk_category = category
       embulk_category = "input" if category == "web_api_input"
@@ -79,7 +81,7 @@ module EmbulkPluginBuilder
         #
         # Generate project repository
         #
-        pkg = EmbulkPluginBuilder::PackageData.new("new", full_project_name, binding())
+        pkg = Embulk::Input::WebApi::Builder::PackageData.new("new", full_project_name, binding())
         pkg.cp_erb("README.md.erb", "README.md")
         pkg.cp("LICENSE.txt", "LICENSE.txt")
         pkg.cp_erb("gitignore.erb", ".gitignore")
@@ -111,7 +113,7 @@ module EmbulkPluginBuilder
 
         success = true
       ensure
-        Files.rm_rf full_project_name unless success
+        FileUtils.rm_rf full_project_name unless success
       end
     end
 
@@ -156,8 +158,8 @@ module EmbulkPluginBuilder
   end
 
   def self.usage(message)
-    STDERR.puts "embulk_plugin_builder v#{EmbulkPluginBuilder::VERSION}"
-    STDERR.puts "Usage: embulk_plugin_builder <category> <name>"
+    STDERR.puts "embulk-input-web_api v#{Embulk::Input::WebApi::VERSION}"
+    STDERR.puts "Usage: embulk_plugin_builder <config.yml>"
     if message
       system_exit "error: #{message}"
     else
@@ -188,4 +190,6 @@ module EmbulkPluginBuilder
       File.join(lib, *path.split("/"))
     end
   end
-end
+end # WebApi
+end # Input
+end # Embulk
