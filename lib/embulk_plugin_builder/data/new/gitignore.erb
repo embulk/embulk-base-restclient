@@ -1,0 +1,17 @@
+*~
+/pkg/
+/tmp/
+%if language == :java
+*.gemspec
+.gradle/
+/classpath/
+build/
+.idea
+/.settings/
+/.metadata/
+.classpath
+.project
+%elsif language == :ruby
+/.bundle/
+/Gemfile.lock
+%end

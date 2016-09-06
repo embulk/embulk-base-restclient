@@ -1,0 +1,14 @@
+package <%= java_package_name %>;
+
+import com.google.common.base.Optional;
+import org.embulk.config.Config;
+import org.embulk.config.ConfigDefault;
+import org.embulk.config.Task;
+import org.embulk.input.web_api.WebApiPluginTask;
+import org.embulk.spi.SchemaConfig;
+
+public interface <%= java_options_class_name %>
+        extends WebApiPluginTask
+{
+<%= java_options_definitions %>
+}

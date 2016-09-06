@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
+
+require 'rubygems' unless defined?(gem)
+require 'embulk'
+here = File.dirname(__FILE__)
+$LOAD_PATH << File.expand_path(File.join(here, '..', 'lib'))
+
+require 'embulk_plugin_builder'
+builder = EmbulkPluginBuilder::Runner.new.run ARGV
+exit builder unless builder.nil?
