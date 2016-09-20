@@ -1,14 +1,19 @@
 package org.embulk.input.web_api;
 
 import java.util.List;
+
+import com.google.common.base.Throwables;
 import org.embulk.config.TaskReport;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskSource;
+import org.embulk.input.web_api.writer.SchemaWriter;
+import org.embulk.spi.Exec;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
+import org.slf4j.Logger;
 
 import static org.embulk.spi.Exec.getBufferAllocator;
 import static org.embulk.spi.Exec.newConfigDiff;
@@ -17,29 +22,63 @@ import static org.embulk.spi.Exec.newTaskReport;
 public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginTask>
         implements InputPlugin
 {
+    protected final Logger log;
+
+    protected AbstractWebApiInputPlugin()
+    {
+        log = Exec.getLogger(AbstractWebApiInputPlugin.class);
+    }
+
     @Override
     public ConfigDiff transaction(ConfigSource config, InputPlugin.Control control)
     {
-        PluginTask task = validate(config.loadConfig(getTaskClass()));
-        Schema schema = buildSchema(task);
-        int taskCount = buildTaskCount(task); // number of run() method calls
+        PluginTask task = validateInputTask(config.loadConfig(getInputTaskClass()));
+        Schema schema = buildInputSchema(task);
+        int taskCount = buildInputTaskCount(task); // number of run() method calls
         return resume(task.dump(), schema, taskCount, control);
     }
 
-    protected abstract PluginTask validate(PluginTask task);
+    protected abstract PluginTask validateInputTask(PluginTask task);
 
-    protected abstract Class<PluginTask> getTaskClass();
+    protected abstract Class<PluginTask> getInputTaskClass();
 
-    protected abstract Schema buildSchema(PluginTask task);
-
-    protected int buildTaskCount(PluginTask task) {
+    protected int buildInputTaskCount(PluginTask task) {
         return 1;
+    }
+
+    protected abstract Schema buildInputSchema(PluginTask task);
+
+    protected <SchemaWrite extends SchemaWriter> Class<SchemaWrite> getSchemaWriterClass()
+    {
+        return (Class<SchemaWrite>) SchemaWriter.class;
+    }
+
+    protected SchemaWriter buildSchemaWriter(PluginTask task, Schema schema)
+    {
+        try {
+            return getSchemaWriterClass().newInstance().buildColumnWriters(task, schema);
+        }
+        catch (InstantiationException | IllegalAccessException e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     @Override
     public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
     {
         control.run(taskSource, schema, taskCount);
+
+        PluginTask task = taskSource.loadTask(getInputTaskClass());
+        if (task.getIncremental()) {
+            return buildConfigDiff(task);
+        }
+        else {
+            return newConfigDiff();
+        }
+    }
+
+    protected ConfigDiff buildConfigDiff(PluginTask task)
+    {
         return newConfigDiff();
     }
 
@@ -51,8 +90,8 @@ public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginT
     @Override
     public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
     {
-        PluginTask task = taskSource.loadTask(getTaskClass());
-        try (PageBuilder pageBuilder = newPageBuilder(schema, output)) {
+        PluginTask task = taskSource.loadTask(getInputTaskClass());
+        try (PageBuilder pageBuilder = buildPageBuilder(schema, output)) {
             try {
                 load(task, taskIndex, pageBuilder);
             }
@@ -60,12 +99,24 @@ public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginT
                 pageBuilder.finish();
             }
         }
+        return buildTaskReport(task);
+    }
+
+    protected TaskReport buildTaskReport(PluginTask task)
+    {
         return newTaskReport();
     }
 
-    protected abstract void load(PluginTask task, int taskCount, PageBuilder to);
+    protected void load(PluginTask task, int taskCount, PageBuilder to)
+    {
+        Schema schema = buildInputSchema(task);
+        SchemaWriter schemaWriter = buildSchemaWriter(task, schema);
+        fetch(task, schema, schemaWriter, taskCount, to);
+    }
 
-    private PageBuilder newPageBuilder(Schema schema, PageOutput output)
+    protected abstract void fetch(PluginTask task, Schema schema, SchemaWriter schemaWriter, int taskCount, PageBuilder to);
+
+    protected PageBuilder buildPageBuilder(Schema schema, PageOutput output)
     {
         return new PageBuilder(getBufferAllocator(), schema, output);
     }
