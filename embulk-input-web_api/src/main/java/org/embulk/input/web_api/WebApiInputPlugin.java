@@ -1,6 +1,7 @@
 package org.embulk.input.web_api;
 
 import org.embulk.config.ConfigDiff;
+import org.embulk.input.web_api.schema.SchemaWrapper;
 import org.embulk.input.web_api.writer.SchemaWriter;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.Schema;
@@ -17,7 +18,7 @@ public class WebApiInputPlugin
     }
 
     @Override
-    protected PluginTask validateInputTask(PluginTask task)
+    protected PluginTask validatePluginTask(PluginTask task)
     {
         return task;
     }
@@ -29,7 +30,7 @@ public class WebApiInputPlugin
     }
 
     @Override
-    protected Schema buildInputSchema(PluginTask task)
+    protected SchemaWrapper buildSchemaWrapper(PluginTask task)
     {
         throw new UnsupportedOperationException("should implement");
     }
@@ -42,7 +43,7 @@ public class WebApiInputPlugin
     }
 
     @Override
-    protected void fetch(PluginTask task, Schema schema, SchemaWriter schemaWriter, int taskCount, PageBuilder to)
+    protected void loadFromWebApi(PluginTask task, Schema schema, SchemaWriter schemaWriter, int taskCount, PageBuilder to)
     {
         throw new UnsupportedOperationException("should implement");
     }

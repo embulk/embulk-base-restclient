@@ -1,6 +1,7 @@
 package org.embulk.input.web_api.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.embulk.config.ConfigSource;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.json.JsonParser;
@@ -10,9 +11,9 @@ public class JsonColumnWriter
 {
     private final JsonParser jsonParser;
 
-    public JsonColumnWriter(Column column, JsonParser jsonParser)
+    public JsonColumnWriter(Column column, ConfigSource config, JsonParser jsonParser)
     {
-        super(column);
+        super(column, config);
         this.jsonParser = jsonParser;
     }
 

@@ -68,6 +68,9 @@ subprojects {
     dependencies {
         compile     'org.embulk:embulk-core:0.8.12'
         provided    'org.embulk:embulk-core:0.8.12'
+        compile     'org.jboss.resteasy:resteasy-client:3.0.19.Final'
+        compile     'org.glassfish.jersey.core:jersey-client:2.23.2'
+
         testCompile 'junit:junit:4.+'
         testCompile 'org.embulk:embulk-standards:0.8.12'
     }

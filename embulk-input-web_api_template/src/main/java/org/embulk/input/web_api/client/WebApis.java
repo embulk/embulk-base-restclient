@@ -8,17 +8,19 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.util.Locale;
 
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
+import static java.util.Locale.ENGLISH;
 import static org.embulk.spi.util.RetryExecutor.retryExecutor;
 
-public abstract class WebApiClient<PluginTask extends WebApiPluginTask>
+public class WebApis
 {
-    private final Logger log = Exec.getLogger(WebApiClient.class);
+    private static final Logger log = Exec.getLogger(WebApis.class);
 
-    public <Response> Response fetchWithRetry(final PluginTask task)
+    public static <Response, PluginTask extends WebApiPluginTask> Response fetchWithRetry(
+            final PluginTask task,
+            final RetryableWebApiCall<PluginTask, Response> call)
             throws IOException
     {
         try {
@@ -32,18 +34,18 @@ public abstract class WebApiClient<PluginTask extends WebApiPluginTask>
                         public Response call()
                                 throws Exception
                         {
-                            return fetch(task);
+                            return call.execute(task);
                         }
 
                         @Override
-                        public boolean isRetryableException(Exception exception)
+                        public boolean isRetryableException(Exception e)
                         {
-                            if (isNotRetryableNonWebApiClientException(exception)) {
+                            if (call.isNotRetryableException(e)) {
                                 return false;
                             }
 
-                            if (exception instanceof WebApiClientException &&
-                                    isNotRetryableWebApiCode(((WebApiClientException)exception).getCode())) {
+                            if (e instanceof WebApiClientException &&
+                                    call.isNotRetryableResponse(e)) {
                                 return false;
                             }
 
@@ -51,13 +53,13 @@ public abstract class WebApiClient<PluginTask extends WebApiPluginTask>
                         }
 
                         @Override
-                        public void onRetry(Exception exception, int retryCount, int retryLimit, int retryWait)
+                        public void onRetry(Exception e, int retryCount, int retryLimit, int retryWait)
                                 throws RetryGiveupException
                         {
-                            String message = String.format(Locale.ENGLISH, "Retrying %d/%d after %d seconds. Message: %s",
-                                    retryCount, retryLimit, retryWait / 1000, exception.getMessage());
+                            String message = String.format(ENGLISH, "Retrying %d/%d after %d seconds. Message: %s",
+                                    retryCount, retryLimit, retryWait / 1000, e.getMessage());
                             if (retryCount % 3 == 0) {
-                                log.warn(message, exception);
+                                log.warn(message, e);
                             }
                             else {
                                 log.warn(message);
@@ -65,7 +67,7 @@ public abstract class WebApiClient<PluginTask extends WebApiPluginTask>
                         }
 
                         @Override
-                        public void onGiveup(Exception e, Exception e1)
+                        public void onGiveup(Exception first, Exception last)
                                 throws RetryGiveupException
                         {
                         }
@@ -80,9 +82,5 @@ public abstract class WebApiClient<PluginTask extends WebApiPluginTask>
         }
     }
 
-    protected abstract <Response> Response fetch(PluginTask task);
 
-    protected abstract boolean isNotRetryableNonWebApiClientException(Exception execption);
-
-    protected abstract boolean isNotRetryableWebApiCode(int code);
 }

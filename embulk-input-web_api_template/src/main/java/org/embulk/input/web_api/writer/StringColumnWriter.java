@@ -1,6 +1,7 @@
 package org.embulk.input.web_api.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.embulk.config.ConfigSource;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
@@ -10,9 +11,9 @@ import org.embulk.spi.PageBuilder;
 public class StringColumnWriter
         extends AbstractColumnWriter
 {
-    public StringColumnWriter(Column column)
+    public StringColumnWriter(Column column, ConfigSource config)
     {
-        super(column);
+        super(column, config);
     }
 
     @Override

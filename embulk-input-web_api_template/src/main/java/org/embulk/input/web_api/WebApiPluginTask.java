@@ -3,10 +3,9 @@ package org.embulk.input.web_api;
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
 import org.embulk.config.Task;
-import org.embulk.spi.time.TimestampParser;
 
 public interface WebApiPluginTask
-    extends Task, TimestampParser.Task, TimestampParser.TimestampColumnOption
+    extends Task
 {
     @Config("retry_limit")
     @ConfigDefault("7")
@@ -27,4 +26,11 @@ public interface WebApiPluginTask
     @Config("incremental")
     @ConfigDefault("true")
     public boolean getIncremental();
+
+    @Config("from_date")
+    public String getFromDate();
+
+    @Config("fetch_days")
+    @ConfigDefault("1")
+    public int getFetchDays();
 }

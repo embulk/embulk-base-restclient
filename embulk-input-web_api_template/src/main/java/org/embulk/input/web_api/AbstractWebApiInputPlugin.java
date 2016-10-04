@@ -2,11 +2,12 @@ package org.embulk.input.web_api;
 
 import java.util.List;
 
-import com.google.common.base.Throwables;
 import org.embulk.config.TaskReport;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskSource;
+import org.embulk.input.web_api.client.WebApis;
+import org.embulk.input.web_api.schema.SchemaWrapper;
 import org.embulk.input.web_api.writer.SchemaWriter;
 import org.embulk.spi.Exec;
 import org.embulk.spi.InputPlugin;
@@ -32,13 +33,13 @@ public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginT
     @Override
     public ConfigDiff transaction(ConfigSource config, InputPlugin.Control control)
     {
-        PluginTask task = validateInputTask(config.loadConfig(getInputTaskClass()));
-        Schema schema = buildInputSchema(task);
+        PluginTask task = validatePluginTask(config.loadConfig(getInputTaskClass()));
+        Schema schema = buildSchemaWrapper(task).newSchema();
         int taskCount = buildInputTaskCount(task); // number of run() method calls
         return resume(task.dump(), schema, taskCount, control);
     }
 
-    protected abstract PluginTask validateInputTask(PluginTask task);
+    protected abstract PluginTask validatePluginTask(PluginTask task);
 
     protected abstract Class<PluginTask> getInputTaskClass();
 
@@ -46,22 +47,7 @@ public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginT
         return 1;
     }
 
-    protected abstract Schema buildInputSchema(PluginTask task);
-
-    protected <SchemaWrite extends SchemaWriter> Class<SchemaWrite> getSchemaWriterClass()
-    {
-        return (Class<SchemaWrite>) SchemaWriter.class;
-    }
-
-    protected SchemaWriter buildSchemaWriter(PluginTask task, Schema schema)
-    {
-        try {
-            return getSchemaWriterClass().newInstance().buildColumnWriters(task, schema);
-        }
-        catch (InstantiationException | IllegalAccessException e) {
-            throw Throwables.propagate(e);
-        }
-    }
+    protected abstract SchemaWrapper buildSchemaWrapper(PluginTask task);
 
     @Override
     public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
@@ -109,12 +95,13 @@ public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginT
 
     protected void load(PluginTask task, int taskCount, PageBuilder to)
     {
-        Schema schema = buildInputSchema(task);
-        SchemaWriter schemaWriter = buildSchemaWriter(task, schema);
-        fetch(task, schema, schemaWriter, taskCount, to);
+        SchemaWrapper schemaWrapper = buildSchemaWrapper(task);
+        Schema schema = schemaWrapper.newSchema();
+        SchemaWriter schemaWriter = schemaWrapper.newSchemaWriter();
+        loadFromWebApi(task, schema, schemaWriter, taskCount, to);
     }
 
-    protected abstract void fetch(PluginTask task, Schema schema, SchemaWriter schemaWriter, int taskCount, PageBuilder to);
+    protected abstract void loadFromWebApi(PluginTask task, Schema schema, SchemaWriter writer, int taskCount, PageBuilder to);
 
     protected PageBuilder buildPageBuilder(Schema schema, PageOutput output)
     {
