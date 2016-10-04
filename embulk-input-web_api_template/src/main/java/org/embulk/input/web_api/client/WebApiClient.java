@@ -5,6 +5,7 @@ import org.embulk.spi.util.RetryExecutor.RetryGiveupException;
 import org.embulk.spi.util.RetryExecutor.Retryable;
 import org.slf4j.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 
 import java.io.IOException;
@@ -32,9 +33,9 @@ public class WebApiClient
         return client;
     }
 
-    public <Response, PluginTask extends WebApiPluginTask> Response fetchWithRetry(
-            final PluginTask task,
-            final RetryableWebApiCall<PluginTask, Response> call)
+    public <TASK extends WebApiPluginTask, RESPONSE> RESPONSE fetchWithRetry(
+            final TASK task,
+            final RetryableWebApiCall<TASK, RESPONSE> call)
             throws IOException
     {
         try {
@@ -42,13 +43,19 @@ public class WebApiClient
                     .withRetryLimit(task.getRetryLimit())
                     .withInitialRetryWait(task.getInitialRetryWait())
                     .withMaxRetryWait(task.getMaxRetryWait())
-                    .runInterruptible(new Retryable<Response>() {
+                    .runInterruptible(new Retryable<RESPONSE>() {
 
                         @Override
-                        public Response call()
+                        public RESPONSE call()
                                 throws Exception
                         {
-                            return call.execute(task);
+                            javax.ws.rs.core.Response response = call.request(task);
+
+                            if (response.getStatus() / 100 != 2) {
+                                throw new WebApplicationException(response);
+                            }
+
+                            return call.readResponse(response);
                         }
 
                         @Override
@@ -58,8 +65,7 @@ public class WebApiClient
                                 return false;
                             }
 
-                            if (e instanceof WebApiClientException &&
-                                    call.isNotRetryableResponse(e)) {
+                            if (e instanceof WebApplicationException && call.isNotRetryableResponse(e)) {
                                 return false;
                             }
 
