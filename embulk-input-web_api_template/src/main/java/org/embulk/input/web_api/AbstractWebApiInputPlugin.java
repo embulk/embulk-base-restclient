@@ -6,15 +6,17 @@ import org.embulk.config.TaskReport;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskSource;
-import org.embulk.input.web_api.client.WebApis;
+import org.embulk.input.web_api.client.WebApiClient;
 import org.embulk.input.web_api.schema.SchemaWrapper;
-import org.embulk.input.web_api.writer.SchemaWriter;
 import org.embulk.spi.Exec;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.slf4j.Logger;
+
+import javax.ws.rs.client.Client;
 
 import static org.embulk.spi.Exec.getBufferAllocator;
 import static org.embulk.spi.Exec.newConfigDiff;
@@ -78,8 +80,8 @@ public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginT
     {
         PluginTask task = taskSource.loadTask(getInputTaskClass());
         try (PageBuilder pageBuilder = buildPageBuilder(schema, output)) {
-            try {
-                load(task, taskIndex, pageBuilder);
+            try (WebApiClient client = buildWebApiClient(task)) {
+                load(task, client, buildSchemaWrapper(task), taskIndex, pageBuilder);
             }
             finally {
                 pageBuilder.finish();
@@ -88,24 +90,22 @@ public abstract class AbstractWebApiInputPlugin<PluginTask extends WebApiPluginT
         return buildTaskReport(task);
     }
 
-    protected TaskReport buildTaskReport(PluginTask task)
-    {
-        return newTaskReport();
-    }
+    protected abstract void load(PluginTask task, WebApiClient client, SchemaWrapper schemaWrapper, int taskCount, PageBuilder to);
 
-    protected void load(PluginTask task, int taskCount, PageBuilder to)
+    protected WebApiClient buildWebApiClient(PluginTask task)
     {
-        SchemaWrapper schemaWrapper = buildSchemaWrapper(task);
-        Schema schema = schemaWrapper.newSchema();
-        SchemaWriter schemaWriter = schemaWrapper.newSchemaWriter();
-        loadFromWebApi(task, schema, schemaWriter, taskCount, to);
+        Client client = ResteasyClientBuilder.newBuilder().build();
+        return new WebApiClient.Builder().client(client).build();
     }
-
-    protected abstract void loadFromWebApi(PluginTask task, Schema schema, SchemaWriter writer, int taskCount, PageBuilder to);
 
     protected PageBuilder buildPageBuilder(Schema schema, PageOutput output)
     {
         return new PageBuilder(getBufferAllocator(), schema, output);
+    }
+
+    protected TaskReport buildTaskReport(PluginTask task)
+    {
+        return newTaskReport();
     }
 
     @Override

@@ -1,10 +1,11 @@
 package org.embulk.input.web_api.client;
 
 import org.embulk.input.web_api.WebApiPluginTask;
-import org.embulk.spi.Exec;
 import org.embulk.spi.util.RetryExecutor.RetryGiveupException;
 import org.embulk.spi.util.RetryExecutor.Retryable;
 import org.slf4j.Logger;
+
+import javax.ws.rs.client.Client;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -12,13 +13,26 @@ import java.io.InterruptedIOException;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
 import static java.util.Locale.ENGLISH;
+import static org.embulk.spi.Exec.getLogger;
 import static org.embulk.spi.util.RetryExecutor.retryExecutor;
 
-public class WebApis
+public class WebApiClient
+        implements AutoCloseable
 {
-    private static final Logger log = Exec.getLogger(WebApis.class);
+    private static final Logger log = getLogger(WebApiClient.class);
+    protected final Client client;
 
-    public static <Response, PluginTask extends WebApiPluginTask> Response fetchWithRetry(
+    private WebApiClient(Client client)
+    {
+        this.client = client;
+    }
+
+    public Client getClient()
+    {
+        return client;
+    }
+
+    public <Response, PluginTask extends WebApiPluginTask> Response fetchWithRetry(
             final PluginTask task,
             final RetryableWebApiCall<PluginTask, Response> call)
             throws IOException
@@ -82,5 +96,36 @@ public class WebApis
         }
     }
 
+    @Override
+    public void close()
+    {
+        if (client != null) {
+            client.close();
+        }
+    }
 
+    public static class Builder
+    {
+        private Client client;
+
+        public Builder()
+        {
+        }
+
+        public WebApiClient.Builder client(Client client)
+        {
+            this.client = client;
+            return self();
+        }
+
+        private WebApiClient.Builder self()
+        {
+            return this;
+        }
+
+        public WebApiClient build()
+        {
+            return new WebApiClient(client);
+        }
+    }
 }

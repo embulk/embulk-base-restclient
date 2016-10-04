@@ -1,10 +1,9 @@
 package org.embulk.input.web_api;
 
 import org.embulk.config.ConfigDiff;
+import org.embulk.input.web_api.client.WebApiClient;
 import org.embulk.input.web_api.schema.SchemaWrapper;
-import org.embulk.input.web_api.writer.SchemaWriter;
 import org.embulk.spi.PageBuilder;
-import org.embulk.spi.Schema;
 
 import static org.embulk.spi.Exec.newConfigDiff;
 
@@ -43,8 +42,8 @@ public class WebApiInputPlugin
     }
 
     @Override
-    protected void loadFromWebApi(PluginTask task, Schema schema, SchemaWriter schemaWriter, int taskCount, PageBuilder to)
+    protected void load(PluginTask task, WebApiClient client, SchemaWrapper schemaWrapper, int taskCount, PageBuilder to)
     {
-        throw new UnsupportedOperationException("should implement");
+
     }
 }
