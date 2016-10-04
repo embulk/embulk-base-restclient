@@ -65,7 +65,8 @@ public class WebApiClient
                                 return false;
                             }
 
-                            if (e instanceof WebApplicationException && call.isNotRetryableResponse(e)) {
+                            if (e instanceof WebApplicationException
+                                    && call.isNotRetryableResponse((WebApplicationException)e)) {
                                 return false;
                             }
 

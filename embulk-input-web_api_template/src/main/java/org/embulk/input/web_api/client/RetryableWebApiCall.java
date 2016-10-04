@@ -1,5 +1,6 @@
 package org.embulk.input.web_api.client;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 public interface RetryableWebApiCall<TASK, RESPONSE>
@@ -8,5 +9,5 @@ public interface RetryableWebApiCall<TASK, RESPONSE>
     RESPONSE readResponse(Response response);
 
     boolean isNotRetryableException(Exception e);
-    boolean isNotRetryableResponse(Exception e);
+    boolean isNotRetryableResponse(WebApplicationException e);
 }

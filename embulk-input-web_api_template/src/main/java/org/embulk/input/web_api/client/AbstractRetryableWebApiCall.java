@@ -1,5 +1,6 @@
 package org.embulk.input.web_api.client;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 public abstract class AbstractRetryableWebApiCall<TASK, RESPONSE>
@@ -18,8 +19,8 @@ public abstract class AbstractRetryableWebApiCall<TASK, RESPONSE>
     }
 
     @Override
-    public boolean isNotRetryableResponse(Exception e)
+    public boolean isNotRetryableResponse(WebApplicationException e)
     {
-        return false;
+        return (e.getResponse().getStatus() / 100) == 4;
     }
 }
