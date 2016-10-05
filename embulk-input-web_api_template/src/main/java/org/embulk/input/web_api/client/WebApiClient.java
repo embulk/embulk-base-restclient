@@ -61,16 +61,7 @@ public class WebApiClient
                         @Override
                         public boolean isRetryableException(Exception e)
                         {
-                            if (call.isNotRetryableException(e)) {
-                                return false;
-                            }
-
-                            if (e instanceof WebApplicationException
-                                    && call.isNotRetryableResponse((WebApplicationException)e)) {
-                                return false;
-                            }
-
-                            return true;
+                            return !call.isNotRetryable(e);
                         }
 
                         @Override

@@ -13,14 +13,13 @@ public abstract class AbstractRetryableWebApiCall<TASK, RESPONSE>
     public abstract RESPONSE readResponse(Response response);
 
     @Override
-    public boolean isNotRetryableException(Exception e)
+    public boolean isNotRetryable(Exception e)
     {
-        return false;
-    }
-
-    @Override
-    public boolean isNotRetryableResponse(WebApplicationException e)
-    {
-        return (e.getResponse().getStatus() / 100) == 4;
+        if (e instanceof WebApplicationException) {
+            return ((WebApplicationException)e).getResponse().getStatus() / 100 == 4;
+        }
+        else {
+            return false;
+        }
     }
 }
