@@ -7,25 +7,35 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.IOException;
 
-public class Jsons
+public class JsonParser
 {
-    public static JsonNode parseJsonObject(String jsonText)
+    public JsonNode parseJsonObject(String jsonText)
             throws IOException
     {
         return newObjectMapper().readTree(jsonText);
     }
 
-    public static ArrayNode parseJsonArray(String jsonText)
+    public ArrayNode parseJsonArray(String jsonText)
             throws IOException
     {
         return (ArrayNode) parseJsonObject(jsonText);
     }
 
-    public static ObjectMapper newObjectMapper()
+    private ObjectMapper newObjectMapper()
     {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, false);
         return mapper;
+    }
+
+    public static boolean isNotJsonArray(JsonNode j)
+    {
+        return j == null || j.isArray();
+    }
+
+    public static boolean isNotJsonObject(JsonNode j)
+    {
+        return j == null || !j.isObject();
     }
 }
