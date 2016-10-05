@@ -7,7 +7,7 @@ plugins {
 import com.github.jrubygradle.JRubyExec
 
 def bintrayReleaseProjects = [
-    project(":embulk-input-web_api_template"),
+    project(":embulk-util-web_api"),
     project(":embulk-input-web_api"),
 ]
 
