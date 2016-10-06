@@ -8,7 +8,6 @@ import com.github.jrubygradle.JRubyExec
 
 def bintrayReleaseProjects = [
     project(":embulk-util-web_api"),
-    project(":embulk-input-web_api"),
 ]
 
 allprojects {
