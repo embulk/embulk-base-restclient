@@ -1,6 +1,8 @@
-package org.embulk.util.web_api;
+package org.embulk.input.web_api;
 
 import org.embulk.config.ConfigDiff;
+import org.embulk.util.web_api.AbstractWebApiInputPlugin;
+import org.embulk.util.web_api.WebApiPluginTask;
 import org.embulk.util.web_api.client.WebApiClient;
 import org.embulk.util.web_api.schema.SchemaWrapper;
 import org.embulk.spi.PageBuilder;
