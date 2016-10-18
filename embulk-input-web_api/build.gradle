@@ -1,4 +1,0 @@
-dependencies {
-  compile project(':embulk-util-web_api')
-  testCompile project(':embulk-util-web_api').sourceSets.test.output
-}
