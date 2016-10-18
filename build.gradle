@@ -30,7 +30,7 @@ dependencies {
     compile     'org.glassfish.jersey.core:jersey-client:2.23.2'
 
     testCompile 'junit:junit:4.+'
-    testCompile 'org.embulk:embulk-standards:0.8.12'
+    testCompile 'org.embulk:embulk-core:0.8.12:tests'
 }
 
 tasks.withType(JavaCompile) {
