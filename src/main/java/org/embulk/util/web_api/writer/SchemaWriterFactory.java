@@ -1,15 +1,7 @@
-package org.embulk.util.web_api.schema;
+package org.embulk.util.web_api.writer;
 
 import com.google.common.collect.ImmutableList;
 import org.embulk.config.ConfigSource;
-import org.embulk.util.web_api.writer.BooleanColumnWriter;
-import org.embulk.util.web_api.writer.ColumnWriter;
-import org.embulk.util.web_api.writer.DoubleColumnWriter;
-import org.embulk.util.web_api.writer.JsonColumnWriter;
-import org.embulk.util.web_api.writer.LongColumnWriter;
-import org.embulk.util.web_api.writer.SchemaWriter;
-import org.embulk.util.web_api.writer.StringColumnWriter;
-import org.embulk.util.web_api.writer.TimestampColumnWriter;
 import org.embulk.spi.Column;
 import org.embulk.spi.Schema;
 import org.embulk.spi.json.JsonParser;
@@ -23,12 +15,12 @@ import java.util.List;
 
 import static org.embulk.spi.Exec.newConfigSource;
 
-public class SchemaWrapper
+public class SchemaWriterFactory
 {
     private final List<Column> columns;
     private final List<ColumnWriter> writers;
 
-    public SchemaWrapper(List<Column> columns, List<ColumnWriter> writers)
+    public SchemaWriterFactory(List<Column> columns, List<ColumnWriter> writers)
     {
         this.columns = columns;
         this.writers = writers;
@@ -44,6 +36,11 @@ public class SchemaWrapper
         return new SchemaWriter(writers);
     }
 
+    public static SchemaWriterFactory.Builder builder()
+    {
+        return new Builder();
+    }
+
     public static class Builder
     {
         private final ImmutableList.Builder<Column> columns = ImmutableList.builder();
@@ -51,16 +48,12 @@ public class SchemaWrapper
 
         private int index = 0;
 
-        public Builder()
-        {
-        }
-
-        public SchemaWrapper.Builder add(String name, Type type)
+        public SchemaWriterFactory.Builder add(String name, Type type)
         {
             return add(name, type, newConfigSource());
         }
 
-        public synchronized SchemaWrapper.Builder add(String name, Type type, @NotNull ConfigSource config)
+        public synchronized SchemaWriterFactory.Builder add(String name, Type type, @NotNull ConfigSource config)
         {
             Column column = new Column(index++, name, type);
             columns.add(column);
@@ -99,14 +92,14 @@ public class SchemaWrapper
             }
         }
 
-        private SchemaWrapper.Builder self()
+        private SchemaWriterFactory.Builder self()
         {
             return this;
         }
 
-        public SchemaWrapper build()
+        public SchemaWriterFactory build()
         {
-            return new SchemaWrapper(columns.build(), writers.build());
+            return new SchemaWriterFactory(columns.build(), writers.build());
         }
 
         interface Task

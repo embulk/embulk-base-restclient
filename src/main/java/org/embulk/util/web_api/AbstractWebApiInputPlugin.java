@@ -7,7 +7,7 @@ import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskSource;
 import org.embulk.util.web_api.client.WebApiClient;
-import org.embulk.util.web_api.schema.SchemaWrapper;
+import org.embulk.util.web_api.writer.SchemaWriterFactory;
 import org.embulk.spi.Exec;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
@@ -36,7 +36,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
     public ConfigDiff transaction(ConfigSource config, InputPlugin.Control control)
     {
         TASK task = validatePluginTask(config.loadConfig(getInputTaskClass()));
-        Schema schema = buildSchemaWrapper(task).newSchema();
+        Schema schema = buildSchemaWriterFactory(task).newSchema();
         int taskCount = buildInputTaskCount(task); // number of run() method calls
         return resume(task.dump(), schema, taskCount, control);
     }
@@ -49,7 +49,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
         return 1;
     }
 
-    protected abstract SchemaWrapper buildSchemaWrapper(TASK task);
+    protected abstract SchemaWriterFactory buildSchemaWriterFactory(TASK task);
 
     @Override
     public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
@@ -67,7 +67,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
 
     protected ConfigDiff buildConfigDiff(TASK task)
     {
-        return newConfigDiff();
+        return newConfigDiff(); // for incremental data loading
     }
 
     @Override
@@ -81,7 +81,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
         TASK task = taskSource.loadTask(getInputTaskClass());
         try (PageBuilder pageBuilder = buildPageBuilder(schema, output)) {
             try (WebApiClient client = buildWebApiClient(task)) {
-                load(task, client, buildSchemaWrapper(task), taskIndex, pageBuilder);
+                load(task, client, buildSchemaWriterFactory(task), taskIndex, pageBuilder);
             }
             finally {
                 pageBuilder.finish();
@@ -90,7 +90,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
         return buildTaskReport(task);
     }
 
-    protected abstract void load(TASK task, WebApiClient client, SchemaWrapper schemaWrapper, int taskCount, PageBuilder to);
+    protected abstract void load(TASK task, WebApiClient client, SchemaWriterFactory schemaWriterFactory, int taskCount, PageBuilder to);
 
     protected WebApiClient buildWebApiClient(TASK task)
     {
