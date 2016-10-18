@@ -16,11 +16,12 @@ public class SchemaWriter<PluginTask extends WebApiPluginTask>
         this.writers = writers;
     }
 
-    public void write(ObjectNode record, PageBuilder to)
+    public void addRecordTo(ObjectNode record, PageBuilder to)
     {
         for (ColumnWriter w : writers) {
             Column column = w.getColumn();
             w.write(record.get(column.getName()), to);
         }
+        to.addRecord();
     }
 }
