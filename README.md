@@ -1,3 +1,3 @@
-# embulk-input-web_api
+# embulk-util-web_api
 
-Embulk input plugin abstraction for loading records from Web API
+Common Libraries for Web API based Embulk plugins.  Please see sample code: https://github.com/muga/embulk-util-web_api/blob/master/src/test/java/org/embulk/input/shopify/ShopifyInputPlugin.java
