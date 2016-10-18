@@ -3,14 +3,11 @@ package org.embulk.util.web_api.client;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-public abstract class AbstractRetryableWebApiCall<TASK, RESPONSE>
-        implements RetryableWebApiCall<TASK, RESPONSE>
+public abstract class AbstractRetryableWebApiCall
+        implements RetryableWebApiCall
 {
     @Override
-    public abstract Response request(TASK task);
-
-    @Override
-    public abstract RESPONSE readResponse(Response response);
+    public abstract Response request();
 
     @Override
     public boolean isNotRetryable(Exception e)

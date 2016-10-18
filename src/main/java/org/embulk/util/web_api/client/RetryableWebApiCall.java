@@ -2,9 +2,8 @@ package org.embulk.util.web_api.client;
 
 import javax.ws.rs.core.Response;
 
-public interface RetryableWebApiCall<TASK, RESPONSE>
+public interface RetryableWebApiCall
 {
-    Response request(TASK task);
-    RESPONSE readResponse(Response response);
+    Response request();
     boolean isNotRetryable(Exception e);
 }

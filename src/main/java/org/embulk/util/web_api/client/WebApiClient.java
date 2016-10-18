@@ -8,23 +8,21 @@ import org.slf4j.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
-
 import static com.google.common.base.Throwables.propagate;
-import static com.google.common.base.Throwables.propagateIfInstanceOf;
 import static java.util.Locale.ENGLISH;
 import static org.embulk.spi.Exec.getLogger;
 import static org.embulk.spi.util.RetryExecutor.retryExecutor;
 
-public class WebApiClient
+public class WebApiClient<TASK extends WebApiPluginTask>
         implements AutoCloseable
 {
-    private static final Logger log = getLogger(WebApiClient.class);
+    private final Logger log = getLogger(WebApiClient.class);
     protected final Client client;
+    protected final TASK task;
 
-    private WebApiClient(Client client)
+    private WebApiClient(TASK task, Client client)
     {
+        this.task = task;
         this.client = client;
     }
 
@@ -33,29 +31,26 @@ public class WebApiClient
         return client;
     }
 
-    public <TASK extends WebApiPluginTask, RESPONSE> RESPONSE fetchWithRetry(
-            final TASK task,
-            final RetryableWebApiCall<TASK, RESPONSE> call)
-            throws IOException
+    public String fetchWithRetry(final RetryableWebApiCall call)
     {
         try {
             return retryExecutor()
                     .withRetryLimit(task.getRetryLimit())
                     .withInitialRetryWait(task.getInitialRetryWait())
                     .withMaxRetryWait(task.getMaxRetryWait())
-                    .runInterruptible(new Retryable<RESPONSE>() {
-
+                    .runInterruptible(new Retryable<String>() {
                         @Override
-                        public RESPONSE call()
+                        public String call()
                                 throws Exception
                         {
-                            javax.ws.rs.core.Response response = call.request(task);
+                            javax.ws.rs.core.Response response = call.request();
 
                             if (response.getStatus() / 100 != 2) {
                                 throw new WebApplicationException(response);
                             }
 
-                            return call.readResponse(response);
+                            // TODO read timeout
+                            return response.readEntity(String.class);
                         }
 
                         @Override
@@ -86,10 +81,10 @@ public class WebApiClient
                     });
         }
         catch (InterruptedException e) {
-            throw new InterruptedIOException();
+            Thread.currentThread().interrupt();
+            throw propagate(e);
         }
         catch (RetryGiveupException e) {
-            propagateIfInstanceOf(e.getCause(), IOException.class);
             throw propagate(e.getCause());
         }
     }
@@ -102,11 +97,16 @@ public class WebApiClient
         }
     }
 
+    public static WebApiClient.Builder builder()
+    {
+        return new Builder();
+    }
+
     public static class Builder
     {
         private Client client;
 
-        public Builder()
+        private Builder()
         {
         }
 
@@ -121,9 +121,9 @@ public class WebApiClient
             return this;
         }
 
-        public WebApiClient build()
+        public <TASK extends WebApiPluginTask> WebApiClient build(TASK task)
         {
-            return new WebApiClient(client);
+            return new WebApiClient(task, client);
         }
     }
 }

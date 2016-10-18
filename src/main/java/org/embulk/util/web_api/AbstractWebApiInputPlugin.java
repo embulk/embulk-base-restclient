@@ -95,7 +95,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
     protected WebApiClient buildWebApiClient(TASK task)
     {
         Client client = ResteasyClientBuilder.newBuilder().build();
-        return new WebApiClient.Builder().client(client).build();
+        return WebApiClient.builder().client(client).build(task);
     }
 
     protected PageBuilder buildPageBuilder(Schema schema, PageOutput output)
