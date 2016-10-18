@@ -2,185 +2,94 @@ plugins {
     id "com.jfrog.bintray" version "1.6"
     id "com.github.jruby-gradle.base" version "0.2.1"
     id "java"
+    id "maven" // install jar files to the local repo: $ gradle install
     id "checkstyle"
+    id "findbugs"
+    //id "jacoco"
 }
 import com.github.jrubygradle.JRubyExec
 
-def bintrayReleaseProjects = [
-    project(":embulk-util-web_api"),
-]
+version = '0.1.0'
 
-allprojects {
-    group = 'org.embulk.input.web_api'
-    version = '0.0.0.1'
+repositories {
+    mavenCentral()
+    jcenter()
+}
 
-    apply plugin: 'com.jfrog.bintray'
-    apply plugin: 'maven-publish'
+configurations {
+    provided
+}
 
-    bintray {
-        user = project.hasProperty('bintray_user') ? bintray_user : ''
-        key = project.hasProperty('bintray_api_key') ? bintray_api_key : ''
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
-        publications = ['bintrayMavenRelease']
+dependencies {
+    compile     'org.embulk:embulk-core:0.8.12'
+    provided    'org.embulk:embulk-core:0.8.12'
+    compile     'org.jboss.resteasy:resteasy-client:3.0.19.Final'
+    compile     'org.glassfish.jersey.core:jersey-client:2.23.2'
 
-        dryRun = !bintrayReleaseProjects.contains(project)
-        publish = true
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.embulk:embulk-standards:0.8.12'
+}
 
-        pkg {
-            userOrg = 'embulk-input-web_api'
-            repo = 'maven'
-            name = project.name
-            desc = 'Generic Web API input plugin for Embulk'
-            websiteUrl = 'https://github.com/muga/embulk-input-web_api'
-            issueTrackerUrl = 'https://github.com/muga/embulk-input-web_api/issues'
-            vcsUrl = 'https://github.com/muga/embulk-input-web_api.git'
-            licenses = ['Apache-2.0']
-            labels = ['embulk', 'java']
-            publicDownloadNumbers = true
-
-            version {
-                name = project.version
-            }
-        }
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:unchecked" //<< "-Xlint:deprecation"
+}
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
     }
 }
 
-subprojects {
-    apply plugin: 'maven'  // install jar files to the local repo: $ gradle install
-    apply plugin: 'java'
-    apply plugin: 'findbugs'
-    //apply plugin: 'jacoco'
-    apply plugin: 'com.github.jruby-gradle.base'
-
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-
-    configurations {
-        provided
-    }
-
-    sourceCompatibility = 1.7
-    targetCompatibility = 1.7
-
-    dependencies {
-        compile     'org.embulk:embulk-core:0.8.12'
-        provided    'org.embulk:embulk-core:0.8.12'
-        compile     'org.jboss.resteasy:resteasy-client:3.0.19.Final'
-        compile     'org.glassfish.jersey.core:jersey-client:2.23.2'
-
-        testCompile 'junit:junit:4.+'
-        testCompile 'org.embulk:embulk-standards:0.8.12'
-    }
-
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:unchecked" //<< "-Xlint:deprecation"
-    }
-    tasks.withType(FindBugs) {
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
-
-    findbugs {
-        ignoreFailures = true
-    }
-
-    javadoc {
-        options {
-            locale = 'en_US'
-            encoding = 'UTF-8'
-        }
-    }
-
-    task classpath(type: Copy, dependsOn: ["jar"]) {
-        doFirst { file('classpath').deleteDir() }
-        from (configurations.runtime - configurations.provided + files(jar.archivePath))
-        into 'classpath'
-    }
-    clean { delete 'classpath' }
-
-    checkstyle {
-        configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
-        toolVersion = '6.14.1'
-    }
-    checkstyleMain {
-        configFile = file("${project.rootDir}/config/checkstyle/default.xml")
-        ignoreFailures = true
-    }
-    checkstyleTest {
-        configFile = file("${project.rootDir}/config/checkstyle/default.xml")
-        ignoreFailures = true
-    }
-    task checkstyle(type: Checkstyle) {
-        classpath = sourceSets.main.output + sourceSets.test.output
-        source = sourceSets.main.allJava + sourceSets.test.allJava
-    }
-
-    task gem(type: JRubyExec, dependsOn: ['build', 'gemspec', 'classpath']) {
-        jrubyArgs '-rrubygems/gem_runner', "-eGem::GemRunner.new.run(ARGV)", 'build'
-        scriptArgs "${project.projectDir.absolutePath}/build/gemspec"
-        doLast { ant.move(file: "${project.name}-${project.version}.gem", todir: "${parent.projectDir}/pkg") }
-    }
-
-    javadoc {
-        options {
-            locale = 'en_US'
-            encoding = 'UTF-8'
-        }
-    }
-
-    // add tests/javadoc/source jar tasks as artifacts to be released
-    task testsJar(type: Jar, dependsOn: classes) {
-        classifier = 'tests'
-        from sourceSets.test.output
-    }
-    task sourcesJar(type: Jar, dependsOn: classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-    artifacts {
-        archives testsJar, sourcesJar, javadocJar
-    }
-
-    publishing {
-        publications {
-            bintrayMavenRelease(MavenPublication) {
-                from components.java
-                artifact testsJar
-                artifact sourcesJar
-                artifact javadocJar
-            }
-        }
-    }
-
-    task gemspec << {
-        file('build').mkdirs();
-        file('build/gemspec').write($/
-Gem::Specification.new do |spec|
-  spec.name          = "${project.name}"
-  spec.version       = "${project.version}"
-  spec.authors       = ["Muga Nishizawa"]
-  spec.summary       = %[Generic Web API input plugin for Embulk]
-  spec.description   = %[Loads records from Web API.]
-  spec.email         = ["muga.nishizawa@gmail.com"]
-  spec.licenses      = ["Apache 2.0"]
-  spec.homepage      = "https://github.com/muga/embulk-input-web_api"
-
-  spec.files         = `git ls-files`.split("\n") + Dir["classpath/*.jar"]
-  spec.test_files    = spec.files.grep(%r"^(test|spec)/")
-  spec.require_paths = ["lib"]
-end
-/$)
+javadoc {
+    options {
+        locale = 'en_US'
+        encoding = 'UTF-8'
     }
 }
 
-task gemPush << {
-    "gem push pkg/embulk-input-web_api-${project.version}.gem".execute().waitFor()
+task classpath(type: Copy, dependsOn: ["jar"]) {
+    doFirst { file('classpath').deleteDir() }
+    from (configurations.runtime - configurations.provided + files(jar.archivePath))
+    into 'classpath'
+}
+clean { delete 'classpath' }
+
+// checkstyle
+checkstyle {
+    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    toolVersion = '6.14.1'
+}
+checkstyleMain {
+    configFile = file("${project.rootDir}/config/checkstyle/default.xml")
+    ignoreFailures = true
+}
+checkstyleTest {
+    configFile = file("${project.rootDir}/config/checkstyle/default.xml")
+    ignoreFailures = true
+}
+task checkstyle(type: Checkstyle) {
+    classpath = sourceSets.main.output + sourceSets.test.output
+    source = sourceSets.main.allJava + sourceSets.test.allJava
+}
+
+// findbugs
+findbugs {
+    ignoreFailures = true
+}
+
+// add tests/javadoc/source jar tasks as artifacts to be released
+task testsJar(type: Jar, dependsOn: classes) {
+    classifier = 'tests'
+    from sourceSets.test.output
+}
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
