@@ -1,6 +1,6 @@
 package org.embulk.util.web_api.writer;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.embulk.util.web_api.WebApiPluginTask;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
@@ -16,7 +16,7 @@ public class SchemaWriter<PluginTask extends WebApiPluginTask>
         this.writers = writers;
     }
 
-    public void write(JsonNode record, PageBuilder to)
+    public void write(ObjectNode record, PageBuilder to)
     {
         for (ColumnWriter w : writers) {
             Column column = w.getColumn();
