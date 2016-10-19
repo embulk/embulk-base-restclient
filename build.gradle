@@ -1,8 +1,9 @@
 plugins {
-    id "com.jfrog.bintray" version "1.6"
+    id "com.jfrog.bintray" version "1.7"
     id "com.github.jruby-gradle.base" version "0.2.1"
     id "java"
     id "maven" // install jar files to the local repo: $ gradle install
+    id "maven-publish"
     id "checkstyle"
     id "findbugs"
     //id "jacoco"
@@ -47,6 +48,43 @@ javadoc {
     options {
         locale = 'en_US'
         encoding = 'UTF-8'
+    }
+}
+
+// bintray and publishing
+bintray {
+    // write at your bintray user name and api key to ~/.gradle/gradle.properties file:
+    user = project.hasProperty('bintray_user') ? bintray_user : ''
+    key = project.hasProperty('bintray_api_key') ? bintray_api_key : ''
+
+    publications = ['bintrayMavenRelease']
+    publish = true
+
+    pkg {
+        userOrg = 'embulk-util-web_api'
+        repo = 'maven'
+        name = project.name
+        desc = 'Common Libraries for Web API based Embulk plugins'
+        websiteUrl = 'https://github.com/muga/embulk-util-web_api'
+        issueTrackerUrl = 'https://github.com/muga/embulk-util-web_api/issues'
+        vcsUrl = 'https://github.com/muga/embulk-util-web_api.git'
+        licenses = ['Apache-2.0']
+        labels = ['embulk', 'java']
+        publicDownloadNumbers = true
+
+        version {
+            name = project.version
+        }
+    }
+}
+publishing {
+    publications {
+        bintrayMavenRelease(MavenPublication) {
+            from components.java
+            artifact testsJar
+            artifact sourcesJar
+            artifact javadocJar
+        }
     }
 }
 
