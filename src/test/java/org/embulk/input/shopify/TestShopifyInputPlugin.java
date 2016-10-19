@@ -20,9 +20,9 @@ import static org.junit.Assume.assumeNotNull;
 
 public class TestShopifyInputPlugin
 {
-    private static String SHOPIFY_APIKEY;
-    private static String SHOPIFY_PASSWORD;
-    private static String SHOPIFY_STORE_NAME;
+    private static String shopifyApiKey;
+    private static String shopifyPassword;
+    private static String shopifyStoreName;
 
     @Rule
     public EmbulkTestRuntime runtime = new EmbulkTestRuntime();
@@ -35,10 +35,10 @@ public class TestShopifyInputPlugin
     @BeforeClass
     public static void initializeConstant()
     {
-        SHOPIFY_APIKEY = System.getenv("SHOPIFY_APIKEY");
-        SHOPIFY_PASSWORD = System.getenv("SHOPIFY_PASSWORD");
-        SHOPIFY_STORE_NAME = System.getenv("SHOPIFY_STORE_NAME");
-        assumeNotNull(SHOPIFY_APIKEY, SHOPIFY_PASSWORD, SHOPIFY_STORE_NAME);
+        shopifyApiKey = System.getenv("SHOPIFY_APIKEY");
+        shopifyPassword = System.getenv("SHOPIFY_PASSWORD");
+        shopifyStoreName = System.getenv("SHOPIFY_STORE_NAME");
+        assumeNotNull(shopifyApiKey, shopifyPassword, shopifyStoreName);
     }
 
     @Before
@@ -77,8 +77,8 @@ public class TestShopifyInputPlugin
     private ConfigSource config()
     {
         return newConfigSource()
-                .set("apikey", SHOPIFY_APIKEY)
-                .set("password", SHOPIFY_PASSWORD)
-                .set("store_name", SHOPIFY_STORE_NAME);
+                .set("apikey", shopifyApiKey)
+                .set("password", shopifyPassword)
+                .set("store_name", shopifyStoreName);
     }
 }

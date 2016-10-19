@@ -22,7 +22,7 @@ import static org.embulk.spi.Exec.getBufferAllocator;
 import static org.embulk.spi.Exec.newConfigDiff;
 import static org.embulk.spi.Exec.newTaskReport;
 
-public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
+public abstract class AbstractWebApiInputPlugin<T extends WebApiPluginTask>
         implements InputPlugin
 {
     protected final Logger log;
@@ -35,28 +35,29 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
     @Override
     public ConfigDiff transaction(ConfigSource config, InputPlugin.Control control)
     {
-        TASK task = validatePluginTask(config.loadConfig(getInputTaskClass()));
+        T task = validatePluginTask(config.loadConfig(getInputTaskClass()));
         Schema schema = buildSchemaWriterFactory(task).newSchema();
         int taskCount = buildInputTaskCount(task); // number of run() method calls
         return resume(task.dump(), schema, taskCount, control);
     }
 
-    protected abstract TASK validatePluginTask(TASK task);
+    protected abstract T validatePluginTask(T task);
 
-    protected abstract Class<TASK> getInputTaskClass();
+    protected abstract Class<T> getInputTaskClass();
 
-    protected int buildInputTaskCount(TASK task) {
+    protected int buildInputTaskCount(T task)
+    {
         return 1;
     }
 
-    protected abstract SchemaWriterFactory buildSchemaWriterFactory(TASK task);
+    protected abstract SchemaWriterFactory buildSchemaWriterFactory(T task);
 
     @Override
     public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
     {
         control.run(taskSource, schema, taskCount);
 
-        TASK task = taskSource.loadTask(getInputTaskClass());
+        T task = taskSource.loadTask(getInputTaskClass());
         if (task.getIncremental()) {
             return buildConfigDiff(task);
         }
@@ -65,7 +66,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
         }
     }
 
-    protected ConfigDiff buildConfigDiff(TASK task)
+    protected ConfigDiff buildConfigDiff(T task)
     {
         return newConfigDiff(); // for incremental data loading
     }
@@ -78,7 +79,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
     @Override
     public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
     {
-        TASK task = taskSource.loadTask(getInputTaskClass());
+        T task = taskSource.loadTask(getInputTaskClass());
         try (PageBuilder pageBuilder = buildPageBuilder(schema, output)) {
             try (WebApiClient client = buildWebApiClient(task)) {
                 load(task, client, buildSchemaWriterFactory(task), taskIndex, pageBuilder);
@@ -90,9 +91,9 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
         return buildTaskReport(task);
     }
 
-    protected abstract void load(TASK task, WebApiClient client, SchemaWriterFactory schemaWriterFactory, int taskCount, PageBuilder to);
+    protected abstract void load(T task, WebApiClient client, SchemaWriterFactory schemaWriterFactory, int taskCount, PageBuilder to);
 
-    protected WebApiClient buildWebApiClient(TASK task)
+    protected WebApiClient buildWebApiClient(T task)
     {
         Client client = ResteasyClientBuilder.newBuilder().build();
         return WebApiClient.builder().client(client).build(task);
@@ -103,7 +104,7 @@ public abstract class AbstractWebApiInputPlugin<TASK extends WebApiPluginTask>
         return new PageBuilder(getBufferAllocator(), schema, output);
     }
 
-    protected TaskReport buildTaskReport(TASK task)
+    protected TaskReport buildTaskReport(T task)
     {
         return newTaskReport();
     }
