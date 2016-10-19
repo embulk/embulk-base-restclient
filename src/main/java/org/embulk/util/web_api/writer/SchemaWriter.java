@@ -1,13 +1,12 @@
 package org.embulk.util.web_api.writer;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.embulk.util.web_api.WebApiPluginTask;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
 import java.util.List;
 
-public class SchemaWriter<PluginTask extends WebApiPluginTask>
+public class SchemaWriter
 {
     private List<ColumnWriter> writers;
 

@@ -13,7 +13,7 @@ public abstract class AbstractRetryableWebApiCall
     public boolean isNotRetryable(Exception e)
     {
         if (e instanceof WebApplicationException) {
-            return ((WebApplicationException)e).getResponse().getStatus() / 100 == 4;
+            return ((WebApplicationException) e).getResponse().getStatus() / 100 == 4;
         }
         else {
             return false;

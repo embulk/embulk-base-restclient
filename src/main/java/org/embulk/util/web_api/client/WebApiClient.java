@@ -13,14 +13,14 @@ import static java.util.Locale.ENGLISH;
 import static org.embulk.spi.Exec.getLogger;
 import static org.embulk.spi.util.RetryExecutor.retryExecutor;
 
-public class WebApiClient<TASK extends WebApiPluginTask>
+public class WebApiClient<T extends WebApiPluginTask>
         implements AutoCloseable
 {
     private final Logger log = getLogger(WebApiClient.class);
     protected final Client client;
-    protected final TASK task;
+    protected final T task;
 
-    private WebApiClient(TASK task, Client client)
+    private WebApiClient(T task, Client client)
     {
         this.task = task;
         this.client = client;
@@ -121,9 +121,9 @@ public class WebApiClient<TASK extends WebApiPluginTask>
             return this;
         }
 
-        public <TASK extends WebApiPluginTask> WebApiClient build(TASK task)
+        public <T extends WebApiPluginTask> WebApiClient build(T task)
         {
-            return new WebApiClient(task, client);
+            return new WebApiClient<>(task, client);
         }
     }
 }

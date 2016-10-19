@@ -5,9 +5,6 @@ import org.embulk.config.ConfigSource;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
-/**
- * Created by muga on 9/16/16.
- */
 public class LongColumnWriter
         extends AbstractColumnWriter
 {
@@ -26,5 +23,4 @@ public class LongColumnWriter
             to.setLong(column, v.longValue());
         }
     }
-
 }
