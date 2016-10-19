@@ -10,6 +10,7 @@ plugins {
 }
 import com.github.jrubygradle.JRubyExec
 
+group = 'org.embulk.util.web_api'
 version = '0.1.0'
 
 repositories {
@@ -61,7 +62,7 @@ bintray {
     publish = true
 
     pkg {
-        userOrg = 'embulk-util-web_api'
+        userOrg = 'embulk-util-web-api'
         repo = 'maven'
         name = project.name
         desc = 'Common Libraries for Web API based Embulk plugins'
