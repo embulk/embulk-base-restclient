@@ -1,7 +1,6 @@
 package org.embulk.util.web_api.writer;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
 import java.util.List;
@@ -18,8 +17,7 @@ public class SchemaWriter
     public void addRecordTo(ObjectNode record, PageBuilder to)
     {
         for (ColumnWriter w : writers) {
-            Column column = w.getColumn();
-            w.write(record.get(column.getName()), to);
+            w.write(record.get(w.getAttributeName()), to);
         }
         to.addRecord();
     }
