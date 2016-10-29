@@ -1,19 +1,20 @@
 package org.embulk.util.web_api.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.embulk.config.ConfigSource;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.time.TimestampParser;
+
+import static org.embulk.util.web_api.writer.SchemaWriterFactory.WebApiColumnOption;
 
 public class TimestampColumnWriter
         extends AbstractColumnWriter
 {
     private final TimestampParser timestampParser;
 
-    public TimestampColumnWriter(Column column, ConfigSource config, TimestampParser timestampParser)
+    public TimestampColumnWriter(Column column, WebApiColumnOption option, TimestampParser timestampParser)
     {
-        super(column, config);
+        super(column, option);
         this.timestampParser = timestampParser;
     }
 

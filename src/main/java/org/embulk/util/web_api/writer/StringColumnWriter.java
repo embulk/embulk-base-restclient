@@ -1,16 +1,16 @@
 package org.embulk.util.web_api.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.embulk.config.ConfigSource;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
+import org.embulk.util.web_api.writer.SchemaWriterFactory.WebApiColumnOption;
 
 public class StringColumnWriter
         extends AbstractColumnWriter
 {
-    public StringColumnWriter(Column column, ConfigSource config)
+    public StringColumnWriter(Column column, WebApiColumnOption option)
     {
-        super(column, config);
+        super(column, option);
     }
 
     @Override
