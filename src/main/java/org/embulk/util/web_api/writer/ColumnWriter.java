@@ -8,5 +8,7 @@ public interface ColumnWriter
 {
     Column getColumn();
 
+    String getAttributeName();
+
     void write(JsonNode v, PageBuilder to);
 }

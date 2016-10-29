@@ -55,10 +55,27 @@ public class SchemaWriterFactory
 
         public synchronized SchemaWriterFactory.Builder add(String name, Type type, @NotNull ConfigSource config)
         {
-            Column column = new Column(index++, name, type);
+            ConfigSource mergedConfig = mergeConfig(name, config);
+            Column column = buildColumn(index++, name, type, mergedConfig);
             columns.add(column);
-            writers.add(buildColumnWriter(column, config));
+            writers.add(buildColumnWriter(column, mergedConfig));
             return self();
+        }
+
+        private ConfigSource mergeConfig(String name, ConfigSource config)
+        {
+            ConfigSource merging = newConfigSource();
+            merging.set("attribute", name);
+            return config.merge(merging);
+        }
+
+        private Column buildColumn(int index, String name, Type type, ConfigSource config)
+        {
+            // column_name
+            if (config.has("column_name")) {
+                name = config.get(String.class, "column_name");
+            }
+            return new Column(index, name, type);
         }
 
         private ColumnWriter buildColumnWriter(Column column, ConfigSource config)
