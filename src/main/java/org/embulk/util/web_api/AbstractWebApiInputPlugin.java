@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 
 import javax.ws.rs.client.Client;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.embulk.spi.Exec.getBufferAllocator;
 import static org.embulk.spi.Exec.newConfigDiff;
 import static org.embulk.spi.Exec.newTaskReport;
@@ -95,7 +96,12 @@ public abstract class AbstractWebApiInputPlugin<T extends WebApiPluginTask>
 
     protected WebApiClient buildWebApiClient(T task)
     {
-        Client client = ResteasyClientBuilder.newBuilder().build();
+        Client client = ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
+                .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), MILLISECONDS)
+                .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), MILLISECONDS)
+                .socketTimeout(task.getSocketTimeout(), MILLISECONDS)
+                .connectionPoolSize(task.getConnectionPoolSize())
+                .build();
         return WebApiClient.builder().client(client).build(task);
     }
 

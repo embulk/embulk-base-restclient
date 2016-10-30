@@ -43,13 +43,14 @@ public class WebApiClient<T extends WebApiPluginTask>
                         public String call()
                                 throws Exception
                         {
+                            // javax.ws.rs.ProcessingException happens by connect and read timed out
                             javax.ws.rs.core.Response response = call.request();
 
                             if (response.getStatus() / 100 != 2) {
                                 throw new WebApplicationException(response);
                             }
 
-                            // TODO read timeout
+                            // javax.ws.rs.ProcessingException happens by read timed out
                             return response.readEntity(String.class);
                         }
 
