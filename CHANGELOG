@@ -1,3 +1,8 @@
+Release 0.1.2 - 2016-10-29
+
+* [maintenance] Add column_name option in WebApiColumnOption [#5](https://github.com/muga/embulk-util-web_api/pull/5)
+* [general change] Upgrade Embulk v0.8.14 [#4](https://github.com/muga/embulk-util-web_api/pull/4)
+
 Release 0.1.1 - 2016-10-19
 Release 0.1.0 - 2016-10-19
 
