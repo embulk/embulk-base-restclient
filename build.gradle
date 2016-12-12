@@ -29,7 +29,7 @@ dependencies {
     compile     'org.embulk:embulk-core:0.8.14'
     provided    'org.embulk:embulk-core:0.8.14'
     compile     'org.jboss.resteasy:resteasy-client:3.0.19.Final'
-    compile     'org.glassfish.jersey.core:jersey-client:2.23.2'
+    compile     'org.glassfish.jersey.core:jersey-client:2.25'
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.embulk:embulk-core:0.8.14:tests'
