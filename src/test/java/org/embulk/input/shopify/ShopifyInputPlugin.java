@@ -18,6 +18,7 @@ import org.embulk.util.web_api.writer.SchemaWriter;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.type.Types;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.DatatypeConverter;
 
@@ -168,6 +169,21 @@ public class ShopifyInputPlugin
                         .request()
                         .header("AUTHORIZATION", "Basic " + DatatypeConverter.printBase64Binary(userpass.getBytes()))
                         .get();
+            }
+
+            @Override
+            public boolean isNotRetryable(Exception e)
+            {
+                if (e instanceof WebApplicationException) {
+                    int status = ((WebApplicationException) e).getResponse().getStatus();
+                    if (status == 429) {
+                        return false;
+                    }
+                    return status / 100 == 4;
+                }
+                else {
+                    return false;
+                }
             }
         });
     }
