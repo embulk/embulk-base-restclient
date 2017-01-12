@@ -10,7 +10,7 @@ plugins {
 }
 import com.github.jrubygradle.JRubyExec
 
-group = 'org.embulk.util.web_api'
+group = 'org.embulk.base.restclient'
 version = '0.1.3'
 
 repositories {
@@ -28,11 +28,12 @@ targetCompatibility = 1.7
 dependencies {
     compile     'org.embulk:embulk-core:0.8.15'
     provided    'org.embulk:embulk-core:0.8.15'
-    compile     'org.jboss.resteasy:resteasy-client:3.0.19.Final'
-    compile     'org.glassfish.jersey.core:jersey-client:2.25'
+    compile     'javax.ws.rs:javax.ws.rs-api:2.0.1'
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.embulk:embulk-core:0.8.15:tests'
+    // RESTEasy JAX-RS implementation is required only for testing.
+    testCompile 'org.jboss.resteasy:resteasy-client:3.0.19.Final'
 }
 
 tasks.withType(JavaCompile) {
@@ -62,13 +63,13 @@ bintray {
     publish = true
 
     pkg {
-        userOrg = 'embulk-util-web-api'
+        userOrg = 'embulk-base-restclient'
         repo = 'maven'
         name = project.name
-        desc = 'Common Libraries for Web API based Embulk plugins'
-        websiteUrl = 'https://github.com/muga/embulk-util-web_api'
-        issueTrackerUrl = 'https://github.com/muga/embulk-util-web_api/issues'
-        vcsUrl = 'https://github.com/muga/embulk-util-web_api.git'
+        desc = 'Base classes for Embulk plugins working as REST clients'
+        websiteUrl = 'https://github.com/embulk/embulk-base-restclient'
+        issueTrackerUrl = 'https://github.com/embulk/embulk-base-restclient/issues'
+        vcsUrl = 'https://github.com/embulk/embulk-base-restclient.git'
         licenses = ['Apache-2.0']
         labels = ['embulk', 'java']
         publicDownloadNumbers = true
