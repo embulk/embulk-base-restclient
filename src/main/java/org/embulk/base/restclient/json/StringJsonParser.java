@@ -1,4 +1,4 @@
-package org.embulk.util.web_api.json;
+package org.embulk.base.restclient.json;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
