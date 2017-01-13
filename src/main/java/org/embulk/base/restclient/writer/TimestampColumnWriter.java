@@ -6,7 +6,7 @@ import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.time.TimestampParser;
 
-import static org.embulk.base.restclient.writer.SchemaWriterFactory.WebApiColumnOption;
+import static org.embulk.base.restclient.JacksonServiceResponseSchema.WebApiColumnOption;
 
 public class TimestampColumnWriter
         extends AbstractColumnWriter

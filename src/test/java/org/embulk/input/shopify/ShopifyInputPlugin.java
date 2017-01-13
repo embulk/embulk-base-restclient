@@ -16,13 +16,13 @@ import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.type.Types;
 
-import org.embulk.base.restclient.AbstractWebApiInputPlugin;
-import org.embulk.base.restclient.WebApiPluginTask;
-import org.embulk.base.restclient.client.AbstractRetryableWebApiCall;
-import org.embulk.base.restclient.client.WebApiClient;
+import org.embulk.base.restclient.RestClientInputPluginBase;
+import org.embulk.base.restclient.RestClientInputTaskBase;
+import org.embulk.base.restclient.JacksonServiceResponseSchema;
 import org.embulk.base.restclient.json.StringJsonParser;
+import org.embulk.base.restclient.request.SingleRequester;
+import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.writer.SchemaWriter;
-import org.embulk.base.restclient.writer.SchemaWriterFactory;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
@@ -30,10 +30,10 @@ import static org.embulk.spi.Exec.newConfigDiff;
 import static org.embulk.spi.Exec.newConfigSource;
 
 public class ShopifyInputPlugin
-        extends AbstractWebApiInputPlugin<ShopifyInputPlugin.PluginTask>
+        extends RestClientInputPluginBase<ShopifyInputPlugin.PluginTask>
 {
     public interface PluginTask
-            extends WebApiPluginTask
+            extends RestClientInputTaskBase
     {
         // An example required configuration
 
@@ -73,11 +73,11 @@ public class ShopifyInputPlugin
     }
 
     @Override
-    public SchemaWriterFactory buildSchemaWriterFactory(PluginTask task)
+    public JacksonServiceResponseSchema buildSchemaWriterFactory(PluginTask task)
     {
         ConfigSource timestampConfig = newConfigSource().set("format", "%Y-%m-%dT%H:%M:%S%z");
 
-        return SchemaWriterFactory.builder()
+        return JacksonServiceResponseSchema.builder()
                 .add("id", Types.LONG)
                 .add("email", Types.STRING)
                 .add("accepts_marketing", Types.BOOLEAN)
@@ -110,7 +110,7 @@ public class ShopifyInputPlugin
     private static final int PAGE_LIMIT = 250;
 
     @Override
-    protected void load(PluginTask task, WebApiClient client, SchemaWriterFactory schemaWriterFactory, int taskCount, PageBuilder to)
+    protected void load(PluginTask task, RetryHelper client, JacksonServiceResponseSchema schemaWriterFactory, int taskCount, PageBuilder to)
     {
         SchemaWriter schemaWriter = schemaWriterFactory.newSchemaWriter();
         int pageIndex = 1;
@@ -155,9 +155,9 @@ public class ShopifyInputPlugin
         }
     }
 
-    private String fetchFromWebApi(final PluginTask task, final WebApiClient client, final int pageIndex)
+    private String fetchFromWebApi(final PluginTask task, final RetryHelper client, final int pageIndex)
     {
-        return client.fetchWithRetry(new AbstractRetryableWebApiCall() {
+        return client.fetchWithRetry(new SingleRequester() {
             @Override
             public Response request()
             {

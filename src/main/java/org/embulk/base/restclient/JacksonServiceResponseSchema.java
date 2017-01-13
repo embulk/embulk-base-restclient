@@ -1,4 +1,4 @@
-package org.embulk.base.restclient.writer;
+package org.embulk.base.restclient;
 
 import java.util.List;
 
@@ -18,11 +18,20 @@ import org.embulk.spi.time.TimestampParser;
 import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
 
+import org.embulk.base.restclient.writer.BooleanColumnWriter;
+import org.embulk.base.restclient.writer.ColumnWriter;
+import org.embulk.base.restclient.writer.DoubleColumnWriter;
+import org.embulk.base.restclient.writer.JsonColumnWriter;
+import org.embulk.base.restclient.writer.LongColumnWriter;
+import org.embulk.base.restclient.writer.SchemaWriter;
+import org.embulk.base.restclient.writer.StringColumnWriter;
+import org.embulk.base.restclient.writer.TimestampColumnWriter;
+
 import static org.embulk.spi.Exec.newConfigSource;
 
-public class SchemaWriterFactory
+public class JacksonServiceResponseSchema
 {
-    interface WebApiColumnOption
+    public interface WebApiColumnOption
             extends org.embulk.config.Task, TimestampParser.Task, TimestampParser.TimestampColumnOption
     {
         @Config("column_name")
@@ -36,7 +45,7 @@ public class SchemaWriterFactory
     private final List<Column> columns;
     private final List<ColumnWriter> writers;
 
-    public SchemaWriterFactory(List<Column> columns, List<ColumnWriter> writers)
+    public JacksonServiceResponseSchema(List<Column> columns, List<ColumnWriter> writers)
     {
         this.columns = columns;
         this.writers = writers;
@@ -52,7 +61,7 @@ public class SchemaWriterFactory
         return new SchemaWriter(writers);
     }
 
-    public static SchemaWriterFactory.Builder builder()
+    public static JacksonServiceResponseSchema.Builder builder()
     {
         return new Builder();
     }
@@ -64,12 +73,12 @@ public class SchemaWriterFactory
 
         private int index = 0;
 
-        public SchemaWriterFactory.Builder add(String name, Type type)
+        public JacksonServiceResponseSchema.Builder add(String name, Type type)
         {
             return add(name, type, newConfigSource());
         }
 
-        public synchronized SchemaWriterFactory.Builder add(String name, Type type, @NotNull ConfigSource config)
+        public synchronized JacksonServiceResponseSchema.Builder add(String name, Type type, @NotNull ConfigSource config)
         {
             WebApiColumnOption option = buildOption(name, config);
             TaskSource task = option.dump();
@@ -129,14 +138,14 @@ public class SchemaWriterFactory
             }
         }
 
-        private SchemaWriterFactory.Builder self()
+        private JacksonServiceResponseSchema.Builder self()
         {
             return this;
         }
 
-        public SchemaWriterFactory build()
+        public JacksonServiceResponseSchema build()
         {
-            return new SchemaWriterFactory(columns.build(), writers.build());
+            return new JacksonServiceResponseSchema(columns.build(), writers.build());
         }
 
         interface Task

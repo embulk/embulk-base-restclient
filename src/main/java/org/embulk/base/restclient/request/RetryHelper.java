@@ -1,4 +1,4 @@
-package org.embulk.base.restclient.client;
+package org.embulk.base.restclient.request;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -8,21 +8,21 @@ import org.embulk.spi.util.RetryExecutor.RetryGiveupException;
 
 import org.slf4j.Logger;
 
-import org.embulk.base.restclient.WebApiPluginTask;
+import org.embulk.base.restclient.RestClientInputTaskBase;
 
 import static com.google.common.base.Throwables.propagate;
 import static java.util.Locale.ENGLISH;
 import static org.embulk.spi.Exec.getLogger;
 import static org.embulk.spi.util.RetryExecutor.retryExecutor;
 
-public class WebApiClient<T extends WebApiPluginTask>
+public class RetryHelper<T extends RestClientInputTaskBase>
         implements AutoCloseable
 {
-    private final Logger log = getLogger(WebApiClient.class);
+    private final Logger log = getLogger(RetryHelper.class);
     protected final Client client;
     protected final T task;
 
-    private WebApiClient(T task, Client client)
+    private RetryHelper(T task, Client client)
     {
         this.task = task;
         this.client = client;
@@ -33,7 +33,7 @@ public class WebApiClient<T extends WebApiPluginTask>
         return client;
     }
 
-    public String fetchWithRetry(final RetryableWebApiCall call)
+    public String fetchWithRetry(final SingleRequester call)
     {
         try {
             return retryExecutor()
@@ -100,7 +100,7 @@ public class WebApiClient<T extends WebApiPluginTask>
         }
     }
 
-    public static WebApiClient.Builder builder()
+    public static RetryHelper.Builder builder()
     {
         return new Builder();
     }
@@ -113,20 +113,20 @@ public class WebApiClient<T extends WebApiPluginTask>
         {
         }
 
-        public WebApiClient.Builder client(Client client)
+        public RetryHelper.Builder client(Client client)
         {
             this.client = client;
             return self();
         }
 
-        private WebApiClient.Builder self()
+        private RetryHelper.Builder self()
         {
             return this;
         }
 
-        public <T extends WebApiPluginTask> WebApiClient build(T task)
+        public <T extends RestClientInputTaskBase> RetryHelper build(T task)
         {
-            return new WebApiClient<>(task, client);
+            return new RetryHelper<>(task, client);
         }
     }
 }

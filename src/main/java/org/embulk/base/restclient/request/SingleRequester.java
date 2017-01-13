@@ -1,15 +1,12 @@
-package org.embulk.base.restclient.client;
+package org.embulk.base.restclient.request;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-public abstract class AbstractRetryableWebApiCall
-        implements RetryableWebApiCall
+public abstract class SingleRequester
 {
-    @Override
     public abstract Response request();
 
-    @Override
     public boolean isNotRetryable(Exception e)
     {
         if (e instanceof WebApplicationException) {

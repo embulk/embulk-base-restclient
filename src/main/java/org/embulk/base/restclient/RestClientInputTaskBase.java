@@ -4,7 +4,7 @@ import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
 import org.embulk.config.Task;
 
-public interface WebApiPluginTask
+public interface RestClientInputTaskBase
     extends Task
 {
     // client retry setting

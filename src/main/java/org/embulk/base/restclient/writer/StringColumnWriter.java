@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
-import org.embulk.base.restclient.writer.SchemaWriterFactory.WebApiColumnOption;
+import org.embulk.base.restclient.JacksonServiceResponseSchema.WebApiColumnOption;
 
 public class StringColumnWriter
         extends AbstractColumnWriter
