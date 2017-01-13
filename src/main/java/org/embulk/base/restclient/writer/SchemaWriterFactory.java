@@ -1,7 +1,12 @@
-package org.embulk.util.web_api.writer;
+package org.embulk.base.restclient.writer;
+
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigSource;
@@ -12,10 +17,6 @@ import org.embulk.spi.json.JsonParser;
 import org.embulk.spi.time.TimestampParser;
 import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
-
-import javax.validation.constraints.NotNull;
-
-import java.util.List;
 
 import static org.embulk.spi.Exec.newConfigSource;
 

@@ -1,4 +1,4 @@
-package org.embulk.util.web_api.client;
+package org.embulk.base.restclient.client;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;

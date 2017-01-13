@@ -1,16 +1,16 @@
-package org.embulk.util.web_api.writer;
+package org.embulk.base.restclient.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.embulk.config.ConfigSource;
+
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
-import static org.embulk.util.web_api.writer.SchemaWriterFactory.*;
+import static org.embulk.base.restclient.writer.SchemaWriterFactory.WebApiColumnOption;
 
-public class BooleanColumnWriter
+public class LongColumnWriter
         extends AbstractColumnWriter
 {
-    public BooleanColumnWriter(Column column, WebApiColumnOption option)
+    public LongColumnWriter(Column column, WebApiColumnOption option)
     {
         super(column, option);
     }
@@ -22,7 +22,7 @@ public class BooleanColumnWriter
             to.setNull(column);
         }
         else {
-            to.setBoolean(column, v.booleanValue());
+            to.setLong(column, v.longValue());
         }
     }
 }

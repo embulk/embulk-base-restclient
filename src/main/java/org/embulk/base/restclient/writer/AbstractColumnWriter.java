@@ -1,7 +1,7 @@
-package org.embulk.util.web_api.writer;
+package org.embulk.base.restclient.writer;
 
+import org.embulk.base.restclient.writer.SchemaWriterFactory.WebApiColumnOption;
 import org.embulk.spi.Column;
-import org.embulk.util.web_api.writer.SchemaWriterFactory.WebApiColumnOption;
 
 abstract class AbstractColumnWriter
         implements ColumnWriter

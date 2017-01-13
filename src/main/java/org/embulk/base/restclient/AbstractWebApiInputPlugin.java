@@ -1,22 +1,25 @@
-package org.embulk.util.web_api;
+package org.embulk.base.restclient;
 
 import java.util.List;
 
-import org.embulk.config.TaskReport;
+import javax.ws.rs.client.Client;
+
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
+import org.embulk.config.TaskReport;
 import org.embulk.config.TaskSource;
-import org.embulk.util.web_api.client.WebApiClient;
-import org.embulk.util.web_api.writer.SchemaWriterFactory;
 import org.embulk.spi.Exec;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
+
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+
 import org.slf4j.Logger;
 
-import javax.ws.rs.client.Client;
+import org.embulk.base.restclient.client.WebApiClient;
+import org.embulk.base.restclient.writer.SchemaWriterFactory;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.embulk.spi.Exec.getBufferAllocator;

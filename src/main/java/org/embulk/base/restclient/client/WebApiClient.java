@@ -1,12 +1,14 @@
-package org.embulk.util.web_api.client;
-
-import org.embulk.util.web_api.WebApiPluginTask;
-import org.embulk.spi.util.RetryExecutor.RetryGiveupException;
-import org.embulk.spi.util.RetryExecutor.Retryable;
-import org.slf4j.Logger;
+package org.embulk.base.restclient.client;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
+
+import org.embulk.spi.util.RetryExecutor.Retryable;
+import org.embulk.spi.util.RetryExecutor.RetryGiveupException;
+
+import org.slf4j.Logger;
+
+import org.embulk.base.restclient.WebApiPluginTask;
 
 import static com.google.common.base.Throwables.propagate;
 import static java.util.Locale.ENGLISH;

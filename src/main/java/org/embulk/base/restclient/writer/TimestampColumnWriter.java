@@ -1,11 +1,12 @@
-package org.embulk.util.web_api.writer;
+package org.embulk.base.restclient.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.time.TimestampParser;
 
-import static org.embulk.util.web_api.writer.SchemaWriterFactory.WebApiColumnOption;
+import static org.embulk.base.restclient.writer.SchemaWriterFactory.WebApiColumnOption;
 
 public class TimestampColumnWriter
         extends AbstractColumnWriter

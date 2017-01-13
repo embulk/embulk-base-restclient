@@ -1,6 +1,7 @@
-package org.embulk.util.web_api.writer;
+package org.embulk.base.restclient.writer;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
