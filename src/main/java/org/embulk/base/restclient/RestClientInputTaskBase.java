@@ -5,7 +5,7 @@ import org.embulk.config.ConfigDefault;
 import org.embulk.config.Task;
 
 public interface RestClientInputTaskBase
-    extends Task
+    extends RestClientTaskBase
 {
     // client retry setting
     @Config("retry_limit")
