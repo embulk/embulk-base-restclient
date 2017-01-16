@@ -1,6 +1,7 @@
 package org.embulk.input.shopify;
 
-import javax.ws.rs.WebApplicationException;
+import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.core.Response;
 import javax.xml.bind.DatatypeConverter;
 
@@ -15,9 +16,12 @@ import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.type.Types;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+
 import org.embulk.base.restclient.RestClientInputPluginBase;
 import org.embulk.base.restclient.RestClientInputTaskBase;
 import org.embulk.base.restclient.ServiceResponseSchemaBuildable;
+import org.embulk.base.restclient.ClientCreatable;
 import org.embulk.base.restclient.JacksonServiceResponseSchema;
 import org.embulk.base.restclient.json.StringJsonParser;
 import org.embulk.base.restclient.record.JacksonServiceRecord;
@@ -33,10 +37,10 @@ import static org.embulk.spi.Exec.newConfigDiff;
 public class ShopifyInputPlugin
         extends RestClientInputPluginBase<ShopifyInputPlugin.PluginTask>
 {
-	public ShopifyInputPlugin()
-	{
-		super(new ShopifyResponseSchemaBuilder());
-	}
+    public ShopifyInputPlugin()
+    {
+        super(new ClientCreator(), new ShopifyResponseSchemaBuilder());
+    }
 
     public interface PluginTask
             extends RestClientInputTaskBase
@@ -118,7 +122,7 @@ public class ShopifyInputPlugin
     private static final int PAGE_LIMIT = 250;
 
     @Override
-    protected void load(PluginTask task, RetryHelper<PluginTask> client, SchemaWriter<JacksonValueLocator> schemaWriter, int taskCount, PageBuilder to)
+    protected void load(PluginTask task, RetryHelper client, SchemaWriter<JacksonValueLocator> schemaWriter, int taskCount, PageBuilder to)
     {
         int pageIndex = 1;
 
@@ -162,16 +166,16 @@ public class ShopifyInputPlugin
         }
     }
 
-    private String fetchFromWebApi(final PluginTask task, final RetryHelper<PluginTask> client, final int pageIndex)
+    private String fetchFromWebApi(final PluginTask task, final RetryHelper retryHelper, final int pageIndex)
     {
-        return client.fetchWithRetry(new SingleRequester() {
+        Response response = retryHelper.requestWithRetry(new SingleRequester() {
             @Override
-            public Response request()
+            public Response requestOnce(javax.ws.rs.client.Client client)
             {
                 final String url = String.format(ENGLISH, "https://%s.myshopify.com/admin/customers.json", task.getStoreName());
                 final String userpass = String.format(ENGLISH, "%s:%s", task.getApiKey(), task.getPassword());
 
-                return client.getClient()
+                return client
                         .target(url)
                         .queryParam("page", pageIndex)
                         .queryParam("limit", PAGE_LIMIT)
@@ -181,19 +185,32 @@ public class ShopifyInputPlugin
             }
 
             @Override
-            public boolean isNotRetryable(Exception e)
+            public boolean isResponseStatusToRetry(Response response)
             {
-                if (e instanceof WebApplicationException) {
-                    int status = ((WebApplicationException) e).getResponse().getStatus();
-                    if (status == 429) {
-                        return false;
-                    }
-                    return status / 100 == 4;
+                int status = response.getStatus();
+                if (status == 429) {
+                    return true;
                 }
-                else {
-                    return false;
-                }
+                return status / 100 != 4;
             }
         });
+        return response.readEntity(String.class);
+    }
+
+    private static class ClientCreator
+            implements ClientCreatable<PluginTask>
+    {
+        @Override
+        public javax.ws.rs.client.Client createClient(PluginTask task)
+        {
+            javax.ws.rs.client.Client client =
+                ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
+                .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                .socketTimeout(task.getSocketTimeout(), TimeUnit.MILLISECONDS)
+                .connectionPoolSize(task.getConnectionPoolSize())
+                .build();
+            return client;
+        }
     }
 }

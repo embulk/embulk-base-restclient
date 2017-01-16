@@ -2,8 +2,6 @@ package org.embulk.base.restclient;
 
 import java.util.List;
 
-import javax.ws.rs.client.Client;
-
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -14,15 +12,13 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
 
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-
 import org.slf4j.Logger;
 
 import org.embulk.base.restclient.record.JacksonValueLocator;
+import org.embulk.base.restclient.request.AutoCloseableClient;
 import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.writer.SchemaWriter;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.embulk.spi.Exec.getBufferAllocator;
 import static org.embulk.spi.Exec.newConfigDiff;
 import static org.embulk.spi.Exec.newTaskReport;
@@ -33,9 +29,11 @@ public abstract class RestClientInputPluginBase<T extends RestClientInputTaskBas
 {
     protected final Logger log;
 
-    protected RestClientInputPluginBase(ServiceResponseSchemaBuildable<JacksonValueLocator> serviceResponseSchemaBuilder)
+    protected RestClientInputPluginBase(ClientCreatable<T> clientCreator,
+                                        ServiceResponseSchemaBuildable<JacksonValueLocator> serviceResponseSchemaBuilder)
     {
         log = Exec.getLogger(RestClientInputPluginBase.class);
+        this.clientCreator = clientCreator;
         this.serviceResponseSchema = serviceResponseSchemaBuilder.buildServiceResponseSchema();
     }
 
@@ -86,8 +84,13 @@ public abstract class RestClientInputPluginBase<T extends RestClientInputTaskBas
     {
         T task = taskSource.loadTask(getInputTaskClass());
         try (PageBuilder pageBuilder = buildPageBuilder(schema, output)) {
-            try (RetryHelper<T> client = buildWebApiClient(task)) {
-                load(task, client, this.serviceResponseSchema.createSchemaWriter(), taskIndex, pageBuilder);
+            try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
+                RetryHelper retryHelper = new RetryHelper(
+                        clientWrapper.getClient(),
+                        task.getRetryLimit(),
+                        task.getInitialRetryWait(),
+                        task.getMaxRetryWait());
+                load(task, retryHelper, this.serviceResponseSchema.createSchemaWriter(), taskIndex, pageBuilder);
             }
             finally {
                 pageBuilder.finish();
@@ -96,18 +99,7 @@ public abstract class RestClientInputPluginBase<T extends RestClientInputTaskBas
         return buildTaskReport(task);
     }
 
-    protected abstract void load(T task, RetryHelper<T> client, SchemaWriter<JacksonValueLocator> schemaWriter, int taskCount, PageBuilder to);
-
-    protected RetryHelper<T> buildWebApiClient(T task)
-    {
-        Client client = ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
-                .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), MILLISECONDS)
-                .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), MILLISECONDS)
-                .socketTimeout(task.getSocketTimeout(), MILLISECONDS)
-                .connectionPoolSize(task.getConnectionPoolSize())
-                .build();
-        return RetryHelper.builder().client(client).build(task);
-    }
+    protected abstract void load(T task, RetryHelper client, SchemaWriter<JacksonValueLocator> schemaWriter, int taskCount, PageBuilder to);
 
     protected PageBuilder buildPageBuilder(Schema schema, PageOutput output)
     {
@@ -125,5 +117,6 @@ public abstract class RestClientInputPluginBase<T extends RestClientInputTaskBas
         return newConfigDiff();
     }
     
+    private final ClientCreatable<T> clientCreator;
     private final ServiceResponseSchema<JacksonValueLocator> serviceResponseSchema;
 }

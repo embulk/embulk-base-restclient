@@ -1,132 +1,92 @@
 package org.embulk.base.restclient.request;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
+import java.util.Locale;
 
-import org.embulk.spi.util.RetryExecutor.Retryable;
-import org.embulk.spi.util.RetryExecutor.RetryGiveupException;
+import com.google.common.base.Throwables;
+
+import org.embulk.spi.Exec;
+import org.embulk.spi.util.RetryExecutor;
 
 import org.slf4j.Logger;
 
-import org.embulk.base.restclient.RestClientInputTaskBase;
-
-import static com.google.common.base.Throwables.propagate;
-import static java.util.Locale.ENGLISH;
-import static org.embulk.spi.Exec.getLogger;
-import static org.embulk.spi.util.RetryExecutor.retryExecutor;
-
-public class RetryHelper<T extends RestClientInputTaskBase>
-        implements AutoCloseable
+public class RetryHelper
 {
-    private final Logger log = getLogger(RetryHelper.class);
-    protected final Client client;
-    protected final T task;
-
-    private RetryHelper(T task, Client client)
+    public RetryHelper(final javax.ws.rs.client.Client client,
+                       final int retryLimit,
+                       final int initialRetryWait,
+                       final int maxRetryWait)
     {
-        this.task = task;
+        this.logger = Exec.getLogger(RetryHelper.class);
         this.client = client;
+        this.retryLimit = retryLimit;
+        this.initialRetryWait = initialRetryWait;
+        this.maxRetryWait = maxRetryWait;
     }
 
-    public Client getClient()
-    {
-        return client;
-    }
-
-    public String fetchWithRetry(final SingleRequester call)
+    public javax.ws.rs.core.Response requestWithRetry(final SingleRequester singleRequester)
     {
         try {
-            return retryExecutor()
-                    .withRetryLimit(task.getRetryLimit())
-                    .withInitialRetryWait(task.getInitialRetryWait())
-                    .withMaxRetryWait(task.getMaxRetryWait())
-                    .runInterruptible(new Retryable<String>() {
+            return RetryExecutor
+                .retryExecutor()
+                .withRetryLimit(retryLimit)
+                .withInitialRetryWait(initialRetryWait)
+                .withMaxRetryWait(maxRetryWait)
+                .runInterruptible(new RetryExecutor.Retryable<javax.ws.rs.core.Response>() {
                         @Override
-                        public String call()
+                        public javax.ws.rs.core.Response call()
                                 throws Exception
                         {
-                            // javax.ws.rs.ProcessingException happens by connect and read timed out
-                            javax.ws.rs.core.Response response = call.request();
+                            // |javax.ws.rs.ProcessingException| can be throws
+                            // by timeout in connection or reading.
+                            javax.ws.rs.core.Response response = singleRequester.requestOnce(client);
 
                             if (response.getStatus() / 100 != 2) {
-                                throw new WebApplicationException(response);
+                                throw new javax.ws.rs.WebApplicationException(response);
                             }
 
-                            // javax.ws.rs.ProcessingException happens by read timed out
-                            return response.readEntity(String.class);
+                            return response;
                         }
 
                         @Override
-                        public boolean isRetryableException(Exception e)
+                        public boolean isRetryableException(Exception exception)
                         {
-                            return !call.isNotRetryable(e);
+                            return singleRequester.toRetry(exception);
                         }
 
                         @Override
-                        public void onRetry(Exception e, int retryCount, int retryLimit, int retryWait)
-                                throws RetryGiveupException
+                        public void onRetry(Exception exception, int retryCount, int retryLimit, int retryWait)
+                                throws RetryExecutor.RetryGiveupException
                         {
-                            String message = String.format(ENGLISH, "Retrying %d/%d after %d seconds. Message: %s",
-                                    retryCount, retryLimit, retryWait / 1000, e.getMessage());
+                            String message = String.format(
+                                Locale.ENGLISH, "Retrying %d/%d after %d seconds. Message: %s",
+                                retryCount, retryLimit, retryWait / 1000, exception.getMessage());
                             if (retryCount % 3 == 0) {
-                                log.warn(message, e);
+                                logger.warn(message, exception);
                             }
                             else {
-                                log.warn(message);
+                                logger.warn(message);
                             }
                         }
 
                         @Override
                         public void onGiveup(Exception first, Exception last)
-                                throws RetryGiveupException
+                                throws RetryExecutor.RetryGiveupException
                         {
                         }
                     });
         }
         catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw propagate(e);
+            throw Throwables.propagate(e);
         }
-        catch (RetryGiveupException e) {
-            throw propagate(e.getCause());
-        }
-    }
-
-    @Override
-    public void close()
-    {
-        if (client != null) {
-            client.close();
+        catch (RetryExecutor.RetryGiveupException e) {
+            throw Throwables.propagate(e.getCause());
         }
     }
 
-    public static RetryHelper.Builder builder()
-    {
-        return new Builder();
-    }
-
-    public static class Builder
-    {
-        private Client client;
-
-        private Builder()
-        {
-        }
-
-        public RetryHelper.Builder client(Client client)
-        {
-            this.client = client;
-            return self();
-        }
-
-        private RetryHelper.Builder self()
-        {
-            return this;
-        }
-
-        public <T extends RestClientInputTaskBase> RetryHelper<T> build(T task)
-        {
-            return new RetryHelper<>(task, client);
-        }
-    }
+    private final Logger logger;
+    private final javax.ws.rs.client.Client client;
+    private final int retryLimit;
+    private final int initialRetryWait;
+    private final int maxRetryWait;
 }

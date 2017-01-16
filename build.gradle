@@ -28,11 +28,12 @@ targetCompatibility = 1.7
 dependencies {
     compile     'org.embulk:embulk-core:0.8.15'
     provided    'org.embulk:embulk-core:0.8.15'
-    compile     'org.jboss.resteasy:resteasy-client:3.0.19.Final'
-    compile     'org.glassfish.jersey.core:jersey-client:2.25'
+    compile     'javax.ws.rs:javax.ws.rs-api:2.0.1'
 
     testCompile 'junit:junit:4.+'
     testCompile 'org.embulk:embulk-core:0.8.15:tests'
+    // RESTEasy JAX-RS implementation is required only for testing.
+    testCompile 'org.jboss.resteasy:resteasy-client:3.0.19.Final'
 }
 
 tasks.withType(JavaCompile) {
