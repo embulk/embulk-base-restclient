@@ -16,9 +16,8 @@ import org.embulk.spi.InputPlugin;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TestPageBuilderReader.MockPageOutput;
 
-import static org.junit.Assume.assumeNotNull;
-
 import static org.embulk.spi.Exec.newConfigSource;
+import static org.junit.Assume.assumeNotNull;
 
 public class TestShopifyInputPlugin
 {

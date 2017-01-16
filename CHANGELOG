@@ -1,3 +1,9 @@
+Release 0.2.0 - 2017-01-12
+
+* [renewal] Renew as embulk-base-restclient as a base for input/output plugins with REST.
+
+====
+
 Release 0.1.3 - 2016-10-29
 
 * [general change] Add timeout settings [#6](https://github.com/muga/embulk-util-web_api/pull/6)
@@ -9,4 +15,3 @@ Release 0.1.2 - 2016-10-29
 
 Release 0.1.1 - 2016-10-19
 Release 0.1.0 - 2016-10-19
-
