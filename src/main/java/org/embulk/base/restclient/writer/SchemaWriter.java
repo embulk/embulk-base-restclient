@@ -2,24 +2,25 @@ package org.embulk.base.restclient.writer;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.embulk.spi.PageBuilder;
 
-public class SchemaWriter
+import org.embulk.base.restclient.record.ServiceRecord;
+import org.embulk.base.restclient.record.ValueLocator;
+
+public class SchemaWriter<T extends ValueLocator>
 {
-    private List<ColumnWriter> writers;
-
-    public SchemaWriter(List<ColumnWriter> writers)
+    public SchemaWriter(List<ColumnWriter<T>> columnWriters)
     {
-        this.writers = writers;
+        this.columnWriters = columnWriters;
     }
 
-    public void addRecordTo(ObjectNode record, PageBuilder to)
+    public void addRecordTo(ServiceRecord<T> record, PageBuilder pageBuilderToLoad)
     {
-        for (ColumnWriter w : writers) {
-            w.write(record.get(w.getAttributeName()), to);
+        for (ColumnWriter<T> columnWriter : columnWriters) {
+            columnWriter.writeColumnResponsible(record, pageBuilderToLoad);
         }
-        to.addRecord();
+        pageBuilderToLoad.addRecord();
     }
+
+    private List<ColumnWriter<T>> columnWriters;
 }

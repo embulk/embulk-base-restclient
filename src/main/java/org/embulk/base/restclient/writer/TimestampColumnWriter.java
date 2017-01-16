@@ -1,32 +1,33 @@
 package org.embulk.base.restclient.writer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.time.TimestampParser;
 
-import static org.embulk.base.restclient.JacksonServiceResponseSchema.WebApiColumnOption;
+import org.embulk.base.restclient.record.ServiceRecord;
+import org.embulk.base.restclient.record.ServiceValue;
+import org.embulk.base.restclient.record.ValueLocator;
 
-public class TimestampColumnWriter
-        extends AbstractColumnWriter
+public class TimestampColumnWriter<T extends ValueLocator>
+        extends ColumnWriter<T>
 {
-    private final TimestampParser timestampParser;
-
-    public TimestampColumnWriter(Column column, WebApiColumnOption option, TimestampParser timestampParser)
+    public TimestampColumnWriter(Column column, T valueLocator, TimestampParser timestampParser)
     {
-        super(column, option);
+        super(column, valueLocator);
         this.timestampParser = timestampParser;
     }
 
     @Override
-    public void write(JsonNode v, PageBuilder to)
+    public void writeColumnResponsible(ServiceRecord<T> record, PageBuilder pageBuilderToLoad)
     {
-        if (v == null || v.isNull()) {
-            to.setNull(column);
+        ServiceValue value = pickupValueResponsible(record);
+        if (value == null || value.isNull()) {
+            pageBuilderToLoad.setNull(getColumnResponsible());
         }
         else {
-            to.setTimestamp(column, timestampParser.parse(v.asText()));
+            pageBuilderToLoad.setTimestamp(getColumnResponsible(), value.timestampValue(timestampParser));
         }
     }
+
+    private final TimestampParser timestampParser;
 }

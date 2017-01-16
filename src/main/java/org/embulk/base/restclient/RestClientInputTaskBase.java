@@ -2,7 +2,6 @@ package org.embulk.base.restclient;
 
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
-import org.embulk.config.Task;
 
 public interface RestClientInputTaskBase
     extends RestClientTaskBase

@@ -1,28 +1,29 @@
 package org.embulk.base.restclient.writer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 
-import static org.embulk.base.restclient.JacksonServiceResponseSchema.WebApiColumnOption;
+import org.embulk.base.restclient.record.ServiceRecord;
+import org.embulk.base.restclient.record.ServiceValue;
+import org.embulk.base.restclient.record.ValueLocator;
 
-public class LongColumnWriter
-        extends AbstractColumnWriter
+public class LongColumnWriter<T extends ValueLocator>
+        extends ColumnWriter<T>
 {
-    public LongColumnWriter(Column column, WebApiColumnOption option)
+    public LongColumnWriter(Column column, T valueLocator)
     {
-        super(column, option);
+        super(column, valueLocator);
     }
 
     @Override
-    public void write(JsonNode v, PageBuilder to)
+    public void writeColumnResponsible(ServiceRecord<T> record, PageBuilder pageBuilderToLoad)
     {
-        if (v == null || v.isNull()) {
-            to.setNull(column);
+        ServiceValue value = pickupValueResponsible(record);
+        if (value == null || value.isNull()) {
+            pageBuilderToLoad.setNull(getColumnResponsible());
         }
         else {
-            to.setLong(column, v.longValue());
+            pageBuilderToLoad.setLong(getColumnResponsible(), value.longValue());
         }
     }
 }
