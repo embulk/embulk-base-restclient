@@ -1,26 +1,28 @@
 package org.embulk.input.shopify;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigException;
 import org.embulk.config.ConfigSource;
 import org.embulk.spi.DataException;
-import org.embulk.util.web_api.AbstractWebApiInputPlugin;
-import org.embulk.util.web_api.WebApiPluginTask;
-import org.embulk.util.web_api.client.AbstractRetryableWebApiCall;
-import org.embulk.util.web_api.client.WebApiClient;
-import org.embulk.util.web_api.json.StringJsonParser;
-import org.embulk.util.web_api.writer.SchemaWriterFactory;
-import org.embulk.util.web_api.writer.SchemaWriter;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.type.Types;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
+import org.embulk.base.restclient.AbstractWebApiInputPlugin;
+import org.embulk.base.restclient.WebApiPluginTask;
+import org.embulk.base.restclient.client.AbstractRetryableWebApiCall;
+import org.embulk.base.restclient.client.WebApiClient;
+import org.embulk.base.restclient.json.StringJsonParser;
+import org.embulk.base.restclient.writer.SchemaWriter;
+import org.embulk.base.restclient.writer.SchemaWriterFactory;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;

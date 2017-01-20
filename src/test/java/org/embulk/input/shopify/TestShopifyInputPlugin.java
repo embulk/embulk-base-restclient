@@ -1,5 +1,13 @@
 package org.embulk.input.shopify;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+
 import org.embulk.EmbulkTestRuntime;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -7,16 +15,10 @@ import org.embulk.config.TaskSource;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TestPageBuilderReader.MockPageOutput;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assume.assumeNotNull;
 
 import static org.embulk.spi.Exec.newConfigSource;
-import static org.junit.Assume.assumeNotNull;
 
 public class TestShopifyInputPlugin
 {

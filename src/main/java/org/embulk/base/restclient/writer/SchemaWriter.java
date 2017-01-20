@@ -1,9 +1,10 @@
-package org.embulk.util.web_api.writer;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.embulk.spi.PageBuilder;
+package org.embulk.base.restclient.writer;
 
 import java.util.List;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.embulk.spi.PageBuilder;
 
 public class SchemaWriter
 {
