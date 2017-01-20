@@ -124,7 +124,7 @@ public class RetryHelper<T extends RestClientInputTaskBase>
             return this;
         }
 
-        public <T extends RestClientInputTaskBase> RetryHelper build(T task)
+        public <T extends RestClientInputTaskBase> RetryHelper<T> build(T task)
         {
             return new RetryHelper<>(task, client);
         }

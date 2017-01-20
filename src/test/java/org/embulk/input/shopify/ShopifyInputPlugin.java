@@ -11,15 +11,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigException;
-import org.embulk.config.ConfigSource;
 import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.type.Types;
 
 import org.embulk.base.restclient.RestClientInputPluginBase;
 import org.embulk.base.restclient.RestClientInputTaskBase;
+import org.embulk.base.restclient.ServiceResponseSchemaBuildable;
 import org.embulk.base.restclient.JacksonServiceResponseSchema;
 import org.embulk.base.restclient.json.StringJsonParser;
+import org.embulk.base.restclient.record.JacksonServiceRecord;
+import org.embulk.base.restclient.record.JacksonValueLocator;
 import org.embulk.base.restclient.request.SingleRequester;
 import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.writer.SchemaWriter;
@@ -27,11 +29,15 @@ import org.embulk.base.restclient.writer.SchemaWriter;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
 import static org.embulk.spi.Exec.newConfigDiff;
-import static org.embulk.spi.Exec.newConfigSource;
 
 public class ShopifyInputPlugin
         extends RestClientInputPluginBase<ShopifyInputPlugin.PluginTask>
 {
+	public ShopifyInputPlugin()
+	{
+		super(new ShopifyResponseSchemaBuilder());
+	}
+
     public interface PluginTask
             extends RestClientInputTaskBase
     {
@@ -72,17 +78,18 @@ public class ShopifyInputPlugin
         return PluginTask.class;
     }
 
-    @Override
-    public JacksonServiceResponseSchema buildSchemaWriterFactory(PluginTask task)
+    private static class ShopifyResponseSchemaBuilder
+            implements ServiceResponseSchemaBuildable<JacksonValueLocator>
     {
-        ConfigSource timestampConfig = newConfigSource().set("format", "%Y-%m-%dT%H:%M:%S%z");
-
-        return JacksonServiceResponseSchema.builder()
+        @Override  // Overridden from |ServiceResponseSchemaBuildable|
+        public JacksonServiceResponseSchema buildServiceResponseSchema()
+        {
+            return JacksonServiceResponseSchema.builder()
                 .add("id", Types.LONG)
                 .add("email", Types.STRING)
                 .add("accepts_marketing", Types.BOOLEAN)
-                .add("created_at", Types.TIMESTAMP, timestampConfig)
-                .add("updated_at", Types.TIMESTAMP, timestampConfig)
+                .add("created_at", Types.TIMESTAMP, "%Y-%m-%dT%H:%M:%S%z")
+                .add("updated_at", Types.TIMESTAMP, "%Y-%m-%dT%H:%M:%S%z")
                 .add("first_name", Types.STRING)
                 .add("last_name", Types.STRING)
                 .add("orders_count", Types.LONG)
@@ -98,6 +105,7 @@ public class ShopifyInputPlugin
                 .add("default_address", Types.JSON)
                 .add("addresses", Types.JSON)
                 .build();
+        }
     }
 
     @Override
@@ -110,9 +118,8 @@ public class ShopifyInputPlugin
     private static final int PAGE_LIMIT = 250;
 
     @Override
-    protected void load(PluginTask task, RetryHelper client, JacksonServiceResponseSchema schemaWriterFactory, int taskCount, PageBuilder to)
+    protected void load(PluginTask task, RetryHelper<PluginTask> client, SchemaWriter<JacksonValueLocator> schemaWriter, int taskCount, PageBuilder to)
     {
-        SchemaWriter schemaWriter = schemaWriterFactory.newSchemaWriter();
         int pageIndex = 1;
 
         while (true) {
@@ -127,7 +134,7 @@ public class ShopifyInputPlugin
                 }
 
                 try {
-                    schemaWriter.addRecordTo((ObjectNode) record, to);
+                    schemaWriter.addRecordTo(new JacksonServiceRecord((ObjectNode) record), to);
                 }
                 catch (Exception e) {
                     log.warn(String.format(ENGLISH, "Skipped json: %s", record.toString()), e);
@@ -155,7 +162,7 @@ public class ShopifyInputPlugin
         }
     }
 
-    private String fetchFromWebApi(final PluginTask task, final RetryHelper client, final int pageIndex)
+    private String fetchFromWebApi(final PluginTask task, final RetryHelper<PluginTask> client, final int pageIndex)
     {
         return client.fetchWithRetry(new SingleRequester() {
             @Override
