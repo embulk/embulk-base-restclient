@@ -26,6 +26,7 @@ import static org.embulk.spi.Exec.newConfigDiff;
 import static org.embulk.spi.Exec.newTaskReport;
 
 public abstract class RestClientInputPluginBase<T extends RestClientInputTaskBase>
+        extends RestClientPluginBase<T>
         implements InputPlugin
 {
     protected final Logger log;
