@@ -18,22 +18,21 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
 import org.slf4j.Logger;
 
-import org.embulk.base.restclient.client.WebApiClient;
-import org.embulk.base.restclient.writer.SchemaWriterFactory;
+import org.embulk.base.restclient.request.RetryHelper;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.embulk.spi.Exec.getBufferAllocator;
 import static org.embulk.spi.Exec.newConfigDiff;
 import static org.embulk.spi.Exec.newTaskReport;
 
-public abstract class AbstractWebApiInputPlugin<T extends WebApiPluginTask>
+public abstract class RestClientInputPluginBase<T extends RestClientInputTaskBase>
         implements InputPlugin
 {
     protected final Logger log;
 
-    protected AbstractWebApiInputPlugin()
+    protected RestClientInputPluginBase()
     {
-        log = Exec.getLogger(AbstractWebApiInputPlugin.class);
+        log = Exec.getLogger(RestClientInputPluginBase.class);
     }
 
     @Override
@@ -54,7 +53,7 @@ public abstract class AbstractWebApiInputPlugin<T extends WebApiPluginTask>
         return 1;
     }
 
-    protected abstract SchemaWriterFactory buildSchemaWriterFactory(T task);
+    protected abstract JacksonServiceResponseSchema buildSchemaWriterFactory(T task);
 
     @Override
     public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
@@ -85,7 +84,7 @@ public abstract class AbstractWebApiInputPlugin<T extends WebApiPluginTask>
     {
         T task = taskSource.loadTask(getInputTaskClass());
         try (PageBuilder pageBuilder = buildPageBuilder(schema, output)) {
-            try (WebApiClient client = buildWebApiClient(task)) {
+            try (RetryHelper client = buildWebApiClient(task)) {
                 load(task, client, buildSchemaWriterFactory(task), taskIndex, pageBuilder);
             }
             finally {
@@ -95,9 +94,9 @@ public abstract class AbstractWebApiInputPlugin<T extends WebApiPluginTask>
         return buildTaskReport(task);
     }
 
-    protected abstract void load(T task, WebApiClient client, SchemaWriterFactory schemaWriterFactory, int taskCount, PageBuilder to);
+    protected abstract void load(T task, RetryHelper client, JacksonServiceResponseSchema schemaWriterFactory, int taskCount, PageBuilder to);
 
-    protected WebApiClient buildWebApiClient(T task)
+    protected RetryHelper buildWebApiClient(T task)
     {
         Client client = ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
                 .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), MILLISECONDS)
@@ -105,7 +104,7 @@ public abstract class AbstractWebApiInputPlugin<T extends WebApiPluginTask>
                 .socketTimeout(task.getSocketTimeout(), MILLISECONDS)
                 .connectionPoolSize(task.getConnectionPoolSize())
                 .build();
-        return WebApiClient.builder().client(client).build(task);
+        return RetryHelper.builder().client(client).build(task);
     }
 
     protected PageBuilder buildPageBuilder(Schema schema, PageOutput output)

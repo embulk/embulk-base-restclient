@@ -6,7 +6,7 @@ import org.embulk.spi.Column;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.json.JsonParser;
 
-import org.embulk.base.restclient.writer.SchemaWriterFactory.WebApiColumnOption;
+import org.embulk.base.restclient.JacksonServiceResponseSchema.WebApiColumnOption;
 
 public class JsonColumnWriter
         extends AbstractColumnWriter
