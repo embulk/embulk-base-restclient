@@ -18,7 +18,7 @@ import org.embulk.base.restclient.writer.SchemaWriter;
  * |ServiceResponseSchema| represents how to locate values in a response, and how the values are
  * mapped into Embulk schema.
  */
-abstract public class ServiceResponseSchema<T extends ValueLocator>
+public abstract class ServiceResponseSchema<T extends ValueLocator>
 {
     protected ServiceResponseSchema(ListMultimap<Column, ColumnOptions<T>> map)
     {
@@ -31,7 +31,7 @@ abstract public class ServiceResponseSchema<T extends ValueLocator>
         return new Schema(ImmutableList.copyOf(map.keys()));
     }
 
-    abstract public SchemaWriter<T> createSchemaWriter();
+    public abstract SchemaWriter<T> createSchemaWriter();
 
     protected final Collection<Map.Entry<Column, ColumnOptions<T>>> entries()
     {
