@@ -12,14 +12,15 @@ import org.embulk.spi.Schema;
 
 import org.embulk.base.restclient.record.ValueLocator;
 
-public class RestClientInputPluginBase<T extends RestClientInputTaskBase, U extends ValueLocator>
-        extends RestClientInputPluginFragileBase<T, U>
+public class RestClientInputPluginBase<T extends RestClientInputTaskBase, U extends ValueLocator, V>
+        extends RestClientInputPluginFragileBase<T, U, V>
 {
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
+                                        ResponseReadable<V> responseReader,
                                         ServiceResponseSchemaBuildable<U> serviceResponseSchemaBuilder,
-                                        PageLoadable<T, U> pageLoader,
+                                        PageLoadable<T,U,V> pageLoader,
                                         TaskReportBuildable<T> taskReportBuilder,
                                         TaskValidatable<T> taskValidator,
                                         int taskCount)
@@ -27,6 +28,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase, U exte
         super(taskClass,
               clientCreator,
               configDiffBuilder,
+              responseReader,
               serviceResponseSchemaBuilder,
               pageLoader,
               taskReportBuilder,
@@ -35,10 +37,10 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase, U exte
     }
 
     protected RestClientInputPluginBase(Class<T> taskClass,
-                                        RestClientInputPluginDelegate<T, U> delegate,
+                                        RestClientInputPluginDelegate<T, U, V> delegate,
                                         int taskCount)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
+        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
     }
 
     @Override

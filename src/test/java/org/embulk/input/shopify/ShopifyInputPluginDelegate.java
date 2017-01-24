@@ -37,7 +37,7 @@ import org.embulk.base.restclient.request.SingleRequester;
 import org.embulk.base.restclient.writer.SchemaWriter;
 
 public class ShopifyInputPluginDelegate
-    implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask, JacksonValueLocator>
+        implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask, JacksonValueLocator, javax.ws.rs.core.Response>
 {
     public interface PluginTask
             extends RestClientInputTaskBase
@@ -126,7 +126,7 @@ public class ShopifyInputPluginDelegate
 
     @Override  // Overridden from |PageLoadable|
     public void loadPage(final PluginTask task,
-                         RetryHelper retryHelper,
+                         RetryHelper<javax.ws.rs.core.Response> retryHelper,
                          SchemaWriter<JacksonValueLocator> schemaWriter,
                          int taskCount,
                          PageBuilder pageBuilderToLoad)
@@ -176,7 +176,7 @@ public class ShopifyInputPluginDelegate
         }
     }
 
-    private javax.ws.rs.core.Response fetchFromShopify(RetryHelper retryHelper,
+    private javax.ws.rs.core.Response fetchFromShopify(RetryHelper<javax.ws.rs.core.Response> retryHelper,
                                                        final PluginTask task,
                                                        final int pageIndex)
     {
@@ -213,6 +213,12 @@ public class ShopifyInputPluginDelegate
     public TaskReport buildTaskReport(PluginTask task)
     {
         return Exec.newTaskReport();
+    }
+
+    @Override  // Overridden from |ResponseReadable|
+    public javax.ws.rs.core.Response readResponse(javax.ws.rs.core.Response response)
+    {
+        return response;
     }
 
     @Override  // Overridden from |ClientCreatable|
