@@ -50,13 +50,13 @@ public final class JacksonServiceResponseSchema
     }
 
     @Override
-    public SchemaWriter<JacksonValueLocator> createSchemaWriter()
+    public SchemaWriter createSchemaWriter()
     {
-        ImmutableList.Builder<ColumnWriter<JacksonValueLocator>> listBuilder = ImmutableList.builder();
+        ImmutableList.Builder<ColumnWriter> listBuilder = ImmutableList.builder();
         for (Map.Entry<Column, ColumnOptions<JacksonValueLocator>> entry : entries()) {
             listBuilder.add(createColumnWriter(entry.getKey(), entry.getValue()));
         }
-        return new SchemaWriter<JacksonValueLocator>(listBuilder.build());
+        return new SchemaWriter(listBuilder.build());
     }
 
     public static final class Builder
@@ -122,23 +122,23 @@ public final class JacksonServiceResponseSchema
         private int index;
     }
 
-    private ColumnWriter<JacksonValueLocator> createColumnWriter(Column column,
-                                                                 ColumnOptions<JacksonValueLocator> columnOptions)
+    private ColumnWriter createColumnWriter(Column column,
+                                            ColumnOptions<JacksonValueLocator> columnOptions)
     {
         Type type = column.getType();
         JacksonValueLocator locator = columnOptions.getValueLocator();
         Optional<String> timestampFormat = columnOptions.getTimestampFormat();
         if (type.equals(Types.BOOLEAN)) {
-            return new BooleanColumnWriter<JacksonValueLocator>(column, locator);
+            return new BooleanColumnWriter(column, locator);
         }
         else if (type.equals(Types.DOUBLE)) {
-            return new DoubleColumnWriter<JacksonValueLocator>(column, locator);
+            return new DoubleColumnWriter(column, locator);
         }
         else if (type.equals(Types.LONG)) {
-            return new LongColumnWriter<JacksonValueLocator>(column, locator);
+            return new LongColumnWriter(column, locator);
         }
         else if (type.equals(Types.STRING)) {
-            return new StringColumnWriter<JacksonValueLocator>(column, locator);
+            return new StringColumnWriter(column, locator);
         }
         else if (type.equals(Types.TIMESTAMP)) {
             TimestampParser timestampParser = new TimestampParser(
@@ -146,11 +146,11 @@ public final class JacksonServiceResponseSchema
                 (timestampFormat.isPresent()
                  ? Exec.newConfigSource().set("format", timestampFormat.get())
                  : Exec.newConfigSource()).loadConfig(TimestampParser.TimestampColumnOption.class));
-            return new TimestampColumnWriter<JacksonValueLocator>(column, locator, timestampParser);
+            return new TimestampColumnWriter(column, locator, timestampParser);
         }
         else if (type.equals(Types.JSON)) {
             JsonParser jsonParser = new JsonParser();
-            return new JsonColumnWriter<JacksonValueLocator>(column, locator, jsonParser);
+            return new JsonColumnWriter(column, locator, jsonParser);
         }
         else {
             throw new IllegalStateException();

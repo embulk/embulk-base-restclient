@@ -12,19 +12,18 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
 
-import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.base.restclient.request.AutoCloseableClient;
 import org.embulk.base.restclient.request.RetryHelper;
 
-public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase, U extends ValueLocator>
+public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
         extends RestClientPluginBase<T>
         implements InputPlugin
 {
     protected RestClientInputPluginFragileBase(Class<T> taskClass,
                                                ClientCreatable<T> clientCreator,
                                                ConfigDiffBuildable<T> configDiffBuilder,
-                                               ServiceResponseSchemaBuildable<U> serviceResponseSchemaBuilder,
-                                               PageLoadable<T,U> pageLoader,
+                                               ServiceResponseSchemaBuildable serviceResponseSchemaBuilder,
+                                               PageLoadable<T> pageLoader,
                                                TaskReportBuildable<T> taskReportBuilder,
                                                TaskValidatable<T> taskValidator,
                                                int taskCount)
@@ -40,7 +39,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase,
     }
 
     protected RestClientInputPluginFragileBase(Class<T> taskClass,
-                                               RestClientInputPluginDelegate<T,U> delegate,
+                                               RestClientInputPluginDelegate<T> delegate,
                                                int taskCount)
     {
         this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
@@ -105,8 +104,8 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase,
     private final Class<T> taskClass;
     private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
-    private final PageLoadable<T,U> pageLoader;
-    private final ServiceResponseSchema<U> serviceResponseSchema;
+    private final PageLoadable<T> pageLoader;
+    private final ServiceResponseSchema serviceResponseSchema;
     private final TaskReportBuildable<T> taskReportBuilder;
     private final TaskValidatable<T> taskValidator;
     private final int taskCount;

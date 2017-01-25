@@ -8,17 +8,17 @@ import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ServiceValue;
 import org.embulk.base.restclient.record.ValueLocator;
 
-public class JsonColumnWriter<T extends ValueLocator>
-        extends ColumnWriter<T>
+public class JsonColumnWriter
+        extends ColumnWriter
 {
-    public JsonColumnWriter(Column column, T valueLocator, JsonParser jsonParser)
+    public JsonColumnWriter(Column column, ValueLocator valueLocator, JsonParser jsonParser)
     {
         super(column, valueLocator);
         this.jsonParser = jsonParser;
     }
 
     @Override
-    public void writeColumnResponsible(ServiceRecord<T> record, PageBuilder pageBuilderToLoad)
+    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilderToLoad)
     {
         ServiceValue value = pickupValueResponsible(record);
         if (value == null || value.isNull()) {

@@ -10,16 +10,14 @@ import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
 
-import org.embulk.base.restclient.record.ValueLocator;
-
-public class RestClientInputPluginBase<T extends RestClientInputTaskBase, U extends ValueLocator>
-        extends RestClientInputPluginFragileBase<T, U>
+public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
+        extends RestClientInputPluginFragileBase<T>
 {
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
-                                        ServiceResponseSchemaBuildable<U> serviceResponseSchemaBuilder,
-                                        PageLoadable<T, U> pageLoader,
+                                        ServiceResponseSchemaBuildable serviceResponseSchemaBuilder,
+                                        PageLoadable<T> pageLoader,
                                         TaskReportBuildable<T> taskReportBuilder,
                                         TaskValidatable<T> taskValidator,
                                         int taskCount)
@@ -35,7 +33,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase, U exte
     }
 
     protected RestClientInputPluginBase(Class<T> taskClass,
-                                        RestClientInputPluginDelegate<T, U> delegate,
+                                        RestClientInputPluginDelegate<T> delegate,
                                         int taskCount)
     {
         super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
