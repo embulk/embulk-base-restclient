@@ -34,6 +34,7 @@ import org.embulk.base.restclient.record.JacksonServiceRecord;
 import org.embulk.base.restclient.record.JacksonValueLocator;
 import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.request.SingleRequester;
+import org.embulk.base.restclient.request.StringResponseEntityReader;
 import org.embulk.base.restclient.writer.SchemaWriter;
 
 public class ShopifyInputPluginDelegate
@@ -133,10 +134,7 @@ public class ShopifyInputPluginDelegate
     {
         int pageIndex = 1;
         while (true) {
-            javax.ws.rs.core.Response response = fetchFromShopify(retryHelper, task, pageIndex);
-
-            // |javax.ws.rs.ProcessingException| can be thrown due to read timeout.
-            String content = response.readEntity(String.class);
+            String content = fetchFromShopify(retryHelper, task, pageIndex);
             ArrayNode records = extractArrayField(content);
 
             int count = 0;
@@ -176,11 +174,12 @@ public class ShopifyInputPluginDelegate
         }
     }
 
-    private javax.ws.rs.core.Response fetchFromShopify(RetryHelper retryHelper,
-                                                       final PluginTask task,
-                                                       final int pageIndex)
+    private String fetchFromShopify(RetryHelper retryHelper,
+                                    final PluginTask task,
+                                    final int pageIndex)
     {
         return retryHelper.requestWithRetry(
+            new StringResponseEntityReader(),
             new SingleRequester() {
                 @Override
                 public Response requestOnce(javax.ws.rs.client.Client client)
