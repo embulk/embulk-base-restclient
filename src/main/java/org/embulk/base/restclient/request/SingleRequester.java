@@ -7,20 +7,24 @@ package org.embulk.base.restclient.request;
  *
  * <pre>{@code
  * javax.ws.rs.core.Response response = retryHelper.requestWithRetry(
+ *     new StringResponseEntityReader(),
  *     new SingleRequester() {
- *         @Override
- *         public boolean isResponseStatusRetryable(javax.ws.rs.core.Response response)
- *         {
- *             return (response.getStatus() / 100) == 4;
- *         }
- *
  *         @Override
  *         public Response requestOnce(javax.ws.rs.client.Client client)
  *         {
  *             return client.target("https://example.com/api/resource").request().get;
  *         }
+ *
+ *         @Override
+ *         public boolean isResponseStatusToRetry(javax.ws.rs.core.Response response)
+ *         {
+ *             return (response.getStatus() / 100) == 4;
+ *         }
  *     });
  * }</pre>
+ *
+ * @see ResponseReadable
+ * @see StringResponseEntityReader
  */
 public abstract class SingleRequester
 {

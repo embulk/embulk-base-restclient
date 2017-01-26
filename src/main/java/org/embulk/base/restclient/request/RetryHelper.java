@@ -23,7 +23,8 @@ public class RetryHelper
         this.maxRetryWait = maxRetryWait;
     }
 
-    public javax.ws.rs.core.Response requestWithRetry(final SingleRequester singleRequester)
+    public <T> T requestWithRetry(final ResponseReadable<T> responseReader,
+                                  final SingleRequester singleRequester)
     {
         try {
             return RetryExecutor
@@ -31,9 +32,9 @@ public class RetryHelper
                 .withRetryLimit(retryLimit)
                 .withInitialRetryWait(initialRetryWait)
                 .withMaxRetryWait(maxRetryWait)
-                .runInterruptible(new RetryExecutor.Retryable<javax.ws.rs.core.Response>() {
+                .runInterruptible(new RetryExecutor.Retryable<T>() {
                         @Override
-                        public javax.ws.rs.core.Response call()
+                        public T call()
                                 throws Exception
                         {
                             // |javax.ws.rs.ProcessingException| can be throws
@@ -44,7 +45,7 @@ public class RetryHelper
                                 throw new javax.ws.rs.WebApplicationException(response);
                             }
 
-                            return response;
+                            return responseReader.readResponse(response);
                         }
 
                         @Override
