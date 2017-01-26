@@ -32,12 +32,13 @@ import org.embulk.base.restclient.RestClientInputTaskBase;
 import org.embulk.base.restclient.json.StringJsonParser;
 import org.embulk.base.restclient.record.JacksonServiceRecord;
 import org.embulk.base.restclient.record.JacksonValueLocator;
+import org.embulk.base.restclient.request.ResponseReaders;
 import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.request.SingleRequester;
 import org.embulk.base.restclient.writer.SchemaWriter;
 
 public class ShopifyInputPluginDelegate
-    implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask, JacksonValueLocator>
+        implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask, JacksonValueLocator, String>
 {
     public interface PluginTask
             extends RestClientInputTaskBase
@@ -126,17 +127,14 @@ public class ShopifyInputPluginDelegate
 
     @Override  // Overridden from |PageLoadable|
     public void loadPage(final PluginTask task,
-                         RetryHelper retryHelper,
+                         RetryHelper<String> retryHelper,
                          SchemaWriter<JacksonValueLocator> schemaWriter,
                          int taskCount,
                          PageBuilder pageBuilderToLoad)
     {
         int pageIndex = 1;
         while (true) {
-            javax.ws.rs.core.Response response = fetchFromShopify(retryHelper, task, pageIndex);
-
-            // |javax.ws.rs.ProcessingException| can be thrown due to read timeout.
-            String content = response.readEntity(String.class);
+            String content = fetchFromShopify(retryHelper, task, pageIndex);
             ArrayNode records = extractArrayField(content);
 
             int count = 0;
@@ -176,9 +174,9 @@ public class ShopifyInputPluginDelegate
         }
     }
 
-    private javax.ws.rs.core.Response fetchFromShopify(RetryHelper retryHelper,
-                                                       final PluginTask task,
-                                                       final int pageIndex)
+    private String fetchFromShopify(RetryHelper<String> retryHelper,
+                                    final PluginTask task,
+                                    final int pageIndex)
     {
         return retryHelper.requestWithRetry(
             new SingleRequester() {
@@ -213,6 +211,12 @@ public class ShopifyInputPluginDelegate
     public TaskReport buildTaskReport(PluginTask task)
     {
         return Exec.newTaskReport();
+    }
+
+    @Override  // Overridden from |ResponseReadable|
+    public String readResponse(javax.ws.rs.core.Response response)
+    {
+        return ResponseReaders.readResponseAsString(response);
     }
 
     @Override  // Overridden from |ClientCreatable|

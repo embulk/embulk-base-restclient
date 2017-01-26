@@ -16,21 +16,23 @@ import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.base.restclient.request.AutoCloseableClient;
 import org.embulk.base.restclient.request.RetryHelper;
 
-public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase, U extends ValueLocator>
+public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase, U extends ValueLocator, V>
         extends RestClientPluginBase<T>
         implements InputPlugin
 {
     protected RestClientInputPluginFragileBase(Class<T> taskClass,
                                                ClientCreatable<T> clientCreator,
                                                ConfigDiffBuildable<T> configDiffBuilder,
+                                               ResponseReadable<V> responseReader,
                                                ServiceResponseSchemaBuildable<U> serviceResponseSchemaBuilder,
-                                               PageLoadable<T,U> pageLoader,
+                                               PageLoadable<T,U,V> pageLoader,
                                                TaskReportBuildable<T> taskReportBuilder,
                                                TaskValidatable<T> taskValidator,
                                                int taskCount)
     {
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
+        this.responseReader = responseReader;
         this.serviceResponseSchema = serviceResponseSchemaBuilder.buildServiceResponseSchema();
         this.taskReportBuilder = taskReportBuilder;
         this.configDiffBuilder = configDiffBuilder;
@@ -40,10 +42,10 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase,
     }
 
     protected RestClientInputPluginFragileBase(Class<T> taskClass,
-                                               RestClientInputPluginDelegate<T,U> delegate,
+                                               RestClientInputPluginDelegate<T,U,V> delegate,
                                                int taskCount)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
+        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
     }
 
     @Override
@@ -78,8 +80,9 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase,
         T task = taskSource.loadTask(this.taskClass);
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
             try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
-                RetryHelper retryHelper = new RetryHelper(
+                RetryHelper<V> retryHelper = new RetryHelper<V>(
                     clientWrapper.getClient(),
+                    this.responseReader,
                     task.getRetryLimit(),
                     task.getInitialRetryWait(),
                     task.getMaxRetryWait());
@@ -105,7 +108,8 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase,
     private final Class<T> taskClass;
     private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
-    private final PageLoadable<T,U> pageLoader;
+    private final ResponseReadable<V> responseReader;
+    private final PageLoadable<T,U,V> pageLoader;
     private final ServiceResponseSchema<U> serviceResponseSchema;
     private final TaskReportBuildable<T> taskReportBuilder;
     private final TaskValidatable<T> taskValidator;

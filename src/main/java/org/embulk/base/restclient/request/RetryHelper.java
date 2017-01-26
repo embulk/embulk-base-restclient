@@ -9,21 +9,25 @@ import org.embulk.spi.util.RetryExecutor;
 
 import org.slf4j.Logger;
 
-public class RetryHelper
+import org.embulk.base.restclient.ResponseReadable;
+
+public class RetryHelper<T>
 {
     public RetryHelper(final javax.ws.rs.client.Client client,
+                       final ResponseReadable<T> responseReader,
                        final int retryLimit,
                        final int initialRetryWait,
                        final int maxRetryWait)
     {
         this.logger = Exec.getLogger(RetryHelper.class);
+        this.responseReader = responseReader;
         this.client = client;
         this.retryLimit = retryLimit;
         this.initialRetryWait = initialRetryWait;
         this.maxRetryWait = maxRetryWait;
     }
 
-    public javax.ws.rs.core.Response requestWithRetry(final SingleRequester singleRequester)
+    public T requestWithRetry(final SingleRequester singleRequester)
     {
         try {
             return RetryExecutor
@@ -31,9 +35,9 @@ public class RetryHelper
                 .withRetryLimit(retryLimit)
                 .withInitialRetryWait(initialRetryWait)
                 .withMaxRetryWait(maxRetryWait)
-                .runInterruptible(new RetryExecutor.Retryable<javax.ws.rs.core.Response>() {
+                .runInterruptible(new RetryExecutor.Retryable<T>() {
                         @Override
-                        public javax.ws.rs.core.Response call()
+                        public T call()
                                 throws Exception
                         {
                             // |javax.ws.rs.ProcessingException| can be throws
@@ -44,7 +48,7 @@ public class RetryHelper
                                 throw new javax.ws.rs.WebApplicationException(response);
                             }
 
-                            return response;
+                            return responseReader.readResponse(response);
                         }
 
                         @Override
@@ -86,6 +90,7 @@ public class RetryHelper
 
     private final Logger logger;
     private final javax.ws.rs.client.Client client;
+    private final ResponseReadable<T> responseReader;
     private final int retryLimit;
     private final int initialRetryWait;
     private final int maxRetryWait;
