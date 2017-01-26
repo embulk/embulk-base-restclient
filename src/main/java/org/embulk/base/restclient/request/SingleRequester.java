@@ -22,14 +22,14 @@ package org.embulk.base.restclient.request;
  *     });
  * }</pre>
  */
-abstract public class SingleRequester
+public abstract class SingleRequester
 {
     /**
      * Requests to the target service with the given {@code javax.ws.rs.client.Client}.
      *
      * The method is {@code abstract} that must be overridden.
      */
-    abstract public javax.ws.rs.core.Response requestOnce(javax.ws.rs.client.Client client);
+    public abstract javax.ws.rs.core.Response requestOnce(javax.ws.rs.client.Client client);
 
     /**
      * Returns {@code true} if the given {@code Exception} from {@link RetryHelper} is to retry.
@@ -54,7 +54,7 @@ abstract public class SingleRequester
      *
      * This method is {@code abstract} to be overridden, and {@code protected} to be called from {@code isRetryable}.
      */
-    abstract protected boolean isResponseStatusToRetry(javax.ws.rs.core.Response response);
+    protected abstract boolean isResponseStatusToRetry(javax.ws.rs.core.Response response);
 
     /**
      * Returns true if the given {@code Exception} is to retry.

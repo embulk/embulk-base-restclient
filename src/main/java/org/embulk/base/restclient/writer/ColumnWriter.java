@@ -7,7 +7,7 @@ import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ServiceValue;
 import org.embulk.base.restclient.record.ValueLocator;
 
-abstract public class ColumnWriter<T extends ValueLocator>
+public abstract class ColumnWriter<T extends ValueLocator>
 {
     protected ColumnWriter(Column column, T valueLocator)
     {
@@ -15,7 +15,7 @@ abstract public class ColumnWriter<T extends ValueLocator>
         this.valueLocator = valueLocator;
     }
 
-    abstract public void writeColumnResponsible(ServiceRecord<T> record, PageBuilder pageBuilderToLoad);
+    public abstract void writeColumnResponsible(ServiceRecord<T> record, PageBuilder pageBuilderToLoad);
 
     protected final Column getColumnResponsible()
     {
