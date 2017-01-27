@@ -7,16 +7,16 @@ import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ServiceValue;
 import org.embulk.base.restclient.record.ValueLocator;
 
-public class LongColumnWriter<T extends ValueLocator>
-        extends ColumnWriter<T>
+public class LongColumnWriter
+        extends ColumnWriter
 {
-    public LongColumnWriter(Column column, T valueLocator)
+    public LongColumnWriter(Column column, ValueLocator valueLocator)
     {
         super(column, valueLocator);
     }
 
     @Override
-    public void writeColumnResponsible(ServiceRecord<T> record, PageBuilder pageBuilderToLoad)
+    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilderToLoad)
     {
         ServiceValue value = pickupValueResponsible(record);
         if (value == null || value.isNull()) {

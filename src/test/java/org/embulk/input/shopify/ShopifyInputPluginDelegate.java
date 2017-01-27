@@ -38,7 +38,7 @@ import org.embulk.base.restclient.request.StringResponseEntityReader;
 import org.embulk.base.restclient.writer.SchemaWriter;
 
 public class ShopifyInputPluginDelegate
-    implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask, JacksonValueLocator>
+    implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask>
 {
     public interface PluginTask
             extends RestClientInputTaskBase
@@ -128,7 +128,7 @@ public class ShopifyInputPluginDelegate
     @Override  // Overridden from |PageLoadable|
     public void loadPage(final PluginTask task,
                          RetryHelper retryHelper,
-                         SchemaWriter<JacksonValueLocator> schemaWriter,
+                         SchemaWriter schemaWriter,
                          int taskCount,
                          PageBuilder pageBuilderToLoad)
     {
