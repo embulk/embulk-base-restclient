@@ -22,7 +22,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginFragileBase(Class<T> taskClass,
                                                ClientCreatable<T> clientCreator,
                                                ConfigDiffBuildable<T> configDiffBuilder,
-                                               ServiceResponseSchemaBuildable serviceResponseSchemaBuilder,
+                                               ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
                                                PageLoadable<T> pageLoader,
                                                TaskReportBuildable<T> taskReportBuilder,
                                                TaskValidatable<T> taskValidator,
@@ -30,7 +30,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     {
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
-        this.serviceResponseSchema = serviceResponseSchemaBuilder.buildServiceResponseSchema();
+        this.serviceResponseSchemaBuilder = serviceResponseSchemaBuilder;
         this.taskReportBuilder = taskReportBuilder;
         this.configDiffBuilder = configDiffBuilder;
         this.pageLoader = pageLoader;
@@ -50,7 +50,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     {
         T task = loadConfig(config, this.taskClass);
         taskValidator.validateTask(task);
-        Schema schema = this.serviceResponseSchema.getEmbulkSchema();
+        Schema schema = this.serviceResponseSchemaBuilder.buildServiceResponseSchema(task).getEmbulkSchema();
         return resume(task.dump(), schema, this.taskCount, control);
     }
 
@@ -75,6 +75,8 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
     {
         T task = taskSource.loadTask(this.taskClass);
+        ServiceResponseSchema serviceResponseSchema =
+            this.serviceResponseSchemaBuilder.buildServiceResponseSchema(task);
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
             try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
                 RetryHelper retryHelper = new RetryHelper(
@@ -84,7 +86,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
                     task.getMaxRetryWait());
                 this.pageLoader.loadPage(task,
                                          retryHelper,
-                                         this.serviceResponseSchema.createSchemaWriter(),
+                                         serviceResponseSchema.createSchemaWriter(),
                                          taskIndex,
                                          pageBuilder);
             }
@@ -105,7 +107,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
     private final PageLoadable<T> pageLoader;
-    private final ServiceResponseSchema serviceResponseSchema;
+    private final ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder;
     private final TaskReportBuildable<T> taskReportBuilder;
     private final TaskValidatable<T> taskValidator;
     private final int taskCount;
