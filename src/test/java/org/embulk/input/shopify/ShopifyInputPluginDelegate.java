@@ -91,7 +91,7 @@ public class ShopifyInputPluginDelegate
     }
 
     @Override  // Overridden from |ServiceResponseSchemaBuildable|
-    public JacksonServiceResponseSchema buildServiceResponseSchema()
+    public JacksonServiceResponseSchema buildServiceResponseSchema(PluginTask task)
     {
         return JacksonServiceResponseSchema.builder()
             .add("id", Types.LONG)

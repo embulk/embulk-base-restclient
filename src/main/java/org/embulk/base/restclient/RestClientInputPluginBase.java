@@ -16,7 +16,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
-                                        ServiceResponseSchemaBuildable serviceResponseSchemaBuilder,
+                                        ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
                                         PageLoadable<T> pageLoader,
                                         TaskReportBuildable<T> taskReportBuilder,
                                         TaskValidatable<T> taskValidator,
