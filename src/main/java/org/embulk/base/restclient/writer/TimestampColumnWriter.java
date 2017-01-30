@@ -8,17 +8,17 @@ import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ServiceValue;
 import org.embulk.base.restclient.record.ValueLocator;
 
-public class TimestampColumnWriter
-        extends ColumnWriter
+public class TimestampColumnWriter<T extends ValueLocator>
+        extends ColumnWriter<T>
 {
-    public TimestampColumnWriter(Column column, ValueLocator valueLocator, TimestampParser timestampParser)
+    public TimestampColumnWriter(Column column, T valueLocator, TimestampParser timestampParser)
     {
         super(column, valueLocator);
         this.timestampParser = timestampParser;
     }
 
     @Override
-    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilderToLoad)
+    public void writeColumnResponsible(ServiceRecord<T> record, PageBuilder pageBuilderToLoad)
     {
         ServiceValue value = pickupValueResponsible(record);
         if (value == null || value.isNull()) {

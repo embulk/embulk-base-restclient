@@ -3,7 +3,7 @@ package org.embulk.base.restclient.record;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JacksonServiceRecord
-        extends ServiceRecord
+        extends ServiceRecord<JacksonValueLocator>
 {
     public JacksonServiceRecord(ObjectNode record)
     {
@@ -11,13 +11,9 @@ public class JacksonServiceRecord
     }
 
     @Override
-    public JacksonServiceValue getValue(ValueLocator locator)
+    public JacksonServiceValue getValue(JacksonValueLocator locator)
     {
-        if (locator instanceof JacksonValueLocator) {
-            JacksonValueLocator jacksonLocator = (JacksonValueLocator) locator;
-            return new JacksonServiceValue(jacksonLocator.locateValue(record));
-        }
-        throw new RuntimeException("Non-JacksonValueLocator is used to locate a value in JacksonServiceRecord");
+        return new JacksonServiceValue(locator.locateValue(record));
     }
 
     private ObjectNode record;

@@ -32,6 +32,7 @@ import org.embulk.base.restclient.RestClientInputTaskBase;
 import org.embulk.base.restclient.json.StringJsonParser;
 import org.embulk.base.restclient.record.JacksonServiceRecord;
 import org.embulk.base.restclient.record.JacksonValueLocator;
+import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.request.SingleRequester;
 import org.embulk.base.restclient.request.StringResponseEntityReader;
@@ -128,10 +129,13 @@ public class ShopifyInputPluginDelegate
     @Override  // Overridden from |PageLoadable|
     public void loadPage(final PluginTask task,
                          RetryHelper retryHelper,
-                         SchemaWriter schemaWriter,
+                         SchemaWriter<? extends ValueLocator> schemaWriter,
                          int taskCount,
                          PageBuilder pageBuilderToLoad)
     {
+        @SuppressWarnings("unchecked")
+        SchemaWriter<JacksonValueLocator> jacksonSchemaWriter = (SchemaWriter<JacksonValueLocator>) schemaWriter;
+
         int pageIndex = 1;
         while (true) {
             String content = fetchFromShopify(retryHelper, task, pageIndex);
@@ -145,7 +149,7 @@ public class ShopifyInputPluginDelegate
                 }
 
                 try {
-                    schemaWriter.addRecordTo(
+                    jacksonSchemaWriter.addRecordTo(
                         new JacksonServiceRecord((ObjectNode) record), pageBuilderToLoad);
                 }
                 catch (Exception e) {

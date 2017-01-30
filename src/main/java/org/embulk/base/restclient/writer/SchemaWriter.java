@@ -7,20 +7,20 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ValueLocator;
 
-public class SchemaWriter
+public class SchemaWriter<T extends ValueLocator>
 {
-    public SchemaWriter(List<ColumnWriter> columnWriters)
+    public SchemaWriter(List<ColumnWriter<T>> columnWriters)
     {
         this.columnWriters = columnWriters;
     }
 
-    public void addRecordTo(ServiceRecord record, PageBuilder pageBuilderToLoad)
+    public void addRecordTo(ServiceRecord<T> record, PageBuilder pageBuilderToLoad)
     {
-        for (ColumnWriter columnWriter : columnWriters) {
+        for (ColumnWriter<T> columnWriter : columnWriters) {
             columnWriter.writeColumnResponsible(record, pageBuilderToLoad);
         }
         pageBuilderToLoad.addRecord();
     }
 
-    private List<ColumnWriter> columnWriters;
+    private List<ColumnWriter<T>> columnWriters;
 }
