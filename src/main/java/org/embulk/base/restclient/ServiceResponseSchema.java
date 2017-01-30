@@ -31,7 +31,7 @@ public abstract class ServiceResponseSchema<T extends ValueLocator>
         return new Schema(ImmutableList.copyOf(map.keys()));
     }
 
-    public abstract SchemaWriter createSchemaWriter();
+    public abstract SchemaWriter<T> createSchemaWriter();
 
     protected final Collection<Map.Entry<Column, ColumnOptions<T>>> entries()
     {

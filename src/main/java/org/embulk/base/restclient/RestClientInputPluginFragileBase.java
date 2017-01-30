@@ -12,6 +12,7 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
 
+import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.base.restclient.request.AutoCloseableClient;
 import org.embulk.base.restclient.request.RetryHelper;
 
@@ -75,7 +76,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
     {
         T task = taskSource.loadTask(this.taskClass);
-        ServiceResponseSchema serviceResponseSchema =
+        ServiceResponseSchema<? extends ValueLocator> serviceResponseSchema =
             this.serviceResponseSchemaBuilder.buildServiceResponseSchema(task);
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
             try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
