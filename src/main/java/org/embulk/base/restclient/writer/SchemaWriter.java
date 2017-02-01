@@ -14,12 +14,12 @@ public class SchemaWriter
         this.columnWriters = columnWriters;
     }
 
-    public void addRecordTo(ServiceRecord record, PageBuilder pageBuilderToLoad)
+    public void addRecordTo(ServiceRecord record, PageBuilder pageBuilder)
     {
         for (ColumnWriter columnWriter : columnWriters) {
-            columnWriter.writeColumnResponsible(record, pageBuilderToLoad);
+            columnWriter.writeColumnResponsible(record, pageBuilder);
         }
-        pageBuilderToLoad.addRecord();
+        pageBuilder.addRecord();
     }
 
     private List<ColumnWriter> columnWriters;

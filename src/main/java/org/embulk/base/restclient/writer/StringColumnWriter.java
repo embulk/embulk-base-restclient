@@ -16,14 +16,14 @@ public class StringColumnWriter
     }
 
     @Override
-    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilderToLoad)
+    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilder)
     {
         ServiceValue value = pickupValueResponsible(record);
         if (value == null || value.isNull()) {
-            pageBuilderToLoad.setNull(getColumnResponsible());
+            pageBuilder.setNull(getColumnResponsible());
         }
         else {
-            pageBuilderToLoad.setString(getColumnResponsible(), value.stringValue());
+            pageBuilder.setString(getColumnResponsible(), value.stringValue());
         }
     }
 }

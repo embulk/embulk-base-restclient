@@ -15,7 +15,7 @@ public abstract class ColumnWriter
         this.valueLocator = valueLocator;
     }
 
-    public abstract void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilderToLoad);
+    public abstract void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilder);
 
     protected final Column getColumnResponsible()
     {
