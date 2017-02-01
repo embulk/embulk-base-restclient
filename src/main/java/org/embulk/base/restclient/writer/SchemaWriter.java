@@ -17,7 +17,7 @@ public class SchemaWriter
     public void addRecordTo(ServiceRecord record, PageBuilder pageBuilder)
     {
         for (ColumnWriter columnWriter : columnWriters) {
-            columnWriter.writeColumnResponsible(record, pageBuilder);
+            columnWriter.writeColumn(record, pageBuilder);
         }
         pageBuilder.addRecord();
     }
