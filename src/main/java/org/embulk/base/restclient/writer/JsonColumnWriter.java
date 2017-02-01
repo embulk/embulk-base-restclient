@@ -18,14 +18,14 @@ public class JsonColumnWriter
     }
 
     @Override
-    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilder)
+    public void writeColumn(ServiceRecord record, PageBuilder pageBuilder)
     {
-        ServiceValue value = pickupValueResponsible(record);
+        ServiceValue value = pickupValue(record);
         if (value == null || value.isNull()) {
-            pageBuilder.setNull(getColumnResponsible());
+            pageBuilder.setNull(getColumn());
         }
         else {
-            pageBuilder.setJson(getColumnResponsible(), value.jsonValue(jsonParser));
+            pageBuilder.setJson(getColumn(), value.jsonValue(jsonParser));
         }
     }
 

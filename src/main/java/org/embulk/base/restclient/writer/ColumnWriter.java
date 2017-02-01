@@ -15,14 +15,14 @@ public abstract class ColumnWriter
         this.valueLocator = valueLocator;
     }
 
-    public abstract void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilder);
+    public abstract void writeColumn(ServiceRecord record, PageBuilder pageBuilder);
 
-    protected final Column getColumnResponsible()
+    protected final Column getColumn()
     {
         return column;
     }
 
-    protected final ServiceValue pickupValueResponsible(ServiceRecord record)
+    protected final ServiceValue pickupValue(ServiceRecord record)
     {
         return record.getValue(valueLocator);
     }
