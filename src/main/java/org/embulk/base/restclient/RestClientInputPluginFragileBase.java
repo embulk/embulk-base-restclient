@@ -22,8 +22,8 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginFragileBase(Class<T> taskClass,
                                                ClientCreatable<T> clientCreator,
                                                ConfigDiffBuildable<T> configDiffBuilder,
+                                               ServiceDataIngestable<T> serviceDataIngester,
                                                ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
-                                               PageLoadable<T> pageLoader,
                                                TaskReportBuildable<T> taskReportBuilder,
                                                TaskValidatable<T> taskValidator,
                                                int taskCount)
@@ -33,7 +33,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
         this.serviceResponseSchemaBuilder = serviceResponseSchemaBuilder;
         this.taskReportBuilder = taskReportBuilder;
         this.configDiffBuilder = configDiffBuilder;
-        this.pageLoader = pageLoader;
+        this.serviceDataIngester = serviceDataIngester;
         this.clientCreator = clientCreator;
         this.taskCount = taskCount;
     }
@@ -84,7 +84,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
                     task.getRetryLimit(),
                     task.getInitialRetryWait(),
                     task.getMaxRetryWait());
-                this.pageLoader.loadPage(task,
+                this.serviceDataIngester.ingestServiceData(task,
                                          retryHelper,
                                          serviceResponseSchema.createSchemaWriter(),
                                          taskIndex,
@@ -106,7 +106,7 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
     private final Class<T> taskClass;
     private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
-    private final PageLoadable<T> pageLoader;
+    private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder;
     private final TaskReportBuildable<T> taskReportBuilder;
     private final TaskValidatable<T> taskValidator;

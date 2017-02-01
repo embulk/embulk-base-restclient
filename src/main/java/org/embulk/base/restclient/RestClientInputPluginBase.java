@@ -16,8 +16,8 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
+                                        ServiceDataIngestable<T> serviceDataIngester,
                                         ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
-                                        PageLoadable<T> pageLoader,
                                         TaskReportBuildable<T> taskReportBuilder,
                                         TaskValidatable<T> taskValidator,
                                         int taskCount)
@@ -25,8 +25,8 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
         super(taskClass,
               clientCreator,
               configDiffBuilder,
+              serviceDataIngester,
               serviceResponseSchemaBuilder,
-              pageLoader,
               taskReportBuilder,
               taskValidator,
               taskCount);

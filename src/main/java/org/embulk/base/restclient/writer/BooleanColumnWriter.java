@@ -16,14 +16,14 @@ public class BooleanColumnWriter
     }
 
     @Override
-    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilderToLoad)
+    public void writeColumnResponsible(ServiceRecord record, PageBuilder pageBuilder)
     {
         ServiceValue value = pickupValueResponsible(record);
         if (value == null || value.isNull()) {
-            pageBuilderToLoad.setNull(getColumnResponsible());
+            pageBuilder.setNull(getColumnResponsible());
         }
         else {
-            pageBuilderToLoad.setBoolean(getColumnResponsible(), value.booleanValue());
+            pageBuilder.setBoolean(getColumnResponsible(), value.booleanValue());
         }
     }
 }

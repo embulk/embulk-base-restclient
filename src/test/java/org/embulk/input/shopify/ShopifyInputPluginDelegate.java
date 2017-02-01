@@ -125,12 +125,12 @@ public class ShopifyInputPluginDelegate
 
     private static final int PAGE_LIMIT = 250;
 
-    @Override  // Overridden from |PageLoadable|
-    public void loadPage(final PluginTask task,
-                         RetryHelper retryHelper,
-                         SchemaWriter schemaWriter,
-                         int taskCount,
-                         PageBuilder pageBuilderToLoad)
+    @Override  // Overridden from |ServiceDataIngestable|
+    public void ingestServiceData(final PluginTask task,
+                                  RetryHelper retryHelper,
+                                  SchemaWriter schemaWriter,
+                                  int taskCount,
+                                  PageBuilder pageBuilder)
     {
         int pageIndex = 1;
         while (true) {
@@ -146,7 +146,7 @@ public class ShopifyInputPluginDelegate
 
                 try {
                     schemaWriter.addRecordTo(
-                        new JacksonServiceRecord((ObjectNode) record), pageBuilderToLoad);
+                        new JacksonServiceRecord((ObjectNode) record), pageBuilder);
                 }
                 catch (Exception e) {
                     logger.warn(String.format(Locale.ENGLISH, "Skipped json: %s", record.toString()), e);

@@ -3,7 +3,7 @@ package org.embulk.base.restclient.request;
 /**
  * SingleRequester is to define a single request to the target REST service to be ready for retries.
  *
- * It is expected to use with {@link RetryHelper} as follows. {@code RetryHelper} is given for {@code PageLoadable#loadPage}.
+ * It is expected to use with {@link RetryHelper} as follows. {@code RetryHelper} is given for {@code ServiceDataIngestable#ingestServiceData}.
  *
  * <pre>{@code
  * javax.ws.rs.core.Response response = retryHelper.requestWithRetry(
