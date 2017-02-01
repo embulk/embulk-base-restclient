@@ -25,7 +25,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
                                         ServiceDataIngestable<T> serviceDataIngester,
-                                        ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
+                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                         TaskReportBuildable<T> taskReportBuilder,
                                         TaskValidatable<T> taskValidator,
                                         int taskCount)
@@ -34,7 +34,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
               clientCreator,
               configDiffBuilder,
               serviceDataIngester,
-              serviceResponseSchemaBuilder,
+              serviceResponseMapperBuilder,
               taskReportBuilder,
               taskValidator,
               taskCount);

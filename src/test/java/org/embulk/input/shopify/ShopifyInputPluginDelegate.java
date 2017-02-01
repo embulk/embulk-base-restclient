@@ -26,7 +26,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
 import org.slf4j.Logger;
 
-import org.embulk.base.restclient.JacksonServiceResponseSchema;
+import org.embulk.base.restclient.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.RestClientInputPluginDelegate;
 import org.embulk.base.restclient.RestClientInputTaskBase;
 import org.embulk.base.restclient.json.StringJsonParser;
@@ -90,10 +90,10 @@ public class ShopifyInputPluginDelegate
         }
     }
 
-    @Override  // Overridden from |ServiceResponseSchemaBuildable|
-    public JacksonServiceResponseSchema buildServiceResponseSchema(PluginTask task)
+    @Override  // Overridden from |ServiceResponseMapperBuildable|
+    public JacksonServiceResponseMapper buildServiceResponseMapper(PluginTask task)
     {
-        return JacksonServiceResponseSchema.builder()
+        return JacksonServiceResponseMapper.builder()
             .add("id", Types.LONG)
             .add("email", Types.STRING)
             .add("accepts_marketing", Types.BOOLEAN)
