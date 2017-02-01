@@ -10,8 +10,16 @@ import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
 
+/**
+ * RestClientInputPluginBase is a base class of input plugin implementations.
+ *
+ * Plugin methods of this {@code RestClientInputPluginBase} are all {@code final} to avoid confusion
+ * caused by inappropriate overrides. Though {@code RestClientInputPluginBaseUnsafe} is available to
+ * override the plugin methods, it is really discouraged. Contact the library authors when the base
+ * class does not cover use cases.
+ */
 public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
-        extends RestClientInputPluginFragileBase<T>
+        extends RestClientInputPluginBaseUnsafe<T>
 {
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
@@ -58,13 +66,13 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     }
 
     @Override
-    public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
+    public final TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
     {
         return super.run(taskSource, schema, taskIndex, output);
     }
 
     @Override
-    public ConfigDiff guess(ConfigSource config)
+    public final ConfigDiff guess(ConfigSource config)
     {
         return super.guess(config);
     }

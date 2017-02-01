@@ -15,18 +15,32 @@ import org.embulk.spi.Schema;
 import org.embulk.base.restclient.request.AutoCloseableClient;
 import org.embulk.base.restclient.request.RetryHelper;
 
-public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
+/**
+ * RestClientInputPluginBaseUnsafe is an "unsafe" base class of input plugin implementations.
+ *
+ * Do not use this {@code RestClientInputPluginBaseUnsafe} directly unless you really need this.
+ * For almost all cases, inherit {@code RestClientInputPluginBase} instead.
+ *
+ * This {@code RestClientInputPluginBaseUnsafe} is here to allow overriding the plugin methods
+ * such as {@code transaction} and {@code resume}. Overriding them can cause unexpected behavior.
+ * Plugins using this {@code RestClientInputPluginBaseUnsafe} may have difficulties to catch up
+ * with updates of this library.
+ *
+ * Use {@code RestClientInputPluginBase} instead of {@code RestClientInputPluginBaseUnsafe}.
+ * Plugin methods of {@code RestClientInputPluginBase} are all {@code final} not to be overridden.
+ */
+public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         extends RestClientPluginBase<T>
         implements InputPlugin
 {
-    protected RestClientInputPluginFragileBase(Class<T> taskClass,
-                                               ClientCreatable<T> clientCreator,
-                                               ConfigDiffBuildable<T> configDiffBuilder,
-                                               ServiceDataIngestable<T> serviceDataIngester,
-                                               ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
-                                               TaskReportBuildable<T> taskReportBuilder,
-                                               TaskValidatable<T> taskValidator,
-                                               int taskCount)
+    protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
+                                              ClientCreatable<T> clientCreator,
+                                              ConfigDiffBuildable<T> configDiffBuilder,
+                                              ServiceDataIngestable<T> serviceDataIngester,
+                                              ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
+                                              TaskReportBuildable<T> taskReportBuilder,
+                                              TaskValidatable<T> taskValidator,
+                                              int taskCount)
     {
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
@@ -38,9 +52,9 @@ public class RestClientInputPluginFragileBase<T extends RestClientInputTaskBase>
         this.taskCount = taskCount;
     }
 
-    protected RestClientInputPluginFragileBase(Class<T> taskClass,
-                                               RestClientInputPluginDelegate<T> delegate,
-                                               int taskCount)
+    protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
+                                              RestClientInputPluginDelegate<T> delegate,
+                                              int taskCount)
     {
         this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
     }
