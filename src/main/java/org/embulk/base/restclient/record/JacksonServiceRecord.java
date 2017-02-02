@@ -13,11 +13,20 @@ public class JacksonServiceRecord
     @Override
     public JacksonServiceValue getValue(ValueLocator locator)
     {
-        if (locator instanceof JacksonValueLocator) {
-            JacksonValueLocator jacksonLocator = (JacksonValueLocator) locator;
-            return new JacksonServiceValue(jacksonLocator.locateValue(record));
+        // Based on the implementation of |JacksonServiceResponseSchema|,
+        // the |ValueLocator| should be always |JacksonValueLocator|.
+        // The class cast should always success.
+        //
+        // NOTE: Just casting (with catching |ClassCastException|) is
+        // faster than checking (instanceof) and then casting if
+        // the |ClassCastException| never or hardly happens.
+        JacksonValueLocator jacksonLocator;
+        try {
+            jacksonLocator = (JacksonValueLocator) locator;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Non-JacksonValueLocator is used to locate a value in JacksonServiceRecord", ex);
         }
-        throw new RuntimeException("Non-JacksonValueLocator is used to locate a value in JacksonServiceRecord");
+        return new JacksonServiceValue(jacksonLocator.locateValue(record));
     }
 
     private ObjectNode record;
