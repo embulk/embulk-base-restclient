@@ -1,6 +1,8 @@
-package org.embulk.base.restclient.record;
+package org.embulk.base.restclient.jackson;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import org.embulk.base.restclient.record.ServiceValue;
 
 /**
  * JacksonServiceValue represents a value in a JSON response to be converted to an Embulk column value.
