@@ -37,14 +37,14 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                                               ClientCreatable<T> clientCreator,
                                               ConfigDiffBuildable<T> configDiffBuilder,
                                               ServiceDataIngestable<T> serviceDataIngester,
-                                              ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder,
+                                              ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                               TaskReportBuildable<T> taskReportBuilder,
                                               TaskValidatable<T> taskValidator,
                                               int taskCount)
     {
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
-        this.serviceResponseSchemaBuilder = serviceResponseSchemaBuilder;
+        this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
         this.taskReportBuilder = taskReportBuilder;
         this.configDiffBuilder = configDiffBuilder;
         this.serviceDataIngester = serviceDataIngester;
@@ -64,7 +64,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     {
         T task = loadConfig(config, this.taskClass);
         taskValidator.validateTask(task);
-        Schema schema = this.serviceResponseSchemaBuilder.buildServiceResponseSchema(task).getEmbulkSchema();
+        Schema schema = this.serviceResponseMapperBuilder.buildServiceResponseMapper(task).getEmbulkSchema();
         return resume(task.dump(), schema, this.taskCount, control);
     }
 
@@ -89,8 +89,8 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
     {
         T task = taskSource.loadTask(this.taskClass);
-        ServiceResponseSchema serviceResponseSchema =
-            this.serviceResponseSchemaBuilder.buildServiceResponseSchema(task);
+        ServiceResponseMapper serviceResponseMapper =
+            this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
             try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
                 RetryHelper retryHelper = new RetryHelper(
@@ -100,7 +100,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                     task.getMaxRetryWait());
                 this.serviceDataIngester.ingestServiceData(task,
                                          retryHelper,
-                                         serviceResponseSchema.createSchemaWriter(),
+                                         serviceResponseMapper.createSchemaWriter(),
                                          taskIndex,
                                          pageBuilder);
             }
@@ -121,7 +121,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
     private final ServiceDataIngestable<T> serviceDataIngester;
-    private final ServiceResponseSchemaBuildable<T> serviceResponseSchemaBuilder;
+    private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
     private final TaskReportBuildable<T> taskReportBuilder;
     private final TaskValidatable<T> taskValidator;
     private final int taskCount;

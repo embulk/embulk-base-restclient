@@ -15,12 +15,12 @@ import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.base.restclient.writer.SchemaWriter;
 
 /**
- * |ServiceResponseSchema| represents how to locate values in a response, and how the values are
+ * |ServiceResponseMapper| represents how to locate values in a response, and how the values are
  * mapped into Embulk schema.
  */
-public abstract class ServiceResponseSchema<T extends ValueLocator>
+public abstract class ServiceResponseMapper<T extends ValueLocator>
 {
-    protected ServiceResponseSchema(ListMultimap<Column, ColumnOptions<T>> map)
+    protected ServiceResponseMapper(ListMultimap<Column, ColumnOptions<T>> map)
     {
         this.map = ImmutableListMultimap.copyOf(map);
     }

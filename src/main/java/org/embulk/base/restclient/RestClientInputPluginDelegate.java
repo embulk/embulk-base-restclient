@@ -6,7 +6,7 @@ public interface RestClientInputPluginDelegate<T extends RestClientInputTaskBase
         extends ClientCreatable<T>,
                 ConfigDiffBuildable<T>,
                 ServiceDataIngestable<T>,
-                ServiceResponseSchemaBuildable<T>,
+                ServiceResponseMapperBuildable<T>,
                 TaskReportBuildable<T>,
                 TaskValidatable<T>
 {

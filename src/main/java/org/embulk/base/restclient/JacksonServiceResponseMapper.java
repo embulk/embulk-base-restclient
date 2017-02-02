@@ -26,11 +26,11 @@ import org.embulk.base.restclient.writer.TimestampColumnWriter;
 import org.embulk.base.restclient.writer.SchemaWriter;
 
 /**
- * |JacksonServiceResponseSchema| represents how to locate values in a JSON-based response,
+ * |JacksonServiceResponseMapper| represents how to locate values in a JSON-based response,
  * and how the values are mapped into Embulk schema.
  */
-public final class JacksonServiceResponseSchema
-        extends ServiceResponseSchema<JacksonValueLocator>
+public final class JacksonServiceResponseMapper
+        extends ServiceResponseMapper<JacksonValueLocator>
 {
     /**
      * Initializes |JacksonServiceSchema|.
@@ -38,7 +38,7 @@ public final class JacksonServiceResponseSchema
      * |JacksonServiceSchema| must be created through |JacksonServiceSchema.Builder|.
      * This constructor is private to guarantee the restriction.
      */
-    protected JacksonServiceResponseSchema(
+    protected JacksonServiceResponseMapper(
             ListMultimap<Column, ColumnOptions<JacksonValueLocator>> map)
     {
         super(map);
@@ -67,7 +67,7 @@ public final class JacksonServiceResponseSchema
             this.index = 0;
         }
 
-        public synchronized JacksonServiceResponseSchema.Builder add(
+        public synchronized JacksonServiceResponseMapper.Builder add(
                 String embulkColumnName,
                 Type embulkColumnType)
         {
@@ -77,7 +77,7 @@ public final class JacksonServiceResponseSchema
             return this;
         }
 
-        public synchronized JacksonServiceResponseSchema.Builder add(
+        public synchronized JacksonServiceResponseMapper.Builder add(
                 String embulkColumnName,
                 Type embulkColumnType,
                 String embulkColumnTimestampFormat)
@@ -89,7 +89,7 @@ public final class JacksonServiceResponseSchema
             return this;
         }
 
-        public synchronized JacksonServiceResponseSchema.Builder add(
+        public synchronized JacksonServiceResponseMapper.Builder add(
                 JacksonValueLocator valueLocator,
                 String embulkColumnName,
                 Type embulkColumnType)
@@ -100,7 +100,7 @@ public final class JacksonServiceResponseSchema
             return this;
         }
 
-        public synchronized JacksonServiceResponseSchema.Builder add(
+        public synchronized JacksonServiceResponseMapper.Builder add(
                 JacksonValueLocator valueLocator,
                 String embulkColumnName,
                 Type embulkColumnType,
@@ -113,9 +113,9 @@ public final class JacksonServiceResponseSchema
             return this;
         }
 
-        public JacksonServiceResponseSchema build()
+        public JacksonServiceResponseMapper build()
         {
-            return new JacksonServiceResponseSchema(mapBuilder.build());
+            return new JacksonServiceResponseMapper(mapBuilder.build());
         }
 
         private final ImmutableListMultimap.Builder<Column, ColumnOptions<JacksonValueLocator>> mapBuilder;
