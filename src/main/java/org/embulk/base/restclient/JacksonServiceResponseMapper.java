@@ -16,14 +16,14 @@ import org.embulk.spi.type.Types;
 
 import org.embulk.base.restclient.record.JacksonFlatValueLocator;
 import org.embulk.base.restclient.record.JacksonValueLocator;
-import org.embulk.base.restclient.writer.BooleanColumnWriter;
-import org.embulk.base.restclient.writer.ColumnWriter;
-import org.embulk.base.restclient.writer.DoubleColumnWriter;
-import org.embulk.base.restclient.writer.JsonColumnWriter;
-import org.embulk.base.restclient.writer.LongColumnWriter;
-import org.embulk.base.restclient.writer.StringColumnWriter;
-import org.embulk.base.restclient.writer.TimestampColumnWriter;
-import org.embulk.base.restclient.writer.SchemaWriter;
+import org.embulk.base.restclient.record.RecordImporter;
+import org.embulk.base.restclient.record.ValueImporter;
+import org.embulk.base.restclient.record.values.BooleanValueImporter;
+import org.embulk.base.restclient.record.values.DoubleValueImporter;
+import org.embulk.base.restclient.record.values.JsonValueImporter;
+import org.embulk.base.restclient.record.values.LongValueImporter;
+import org.embulk.base.restclient.record.values.StringValueImporter;
+import org.embulk.base.restclient.record.values.TimestampValueImporter;
 
 /**
  * |JacksonServiceResponseMapper| represents how to locate values in a JSON-based response,
@@ -50,13 +50,13 @@ public final class JacksonServiceResponseMapper
     }
 
     @Override
-    public SchemaWriter createSchemaWriter()
+    public RecordImporter createRecordImporter()
     {
-        ImmutableList.Builder<ColumnWriter> listBuilder = ImmutableList.builder();
+        ImmutableList.Builder<ValueImporter> listBuilder = ImmutableList.builder();
         for (Map.Entry<Column, ColumnOptions<JacksonValueLocator>> entry : entries()) {
-            listBuilder.add(createColumnWriter(entry.getKey(), entry.getValue()));
+            listBuilder.add(createValueImporter(entry.getKey(), entry.getValue()));
         }
-        return new SchemaWriter(listBuilder.build());
+        return new RecordImporter(listBuilder.build());
     }
 
     public static final class Builder
@@ -122,23 +122,23 @@ public final class JacksonServiceResponseMapper
         private int index;
     }
 
-    private ColumnWriter createColumnWriter(Column column,
-                                            ColumnOptions<JacksonValueLocator> columnOptions)
+    private ValueImporter createValueImporter(Column column,
+                                              ColumnOptions<JacksonValueLocator> columnOptions)
     {
         Type type = column.getType();
         JacksonValueLocator locator = columnOptions.getValueLocator();
         Optional<String> timestampFormat = columnOptions.getTimestampFormat();
         if (type.equals(Types.BOOLEAN)) {
-            return new BooleanColumnWriter(column, locator);
+            return new BooleanValueImporter(column, locator);
         }
         else if (type.equals(Types.DOUBLE)) {
-            return new DoubleColumnWriter(column, locator);
+            return new DoubleValueImporter(column, locator);
         }
         else if (type.equals(Types.LONG)) {
-            return new LongColumnWriter(column, locator);
+            return new LongValueImporter(column, locator);
         }
         else if (type.equals(Types.STRING)) {
-            return new StringColumnWriter(column, locator);
+            return new StringValueImporter(column, locator);
         }
         else if (type.equals(Types.TIMESTAMP)) {
             TimestampParser timestampParser = new TimestampParser(
@@ -146,11 +146,11 @@ public final class JacksonServiceResponseMapper
                 (timestampFormat.isPresent()
                  ? Exec.newConfigSource().set("format", timestampFormat.get())
                  : Exec.newConfigSource()).loadConfig(TimestampParser.TimestampColumnOption.class));
-            return new TimestampColumnWriter(column, locator, timestampParser);
+            return new TimestampValueImporter(column, locator, timestampParser);
         }
         else if (type.equals(Types.JSON)) {
             JsonParser jsonParser = new JsonParser();
-            return new JsonColumnWriter(column, locator, jsonParser);
+            return new JsonValueImporter(column, locator, jsonParser);
         }
         else {
             throw new IllegalStateException();

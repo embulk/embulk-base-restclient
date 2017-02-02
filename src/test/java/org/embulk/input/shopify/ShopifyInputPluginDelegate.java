@@ -32,10 +32,10 @@ import org.embulk.base.restclient.RestClientInputTaskBase;
 import org.embulk.base.restclient.json.StringJsonParser;
 import org.embulk.base.restclient.record.JacksonServiceRecord;
 import org.embulk.base.restclient.record.JacksonValueLocator;
+import org.embulk.base.restclient.record.RecordImporter;
 import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.request.SingleRequester;
 import org.embulk.base.restclient.request.StringResponseEntityReader;
-import org.embulk.base.restclient.writer.SchemaWriter;
 
 public class ShopifyInputPluginDelegate
     implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask>
@@ -128,7 +128,7 @@ public class ShopifyInputPluginDelegate
     @Override  // Overridden from |ServiceDataIngestable|
     public void ingestServiceData(final PluginTask task,
                                   RetryHelper retryHelper,
-                                  SchemaWriter schemaWriter,
+                                  RecordImporter recordImporter,
                                   int taskCount,
                                   PageBuilder pageBuilder)
     {
@@ -145,7 +145,7 @@ public class ShopifyInputPluginDelegate
                 }
 
                 try {
-                    schemaWriter.addRecordTo(
+                    recordImporter.importRecord(
                         new JacksonServiceRecord((ObjectNode) record), pageBuilder);
                 }
                 catch (Exception e) {
