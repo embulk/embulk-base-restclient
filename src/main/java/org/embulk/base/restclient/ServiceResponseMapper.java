@@ -38,7 +38,7 @@ public abstract class ServiceResponseMapper<T extends ValueLocator>
         return map.entries();
     }
 
-    protected static class ColumnOptions<U extends ValueLocator>
+    public static class ColumnOptions<U extends ValueLocator>
     {
         public ColumnOptions(U valueLocator)
         {

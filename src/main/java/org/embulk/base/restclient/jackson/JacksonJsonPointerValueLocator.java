@@ -1,4 +1,4 @@
-package org.embulk.base.restclient.record;
+package org.embulk.base.restclient.jackson;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
