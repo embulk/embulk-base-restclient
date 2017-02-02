@@ -100,7 +100,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                     task.getMaxRetryWait());
                 this.serviceDataIngester.ingestServiceData(task,
                                          retryHelper,
-                                         serviceResponseMapper.createSchemaWriter(),
+                                         serviceResponseMapper.createRecordImporter(),
                                          taskIndex,
                                          pageBuilder);
             }

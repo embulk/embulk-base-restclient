@@ -11,8 +11,8 @@ import com.google.common.collect.ListMultimap;
 import org.embulk.spi.Column;
 import org.embulk.spi.Schema;
 
+import org.embulk.base.restclient.record.RecordImporter;
 import org.embulk.base.restclient.record.ValueLocator;
-import org.embulk.base.restclient.writer.SchemaWriter;
 
 /**
  * |ServiceResponseMapper| represents how to locate values in a response, and how the values are
@@ -31,7 +31,7 @@ public abstract class ServiceResponseMapper<T extends ValueLocator>
         return new Schema(ImmutableList.copyOf(map.keys()));
     }
 
-    public abstract SchemaWriter createSchemaWriter();
+    public abstract RecordImporter createRecordImporter();
 
     protected final Collection<Map.Entry<Column, ColumnOptions<T>>> entries()
     {
