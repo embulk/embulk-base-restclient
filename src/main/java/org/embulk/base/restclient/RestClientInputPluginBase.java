@@ -26,7 +26,6 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
                                         ConfigDiffBuildable<T> configDiffBuilder,
                                         ServiceDataIngestable<T> serviceDataIngester,
                                         ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
-                                        TaskReportBuildable<T> taskReportBuilder,
                                         TaskValidatable<T> taskValidator,
                                         int taskCount)
     {
@@ -35,7 +34,6 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
               configDiffBuilder,
               serviceDataIngester,
               serviceResponseMapperBuilder,
-              taskReportBuilder,
               taskValidator,
               taskCount);
     }
@@ -44,7 +42,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
                                         RestClientInputPluginDelegate<T> delegate,
                                         int taskCount)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
+        super(taskClass, delegate, delegate, delegate, delegate, delegate, taskCount);
     }
 
     @Override

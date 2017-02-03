@@ -126,11 +126,11 @@ public class ShopifyInputPluginDelegate
     private static final int PAGE_LIMIT = 250;
 
     @Override  // Overridden from |ServiceDataIngestable|
-    public void ingestServiceData(final PluginTask task,
-                                  RetryHelper retryHelper,
-                                  RecordImporter recordImporter,
-                                  int taskCount,
-                                  PageBuilder pageBuilder)
+    public TaskReport ingestServiceData(final PluginTask task,
+                                        RetryHelper retryHelper,
+                                        RecordImporter recordImporter,
+                                        int taskCount,
+                                        PageBuilder pageBuilder)
     {
         int pageIndex = 1;
         while (true) {
@@ -160,6 +160,7 @@ public class ShopifyInputPluginDelegate
 
             pageIndex++;
         }
+        return Exec.newTaskReport();
     }
 
     private ArrayNode extractArrayField(String content)
@@ -206,12 +207,6 @@ public class ShopifyInputPluginDelegate
                     return status / 100 != 4;  // Retry unless 4xx except for 429.
                 }
             });
-    }
-
-    @Override  // Overridden from |TaskReportBuildable|
-    public TaskReport buildTaskReport(PluginTask task)
-    {
-        return Exec.newTaskReport();
     }
 
     @Override  // Overridden from |ClientCreatable|
