@@ -19,7 +19,9 @@ import org.embulk.config.ConfigException;
 import org.embulk.config.TaskReport;
 import org.embulk.spi.DataException;
 import org.embulk.spi.Exec;
+import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
+import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -116,8 +118,8 @@ public class ShopifyInputPluginDelegate
             .build();
     }
 
-    @Override  // Overridden from |ConfigDiffBuildable|
-    public ConfigDiff buildConfigDiff(PluginTask task)
+    @Override  // Overridden from |InputConfigDiffBuildable|
+    public ConfigDiff buildInputConfigDiff(PluginTask task, Schema schema, int taskCount, InputPlugin.Control control)
     {
         // should implement for incremental data loading
         return Exec.newConfigDiff();

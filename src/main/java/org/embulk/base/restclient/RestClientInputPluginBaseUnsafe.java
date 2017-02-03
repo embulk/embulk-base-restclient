@@ -35,7 +35,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 {
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ClientCreatable<T> clientCreator,
-                                              ConfigDiffBuildable<T> configDiffBuilder,
+                                              InputConfigDiffBuildable<T> inputConfigDiffBuilder,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                               TaskValidatable<T> taskValidator,
@@ -44,7 +44,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
-        this.configDiffBuilder = configDiffBuilder;
+        this.inputConfigDiffBuilder = inputConfigDiffBuilder;
         this.serviceDataIngester = serviceDataIngester;
         this.clientCreator = clientCreator;
         this.taskCount = taskCount;
@@ -72,7 +72,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         control.run(taskSource, schema, taskCount);
         T task = taskSource.loadTask(this.taskClass);
         if (task.getIncremental()) {
-            return this.configDiffBuilder.buildConfigDiff(task);
+            return this.inputConfigDiffBuilder.buildInputConfigDiff(task, schema, taskCount, control);
         } else {
             return Exec.newConfigDiff();
         }
@@ -120,7 +120,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
     private final Class<T> taskClass;
     private final ClientCreatable<T> clientCreator;
-    private final ConfigDiffBuildable<T> configDiffBuilder;
+    private final InputConfigDiffBuildable<T> inputConfigDiffBuilder;
     private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
     private final TaskValidatable<T> taskValidator;
