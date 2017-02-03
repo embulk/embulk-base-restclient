@@ -1,4 +1,4 @@
-package org.embulk.base.restclient;
+package org.embulk.base.restclient.jackson;
 
 import java.util.Map;
 
@@ -14,8 +14,8 @@ import org.embulk.spi.time.TimestampParser;
 import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
 
-import org.embulk.base.restclient.record.JacksonFlatValueLocator;
-import org.embulk.base.restclient.record.JacksonValueLocator;
+import org.embulk.base.restclient.ServiceResponseMapper;
+import org.embulk.base.restclient.ServiceResponseMapper.ColumnOptions;
 import org.embulk.base.restclient.record.RecordImporter;
 import org.embulk.base.restclient.record.ValueImporter;
 import org.embulk.base.restclient.record.values.BooleanValueImporter;

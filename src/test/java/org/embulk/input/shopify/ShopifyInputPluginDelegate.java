@@ -26,12 +26,12 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
 import org.slf4j.Logger;
 
-import org.embulk.base.restclient.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.RestClientInputPluginDelegate;
 import org.embulk.base.restclient.RestClientInputTaskBase;
-import org.embulk.base.restclient.json.StringJsonParser;
-import org.embulk.base.restclient.record.JacksonServiceRecord;
-import org.embulk.base.restclient.record.JacksonValueLocator;
+import org.embulk.base.restclient.jackson.JacksonServiceRecord;
+import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
+import org.embulk.base.restclient.jackson.JacksonValueLocator;
+import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.RecordImporter;
 import org.embulk.base.restclient.request.RetryHelper;
 import org.embulk.base.restclient.request.SingleRequester;
