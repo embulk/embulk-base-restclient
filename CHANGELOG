@@ -1,6 +1,6 @@
-Release 0.2.0 - 2017-01-12
+Release 0.2.0 - 2017-02-02
 
-* [renewal] Renew as embulk-base-restclient as a base for input/output plugins with REST.
+* [renewal] Renew as embulk-base-restclient as a base class library to access RESTful services.
 
 ====
 
