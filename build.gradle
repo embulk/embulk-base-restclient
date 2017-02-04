@@ -1,5 +1,5 @@
 plugins {
-    id "com.jfrog.bintray" version "1.7"
+    id "com.jfrog.bintray" version "1.7.3"
     id "com.github.jruby-gradle.base" version "0.2.1"
     id "java"
     id "maven" // install jar files to the local repo: $ gradle install
@@ -8,7 +8,6 @@ plugins {
     id "findbugs"
     //id "jacoco"
 }
-import com.github.jrubygradle.JRubyExec
 
 group = 'org.embulk.base.restclient'
 version = '0.2.0'
@@ -22,8 +21,26 @@ configurations {
     provided
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+def javaVersion = JavaVersion.VERSION_1_7;
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+task enforceJavaVersion {
+    doLast {
+        def foundVersion = JavaVersion.current();
+        if (foundVersion != javaVersion) {
+            if (project.hasProperty('ignoreJavaVersion')) {
+                println "[WARN] Java " + javaVersion + " is required, but found Java " + foundVersion + "."
+            } else {
+                throw new IllegalStateException("[ERROR] Java " + javaVersion + " is required, but found Java " + foundVersion + ". (Specify -PignoreJavaVersion to ignore the check.)");
+            }
+        }
+    }
+}
+
+compileJava {
+    dependsOn(enforceJavaVersion);
+}
 
 dependencies {
     compile     'org.embulk:embulk-core:0.8.15'
