@@ -21,6 +21,15 @@ import org.embulk.spi.Schema;
 public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
         extends RestClientInputPluginBaseUnsafe<T>
 {
+    /**
+     * Creates a new {@code RestClientInputPluginBase} instance.
+     *
+     * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
+     *
+     * NOTE: Specify {@code taskCount} carefully. If you specify non-{@code 1}, you need to implement
+     * {@code ServiceDataIngestable} carefully to support parallel execution. Use another constructor
+     * without {@code taskCount} for ordinary cases.
+     */
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
@@ -38,11 +47,52 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
               taskCount);
     }
 
+    /**
+     * Creates a new {@code RestClientInputPluginBase} instance.
+     *
+     * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
+     */
+    protected RestClientInputPluginBase(Class<T> taskClass,
+                                        ClientCreatable<T> clientCreator,
+                                        ConfigDiffBuildable<T> configDiffBuilder,
+                                        ServiceDataIngestable<T> serviceDataIngester,
+                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
+                                        TaskValidatable<T> taskValidator)
+    {
+        super(taskClass,
+              clientCreator,
+              configDiffBuilder,
+              serviceDataIngester,
+              serviceResponseMapperBuilder,
+              taskValidator,
+              1);
+    }
+
+    /**
+     * Creates a new {@code RestClientInputPluginBase} instance.
+     *
+     * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
+     *
+     * NOTE: Specify {@code taskCount} carefully. If you specify non-{@code 1}, you need to implement
+     * {@code ServiceDataIngestable} carefully to support parallel execution. Use another constructor
+     * without {@code taskCount} for ordinary cases.
+     */
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         RestClientInputPluginDelegate<T> delegate,
                                         int taskCount)
     {
         super(taskClass, delegate, delegate, delegate, delegate, delegate, taskCount);
+    }
+
+    /**
+     * Creates a new {@code RestClientInputPluginBase} instance.
+     *
+     * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
+     */
+    protected RestClientInputPluginBase(Class<T> taskClass,
+                                        RestClientInputPluginDelegate<T> delegate)
+    {
+        super(taskClass, delegate, delegate, delegate, delegate, delegate, 1);
     }
 
     @Override

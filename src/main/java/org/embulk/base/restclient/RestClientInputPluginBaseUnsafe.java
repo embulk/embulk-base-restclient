@@ -53,10 +53,32 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     }
 
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
+                                              ClientCreatable<T> clientCreator,
+                                              ConfigDiffBuildable<T> configDiffBuilder,
+                                              ServiceDataIngestable<T> serviceDataIngester,
+                                              ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
+                                              TaskValidatable<T> taskValidator)
+    {
+        this(taskClass,
+             clientCreator,
+             configDiffBuilder,
+             serviceDataIngester,
+             serviceResponseMapperBuilder,
+             taskValidator,
+             1);
+    }
+
+    protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               RestClientInputPluginDelegate<T> delegate,
                                               int taskCount)
     {
         this(taskClass, delegate, delegate, delegate, delegate, delegate, taskCount);
+    }
+
+    protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
+                                              RestClientInputPluginDelegate<T> delegate)
+    {
+        this(taskClass, delegate, delegate, delegate, delegate, delegate, 1);
     }
 
     @Override
