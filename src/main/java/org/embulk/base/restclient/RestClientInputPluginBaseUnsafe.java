@@ -2,6 +2,8 @@ package org.embulk.base.restclient;
 
 import java.util.List;
 
+import com.google.common.base.Preconditions;
+
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -90,7 +92,6 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         ServiceResponseMapper serviceResponseMapper =
             this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
 
-        TaskReport taskReport = null;
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
             try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
                 RetryHelper retryHelper = new RetryHelper(
@@ -98,18 +99,18 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                     task.getRetryLimit(),
                     task.getInitialRetryWait(),
                     task.getMaxRetryWait());
-                taskReport = this.serviceDataIngester.ingestServiceData(
-                    task,
-                    retryHelper,
-                    serviceResponseMapper.createRecordImporter(),
-                    taskIndex,
-                    pageBuilder);
+                return Preconditions.checkNotNull(
+                    this.serviceDataIngester.ingestServiceData(
+                        task,
+                        retryHelper,
+                        serviceResponseMapper.createRecordImporter(),
+                        taskIndex,
+                        pageBuilder));
             }
             finally {
                 pageBuilder.finish();
             }
         }
-        return taskReport == null ? Exec.newTaskReport() : taskReport;
     }
 
     @Override

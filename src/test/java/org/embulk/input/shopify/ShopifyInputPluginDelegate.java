@@ -129,7 +129,7 @@ public class ShopifyInputPluginDelegate
     public TaskReport ingestServiceData(final PluginTask task,
                                         RetryHelper retryHelper,
                                         RecordImporter recordImporter,
-                                        int taskCount,
+                                        int taskIndex,
                                         PageBuilder pageBuilder)
     {
         int pageIndex = 1;
