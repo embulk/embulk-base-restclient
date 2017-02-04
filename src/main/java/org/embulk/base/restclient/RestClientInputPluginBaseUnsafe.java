@@ -35,7 +35,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 {
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ClientCreatable<T> clientCreator,
-                                              InputConfigDiffBuildable<T> inputConfigDiffBuilder,
+                                              ConfigDiffBuildable<T> configDiffBuilder,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                               TaskValidatable<T> taskValidator,
@@ -44,7 +44,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
-        this.inputConfigDiffBuilder = inputConfigDiffBuilder;
+        this.configDiffBuilder = configDiffBuilder;
         this.serviceDataIngester = serviceDataIngester;
         this.clientCreator = clientCreator;
         this.taskCount = taskCount;
@@ -69,10 +69,10 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     @Override
     public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
     {
-        control.run(taskSource, schema, taskCount);
         T task = taskSource.loadTask(this.taskClass);
+        List<TaskReport> taskReports = control.run(taskSource, schema, taskCount);
         if (task.getIncremental()) {
-            return this.inputConfigDiffBuilder.buildInputConfigDiff(task, schema, taskCount, control);
+            return this.configDiffBuilder.buildConfigDiff(task, schema, taskCount, taskReports);
         } else {
             return Exec.newConfigDiff();
         }
@@ -120,7 +120,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
     private final Class<T> taskClass;
     private final ClientCreatable<T> clientCreator;
-    private final InputConfigDiffBuildable<T> inputConfigDiffBuilder;
+    private final ConfigDiffBuildable<T> configDiffBuilder;
     private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
     private final TaskValidatable<T> taskValidator;

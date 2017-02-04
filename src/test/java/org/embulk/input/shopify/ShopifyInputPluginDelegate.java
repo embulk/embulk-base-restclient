@@ -1,5 +1,6 @@
 package org.embulk.input.shopify;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -118,8 +119,8 @@ public class ShopifyInputPluginDelegate
             .build();
     }
 
-    @Override  // Overridden from |InputConfigDiffBuildable|
-    public ConfigDiff buildInputConfigDiff(PluginTask task, Schema schema, int taskCount, InputPlugin.Control control)
+    @Override  // Overridden from |ConfigDiffBuildable|
+    public ConfigDiff buildConfigDiff(PluginTask task, Schema schema, int taskCount, List<TaskReport> taskReports)
     {
         // should implement for incremental data loading
         return Exec.newConfigDiff();
