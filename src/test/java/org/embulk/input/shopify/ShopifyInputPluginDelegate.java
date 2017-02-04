@@ -1,5 +1,6 @@
 package org.embulk.input.shopify;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +20,9 @@ import org.embulk.config.ConfigException;
 import org.embulk.config.TaskReport;
 import org.embulk.spi.DataException;
 import org.embulk.spi.Exec;
+import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
+import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -117,7 +120,7 @@ public class ShopifyInputPluginDelegate
     }
 
     @Override  // Overridden from |ConfigDiffBuildable|
-    public ConfigDiff buildConfigDiff(PluginTask task)
+    public ConfigDiff buildConfigDiff(PluginTask task, Schema schema, int taskCount, List<TaskReport> taskReports)
     {
         // should implement for incremental data loading
         return Exec.newConfigDiff();

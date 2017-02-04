@@ -71,10 +71,10 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     @Override
     public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
     {
-        control.run(taskSource, schema, taskCount);
         T task = taskSource.loadTask(this.taskClass);
+        List<TaskReport> taskReports = control.run(taskSource, schema, taskCount);
         if (task.getIncremental()) {
-            return this.configDiffBuilder.buildConfigDiff(task);
+            return this.configDiffBuilder.buildConfigDiff(task, schema, taskCount, taskReports);
         } else {
             return Exec.newConfigDiff();
         }
