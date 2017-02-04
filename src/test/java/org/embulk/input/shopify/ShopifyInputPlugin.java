@@ -7,6 +7,6 @@ public class ShopifyInputPlugin
 {
     public ShopifyInputPlugin()
     {
-        super(ShopifyInputPluginDelegate.PluginTask.class, new ShopifyInputPluginDelegate(), 1);
+        super(ShopifyInputPluginDelegate.PluginTask.class, new ShopifyInputPluginDelegate());
     }
 }
