@@ -15,7 +15,6 @@ import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
 
 import org.embulk.base.restclient.ServiceResponseMapper;
-import org.embulk.base.restclient.ServiceResponseMapper.ColumnOptions;
 import org.embulk.base.restclient.record.RecordImporter;
 import org.embulk.base.restclient.record.ValueImporter;
 import org.embulk.base.restclient.record.values.BooleanValueImporter;
