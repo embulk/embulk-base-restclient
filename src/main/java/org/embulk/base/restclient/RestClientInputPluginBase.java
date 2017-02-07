@@ -33,6 +33,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
+                                        ResumeConfigurable<T> resumeConfigurator,
                                         RetryConfigurable<T> retryConfigurator,
                                         ServiceDataIngestable<T> serviceDataIngester,
                                         ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
@@ -42,6 +43,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
         super(taskClass,
               clientCreator,
               configDiffBuilder,
+              resumeConfigurator,
               retryConfigurator,
               serviceDataIngester,
               serviceResponseMapperBuilder,
@@ -57,6 +59,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
+                                        ResumeConfigurable<T> resumeConfigurator,
                                         RetryConfigurable<T> retryConfigurator,
                                         ServiceDataIngestable<T> serviceDataIngester,
                                         ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
@@ -65,6 +68,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
         super(taskClass,
               clientCreator,
               configDiffBuilder,
+              resumeConfigurator,
               retryConfigurator,
               serviceDataIngester,
               serviceResponseMapperBuilder,
@@ -85,7 +89,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
                                         RestClientInputPluginDelegate<T> delegate,
                                         int taskCount)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
+        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
     }
 
     /**
@@ -96,7 +100,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         RestClientInputPluginDelegate<T> delegate)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, 1);
+        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, delegate, 1);
     }
 
     @Override

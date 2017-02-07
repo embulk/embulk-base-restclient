@@ -57,7 +57,10 @@ public class ShopifyInputPluginDelegate
         @ConfigDefault("60000")
         public int getMaxRetryWait();
 
-        // An example required configuration
+        // incremental data loading setting
+        @Config("incremental")
+        @ConfigDefault("true")
+        public boolean getIncremental();
 
         // client timeout and connection setting: for RESTEasy
         @Config("connection_checkout_timeout")
@@ -234,6 +237,12 @@ public class ShopifyInputPluginDelegate
             .connectionPoolSize(task.getConnectionPoolSize())
             .build();
         return client;
+    }
+
+    @Override  // Overridden from |ResumeConfigurable|
+    public boolean isResuming(PluginTask task)
+    {
+        return task.getIncremental();
     }
 
     @Override  // Overridden from |RetryConfigurable|
