@@ -39,6 +39,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ClientCreatable<T> clientCreator,
                                               ConfigDiffBuildable<T> configDiffBuilder,
+                                              RetryConfigurable<T> retryConfigurator,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                               TaskValidatable<T> taskValidator,
@@ -46,6 +47,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     {
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
+        this.retryConfigurator = retryConfigurator;
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
         this.configDiffBuilder = configDiffBuilder;
         this.serviceDataIngester = serviceDataIngester;
@@ -56,6 +58,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ClientCreatable<T> clientCreator,
                                               ConfigDiffBuildable<T> configDiffBuilder,
+                                              RetryConfigurable<T> retryConfigurator,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                               TaskValidatable<T> taskValidator)
@@ -63,6 +66,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         this(taskClass,
              clientCreator,
              configDiffBuilder,
+             retryConfigurator,
              serviceDataIngester,
              serviceResponseMapperBuilder,
              taskValidator,
@@ -73,13 +77,13 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                                               RestClientInputPluginDelegate<T> delegate,
                                               int taskCount)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate, taskCount);
+        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
     }
 
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               RestClientInputPluginDelegate<T> delegate)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate, 1);
+        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, 1);
     }
 
     @Override
@@ -119,9 +123,9 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
             try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
                 RetryHelper retryHelper = new RetryHelper(
                     clientWrapper.getClient(),
-                    task.getRetryLimit(),
-                    task.getInitialRetryWait(),
-                    task.getMaxRetryWait());
+                    this.retryConfigurator.configureMaximumRetries(task),
+                    this.retryConfigurator.configureInitialRetryIntervalMillis(task),
+                    this.retryConfigurator.configureMaximumRetryIntervalMillis(task));
                 return Preconditions.checkNotNull(
                     this.serviceDataIngester.ingestServiceData(
                         task,
@@ -145,6 +149,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     private final Class<T> taskClass;
     private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
+    private final RetryConfigurable<T> retryConfigurator;
     private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
     private final TaskValidatable<T> taskValidator;

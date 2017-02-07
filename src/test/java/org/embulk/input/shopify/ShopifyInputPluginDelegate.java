@@ -44,6 +44,19 @@ public class ShopifyInputPluginDelegate
     public interface PluginTask
             extends RestClientInputTaskBase
     {
+        // client retry setting
+        @Config("retry_limit")
+        @ConfigDefault("7")
+        public int getRetryLimit();
+
+        @Config("initial_retry_wait")
+        @ConfigDefault("1000")
+        public int getInitialRetryWait();
+
+        @Config("max_retry_wait")
+        @ConfigDefault("60000")
+        public int getMaxRetryWait();
+
         // An example required configuration
 
         // client timeout and connection setting: for RESTEasy
@@ -221,6 +234,24 @@ public class ShopifyInputPluginDelegate
             .connectionPoolSize(task.getConnectionPoolSize())
             .build();
         return client;
+    }
+
+    @Override  // Overridden from |RetryConfigurable|
+    public int configureMaximumRetries(PluginTask task)
+    {
+        return task.getRetryLimit();
+    }
+
+    @Override  // Overridden from |RetryConfigurable|
+    public int configureInitialRetryIntervalMillis(PluginTask task)
+    {
+        return task.getInitialRetryWait();
+    }
+
+    @Override  // Overridden from |RetryConfigurable|
+    public int configureMaximumRetryIntervalMillis(PluginTask task)
+    {
+        return task.getMaxRetryWait();
     }
 
     private final Logger logger = Exec.getLogger(ShopifyInputPluginDelegate.class);
