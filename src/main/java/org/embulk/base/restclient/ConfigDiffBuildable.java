@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
-import org.embulk.spi.InputPlugin;
 import org.embulk.spi.Schema;
 
 public interface ConfigDiffBuildable<T extends RestClientTaskBase>
