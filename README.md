@@ -1,7 +1,7 @@
 embulk-base-restclient
 =======================
 
-Base class library to access RESTful services. Please see sample code: https://github.com/embulk/embulk-base-restclient/blob/master/src/test/java/org/embulk/input/shopify/ShopifyInputPlugin.java
+Base class library to access RESTful services. See [an example](embulk-input-example/).
 
 Versions and compatibility
 ---------------------------
