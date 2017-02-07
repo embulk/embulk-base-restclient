@@ -6,8 +6,4 @@ import org.embulk.config.ConfigDefault;
 public interface RestClientInputTaskBase
         extends RestClientTaskBase
 {
-    // incremental data loading setting
-    @Config("incremental")
-    @ConfigDefault("true")
-    public boolean getIncremental();
 }

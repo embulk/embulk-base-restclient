@@ -39,6 +39,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ClientCreatable<T> clientCreator,
                                               ConfigDiffBuildable<T> configDiffBuilder,
+                                              ResumeConfigurable<T> resumeConfigurator,
                                               RetryConfigurable<T> retryConfigurator,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
@@ -47,6 +48,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     {
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
+        this.resumeConfigurator = resumeConfigurator;
         this.retryConfigurator = retryConfigurator;
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
         this.configDiffBuilder = configDiffBuilder;
@@ -58,6 +60,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ClientCreatable<T> clientCreator,
                                               ConfigDiffBuildable<T> configDiffBuilder,
+                                              ResumeConfigurable<T> resumeConfigurator,
                                               RetryConfigurable<T> retryConfigurator,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
@@ -66,6 +69,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         this(taskClass,
              clientCreator,
              configDiffBuilder,
+             resumeConfigurator,
              retryConfigurator,
              serviceDataIngester,
              serviceResponseMapperBuilder,
@@ -77,13 +81,13 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                                               RestClientInputPluginDelegate<T> delegate,
                                               int taskCount)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
+        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
     }
 
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               RestClientInputPluginDelegate<T> delegate)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, 1);
+        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, delegate, 1);
     }
 
     @Override
@@ -100,7 +104,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     {
         T task = taskSource.loadTask(this.taskClass);
         List<TaskReport> taskReports = control.run(taskSource, schema, taskCount);
-        if (task.getIncremental()) {
+        if (this.resumeConfigurator.isResuming(task)) {
             return this.configDiffBuilder.buildConfigDiff(task, schema, taskCount, taskReports);
         } else {
             return Exec.newConfigDiff();
@@ -149,6 +153,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     private final Class<T> taskClass;
     private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
+    private final ResumeConfigurable<T> resumeConfigurator;
     private final RetryConfigurable<T> retryConfigurator;
     private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
