@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.embulk.config.Config;
+import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
 import org.embulk.spi.DataException;
@@ -35,6 +37,17 @@ public class ExampleInputPluginDelegate
     public interface PluginTask
             extends RestClientInputTaskBase
     {
+        @Config("maximum_retries")
+        @ConfigDefault("7")
+        public int getMaximumRetries();
+
+        @Config("initial_retry_interval_millis")
+        @ConfigDefault("1000")
+        public int getInitialRetryIntervalMillis();
+
+        @Config("maximum_retry_interval_millis")
+        @ConfigDefault("60000")
+        public int getMaximumRetryIntervalMillis();
     }
 
     private final StringJsonParser jsonParser = new StringJsonParser();
@@ -56,6 +69,7 @@ public class ExampleInputPluginDelegate
     public ConfigDiff buildConfigDiff(PluginTask task, Schema schema, int taskCount, List<TaskReport> taskReports)
     {
         // should implement for incremental data loading
+        // consider |incremental| config here
         return Exec.newConfigDiff();
     }
 
@@ -122,6 +136,24 @@ public class ExampleInputPluginDelegate
     {
         // TODO(dmikurube): Configure org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT and READ_TIMEOUT.
         return javax.ws.rs.client.ClientBuilder.newBuilder().build();
+    }
+
+    @Override  // Overridden from |RetryConfigurable|
+    public int configureMaximumRetries(PluginTask task)
+    {
+        return task.getMaximumRetries();
+    }
+
+    @Override  // Overridden from |RetryConfigurable|
+    public int configureInitialRetryIntervalMillis(PluginTask task)
+    {
+        return task.getInitialRetryIntervalMillis();
+    }
+
+    @Override  // Overridden from |RetryConfigurable|
+    public int configureMaximumRetryIntervalMillis(PluginTask task)
+    {
+        return task.getMaximumRetryIntervalMillis();
     }
 
     private final Logger logger = Exec.getLogger(ExampleInputPluginDelegate.class);
