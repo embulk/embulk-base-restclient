@@ -100,11 +100,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     {
         T task = taskSource.loadTask(this.taskClass);
         List<TaskReport> taskReports = control.run(taskSource, schema, taskCount);
-        if (task.getIncremental()) {
-            return this.configDiffBuilder.buildConfigDiff(task, schema, taskCount, taskReports);
-        } else {
-            return Exec.newConfigDiff();
-        }
+        return this.configDiffBuilder.buildConfigDiff(task, schema, taskCount, taskReports);
     }
 
     @Override
