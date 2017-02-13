@@ -1,3 +1,7 @@
+Release 0.2.2 - 2017-02-13
+
+* [maintenance] Fix a problem that it cannot handle Timestamp columns well.
+
 Release 0.2.1 - 2017-02-07
 
 * [maintenance] Configure retries and increment out of the basic classes internal. No default config parameters.
