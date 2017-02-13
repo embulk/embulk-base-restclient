@@ -121,6 +121,16 @@ public final class JacksonServiceResponseMapper
         private int index;
     }
 
+    private interface InternalTimestampParserTask
+            extends org.embulk.config.Task, TimestampParser.Task
+    {
+    }
+
+    private interface InternalTimestampColumnOption
+            extends org.embulk.config.Task, TimestampParser.TimestampColumnOption
+    {
+    }
+
     private ValueImporter createValueImporter(Column column,
                                               ColumnOptions<JacksonValueLocator> columnOptions)
     {
@@ -141,10 +151,10 @@ public final class JacksonServiceResponseMapper
         }
         else if (type.equals(Types.TIMESTAMP)) {
             TimestampParser timestampParser = new TimestampParser(
-                Exec.newConfigSource().loadConfig(TimestampParser.Task.class),
+                Exec.newConfigSource().loadConfig(InternalTimestampParserTask.class),
                 (timestampFormat.isPresent()
                  ? Exec.newConfigSource().set("format", timestampFormat.get())
-                 : Exec.newConfigSource()).loadConfig(TimestampParser.TimestampColumnOption.class));
+                 : Exec.newConfigSource()).loadConfig(InternalTimestampColumnOption.class));
             return new TimestampValueImporter(column, locator, timestampParser);
         }
         else if (type.equals(Types.JSON)) {
