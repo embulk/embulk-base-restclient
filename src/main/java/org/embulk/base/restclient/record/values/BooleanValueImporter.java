@@ -1,6 +1,7 @@
 package org.embulk.base.restclient.record.values;
 
 import org.embulk.spi.Column;
+import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
 
 import org.embulk.base.restclient.record.ServiceRecord;
@@ -19,12 +20,16 @@ public class BooleanValueImporter
     @Override
     public void findAndImportValue(ServiceRecord record, PageBuilder pageBuilder)
     {
-        ServiceValue value = findValue(record);
-        if (value == null || value.isNull()) {
-            pageBuilder.setNull(getColumnToImport());
-        }
-        else {
-            pageBuilder.setBoolean(getColumnToImport(), value.booleanValue());
+        try {
+            ServiceValue value = findValue(record);
+            if (value == null || value.isNull()) {
+                pageBuilder.setNull(getColumnToImport());
+            }
+            else {
+                pageBuilder.setBoolean(getColumnToImport(), value.booleanValue());
+            }
+        } catch (Exception ex) {
+            throw new DataException("Failed to import a value for column: " + getColumnToImport().getName() + " (" + getColumnToImport().getType().getName() + ")", ex);
         }
     }
 }

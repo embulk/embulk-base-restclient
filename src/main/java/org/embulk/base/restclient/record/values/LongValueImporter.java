@@ -1,6 +1,7 @@
 package org.embulk.base.restclient.record.values;
 
 import org.embulk.spi.Column;
+import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
 
 import org.embulk.base.restclient.record.ServiceRecord;
@@ -19,12 +20,16 @@ public class LongValueImporter
     @Override
     public void findAndImportValue(ServiceRecord record, PageBuilder pageBuilder)
     {
-        ServiceValue value = findValue(record);
-        if (value == null || value.isNull()) {
-            pageBuilder.setNull(getColumnToImport());
-        }
-        else {
-            pageBuilder.setLong(getColumnToImport(), value.longValue());
+        try {
+            ServiceValue value = findValue(record);
+            if (value == null || value.isNull()) {
+                pageBuilder.setNull(getColumnToImport());
+            }
+            else {
+                pageBuilder.setLong(getColumnToImport(), value.longValue());
+            }
+        } catch (Exception ex) {
+            throw new DataException("Failed to import a value for column: " + getColumnToImport().getName() + " (" + getColumnToImport().getType().getName() + ")", ex);
         }
     }
 }
