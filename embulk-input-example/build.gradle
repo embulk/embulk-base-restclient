@@ -25,7 +25,7 @@ targetCompatibility = 1.7
 dependencies {
     compile  "org.embulk:embulk-core:0.8.15"
     provided "org.embulk:embulk-core:0.8.15"
-    compile  "org.embulk.base.restclient:embulk-base-restclient:0.2.1"
+    compile  "org.embulk.base.restclient:embulk-base-restclient:0.2.2"
     compile  "org.glassfish.jersey.core:jersey-client:2.25.1"
 
     testCompile "junit:junit:4.+"
