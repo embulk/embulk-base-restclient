@@ -55,7 +55,9 @@ public class JacksonServiceValue
     @Override
     public org.msgpack.value.Value jsonValue(org.embulk.spi.json.JsonParser jsonParser)
     {
-        return jsonParser.parse(value.asText());
+        // Using |JsonNode#toString| instead of |JsonNode#asText| so that an empty JSON value can be parsed.
+        // |asText| converts an empty |JsonNode| to "" while |toString| converts to "{}".
+        return jsonParser.parse(value.toString());
     }
 
     @Override
