@@ -1,3 +1,7 @@
+Release 0.2.3 - 2017-02-15
+
+* [maintenance] Fix a null check in case the response does not have any value at an expected location. [#55](https://github.com/embulk/embulk-base-restclient/pull/55)
+
 Release 0.2.2 - 2017-02-13
 
 * [maintenance] Fix a problem that it cannot handle Timestamp columns well.
