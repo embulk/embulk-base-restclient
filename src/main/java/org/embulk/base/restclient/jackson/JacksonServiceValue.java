@@ -37,7 +37,7 @@ public class JacksonServiceValue
     @Override
     public boolean isNull()
     {
-        return value.isNull();
+        return value == null || value.isNull();
     }
 
     @Override
