@@ -2,6 +2,7 @@ package org.embulk.base.restclient.jackson;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import com.fasterxml.jackson.databind.node.NullNode;
 import org.embulk.base.restclient.record.ServiceValue;
 
 /**
@@ -31,7 +32,11 @@ public class JacksonServiceValue
 {
     public JacksonServiceValue(JsonNode value)
     {
-        this.value = value;
+        if (value == null) {
+            this.value = NullNode.getInstance();
+        } else {
+            this.value = value;
+        }
     }
 
     @Override
