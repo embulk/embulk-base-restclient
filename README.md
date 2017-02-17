@@ -74,8 +74,8 @@ From the following JSON for example:
 }
 ```
 
-* `add("fullname", Type.STRING)` picks up a `String` value `"example_name"` into an Embulk column `"fullname"` .
-* `add(new JacksonJsonPointerValueLocator("/timestamps/start"), "starting_time", Type.TIMESTAMP, "%s")` picks up a `Timestamp` value `2017-02-14T07:14:36Z` (`1487056476`) into an Embulk column `"starting_time"`.
+* `add("fullname", Types.STRING)` picks up a `String` value `"example_name"` into an Embulk column `"fullname"` .
+* `add(new JacksonJsonPointerValueLocator("/timestamps/start"), "starting_time", Types.TIMESTAMP, "%s")` picks up a `Timestamp` value `2017-02-14T07:14:36Z` (`1487056476`) into an Embulk column `"starting_time"`.
 
 ### Key method 2: `ingestServiceData`
 
