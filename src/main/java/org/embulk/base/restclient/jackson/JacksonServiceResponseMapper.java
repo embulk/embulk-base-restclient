@@ -72,7 +72,7 @@ public final class JacksonServiceResponseMapper
         {
             mapBuilder.put(new Column(index++, embulkColumnName, embulkColumnType),
                            new ColumnOptions<JacksonValueLocator>(
-                               new JacksonFlatValueLocator(embulkColumnName)));
+                               new JacksonTopLevelValueLocator(embulkColumnName)));
             return this;
         }
 
@@ -83,7 +83,7 @@ public final class JacksonServiceResponseMapper
         {
             mapBuilder.put(new Column(index++, embulkColumnName, embulkColumnType),
                            new ColumnOptions<JacksonValueLocator>(
-                               new JacksonFlatValueLocator(embulkColumnName),
+                               new JacksonTopLevelValueLocator(embulkColumnName),
                                embulkColumnTimestampFormat));
             return this;
         }

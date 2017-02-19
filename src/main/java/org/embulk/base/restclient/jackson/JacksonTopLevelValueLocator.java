@@ -3,10 +3,10 @@ package org.embulk.base.restclient.jackson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class JacksonFlatValueLocator
+public class JacksonTopLevelValueLocator
         extends JacksonValueLocator
 {
-    public JacksonFlatValueLocator(String name)
+    public JacksonTopLevelValueLocator(String name)
     {
         this.name = name;
     }
