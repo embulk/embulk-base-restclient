@@ -31,18 +31,14 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
      * without {@code taskCount} for ordinary cases.
      */
     protected RestClientInputPluginBase(Class<T> taskClass,
-                                        ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
-                                        RetryConfigurable<T> retryConfigurator,
                                         ServiceDataIngestable<T> serviceDataIngester,
                                         ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                         TaskValidatable<T> taskValidator,
                                         int taskCount)
     {
         super(taskClass,
-              clientCreator,
               configDiffBuilder,
-              retryConfigurator,
               serviceDataIngester,
               serviceResponseMapperBuilder,
               taskValidator,
@@ -55,17 +51,13 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
     protected RestClientInputPluginBase(Class<T> taskClass,
-                                        ClientCreatable<T> clientCreator,
                                         ConfigDiffBuildable<T> configDiffBuilder,
-                                        RetryConfigurable<T> retryConfigurator,
                                         ServiceDataIngestable<T> serviceDataIngester,
                                         ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                         TaskValidatable<T> taskValidator)
     {
         super(taskClass,
-              clientCreator,
               configDiffBuilder,
-              retryConfigurator,
               serviceDataIngester,
               serviceResponseMapperBuilder,
               taskValidator,
@@ -85,7 +77,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
                                         RestClientInputPluginDelegate<T> delegate,
                                         int taskCount)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
+        super(taskClass, delegate, delegate, delegate, delegate, taskCount);
     }
 
     /**
@@ -96,7 +88,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         RestClientInputPluginDelegate<T> delegate)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, 1);
+        super(taskClass, delegate, delegate, delegate, delegate, 1);
     }
 
     @Override

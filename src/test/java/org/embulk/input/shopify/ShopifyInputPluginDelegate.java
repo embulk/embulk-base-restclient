@@ -141,11 +141,21 @@ public class ShopifyInputPluginDelegate
 
     @Override  // Overridden from |ServiceDataIngestable|
     public TaskReport ingestServiceData(final PluginTask task,
-                                        RetryHelper retryHelper,
                                         RecordImporter recordImporter,
                                         int taskIndex,
                                         PageBuilder pageBuilder)
     {
+        final RetryHelper retryHelper = new RetryHelper(
+            ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
+                .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                .socketTimeout(task.getSocketTimeout(), TimeUnit.MILLISECONDS)
+                .connectionPoolSize(task.getConnectionPoolSize())
+                .build(),
+            task.getRetryLimit(),
+            task.getInitialRetryWait(),
+            task.getMaxRetryWait());
+
         int pageIndex = 1;
         while (true) {
             String content = fetchFromShopify(retryHelper, task, pageIndex);
@@ -221,37 +231,6 @@ public class ShopifyInputPluginDelegate
                     return status / 100 != 4;  // Retry unless 4xx except for 429.
                 }
             });
-    }
-
-    @Override  // Overridden from |ClientCreatable|
-    public javax.ws.rs.client.Client createClient(PluginTask task)
-    {
-        javax.ws.rs.client.Client client =
-            ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
-            .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), TimeUnit.MILLISECONDS)
-            .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), TimeUnit.MILLISECONDS)
-            .socketTimeout(task.getSocketTimeout(), TimeUnit.MILLISECONDS)
-            .connectionPoolSize(task.getConnectionPoolSize())
-            .build();
-        return client;
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureMaximumRetries(PluginTask task)
-    {
-        return task.getRetryLimit();
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureInitialRetryIntervalMillis(PluginTask task)
-    {
-        return task.getInitialRetryWait();
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureMaximumRetryIntervalMillis(PluginTask task)
-    {
-        return task.getMaxRetryWait();
     }
 
     private final Logger logger = Exec.getLogger(ShopifyInputPluginDelegate.class);

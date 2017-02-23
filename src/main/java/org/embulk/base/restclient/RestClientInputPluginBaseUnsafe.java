@@ -15,7 +15,6 @@ import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
 
 import org.embulk.base.restclient.record.ValueLocator;
-import org.embulk.base.restclient.request.AutoCloseableClient;
 import org.embulk.base.restclient.request.RetryHelper;
 
 /**
@@ -37,9 +36,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         implements InputPlugin
 {
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
-                                              ClientCreatable<T> clientCreator,
                                               ConfigDiffBuildable<T> configDiffBuilder,
-                                              RetryConfigurable<T> retryConfigurator,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                               TaskValidatable<T> taskValidator,
@@ -47,26 +44,20 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     {
         this.taskClass = taskClass;
         this.taskValidator = taskValidator;
-        this.retryConfigurator = retryConfigurator;
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
         this.configDiffBuilder = configDiffBuilder;
         this.serviceDataIngester = serviceDataIngester;
-        this.clientCreator = clientCreator;
         this.taskCount = taskCount;
     }
 
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
-                                              ClientCreatable<T> clientCreator,
                                               ConfigDiffBuildable<T> configDiffBuilder,
-                                              RetryConfigurable<T> retryConfigurator,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
                                               TaskValidatable<T> taskValidator)
     {
         this(taskClass,
-             clientCreator,
              configDiffBuilder,
-             retryConfigurator,
              serviceDataIngester,
              serviceResponseMapperBuilder,
              taskValidator,
@@ -77,13 +68,13 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                                               RestClientInputPluginDelegate<T> delegate,
                                               int taskCount)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, taskCount);
+        this(taskClass, delegate, delegate, delegate, delegate, taskCount);
     }
 
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               RestClientInputPluginDelegate<T> delegate)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate, delegate, 1);
+        this(taskClass, delegate, delegate, delegate, delegate, 1);
     }
 
     @Override
@@ -116,16 +107,10 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
             this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
 
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
-            try (AutoCloseableClient<T> clientWrapper = new AutoCloseableClient<T>(task, this.clientCreator)) {
-                RetryHelper retryHelper = new RetryHelper(
-                    clientWrapper.getClient(),
-                    this.retryConfigurator.configureMaximumRetries(task),
-                    this.retryConfigurator.configureInitialRetryIntervalMillis(task),
-                    this.retryConfigurator.configureMaximumRetryIntervalMillis(task));
+            try {
                 return Preconditions.checkNotNull(
                     this.serviceDataIngester.ingestServiceData(
                         task,
-                        retryHelper,
                         serviceResponseMapper.createRecordImporter(),
                         taskIndex,
                         pageBuilder));
@@ -143,9 +128,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     }
 
     private final Class<T> taskClass;
-    private final ClientCreatable<T> clientCreator;
     private final ConfigDiffBuildable<T> configDiffBuilder;
-    private final RetryConfigurable<T> retryConfigurator;
     private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
     private final TaskValidatable<T> taskValidator;
