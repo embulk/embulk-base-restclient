@@ -1,14 +1,14 @@
-package org.embulk.base.restclient.request;
+package org.embulk.util.retryhelper.jaxrs;
 
 /**
- * SingleRequester is to define a single request to the target REST service to be ready for retries.
+ * JAXRSSingleRequester is to define a single request to the target REST service to be ready for retries.
  *
- * It is expected to use with {@link RetryHelper} as follows. {@code RetryHelper} is given for {@code ServiceDataIngestable#ingestServiceData}.
+ * It is expected to use with {@link JAXRSRetryHelper} as follows.
  *
  * <pre>{@code
- * javax.ws.rs.core.Response response = retryHelper.requestWithRetry(
- *     new StringResponseEntityReader(),
- *     new SingleRequester() {
+ * javax.ws.rs.core.Response response = jaxrsRetryHelper.requestWithRetry(
+ *     new StringJAXRSResponseEntityReader(),
+ *     new JAXRSSingleRequester() {
  *         @Override
  *         public Response requestOnce(javax.ws.rs.client.Client client)
  *         {
@@ -23,10 +23,10 @@ package org.embulk.base.restclient.request;
  *     });
  * }</pre>
  *
- * @see ResponseReadable
- * @see StringResponseEntityReader
+ * @see JAXRSResponseReadable
+ * @see StringJAXRSResponseEntityReader
  */
-public abstract class SingleRequester
+public abstract class JAXRSSingleRequester
 {
     /**
      * Requests to the target service with the given {@code javax.ws.rs.client.Client}.
@@ -36,7 +36,7 @@ public abstract class SingleRequester
     public abstract javax.ws.rs.core.Response requestOnce(javax.ws.rs.client.Client client);
 
     /**
-     * Returns {@code true} if the given {@code Exception} from {@link RetryHelper} is to retry.
+     * Returns {@code true} if the given {@code Exception} from {@link JAXRSRetryHelper} is to retry.
      *
      * This method cannot be overridden. Override {@code isResponseStatusRetryable} and {@code isExceptionRetryable}
      * instead. {@code isResponseStatusRetryable} is called for {@code javax.ws.rs.WebApplicationException}.
@@ -44,7 +44,7 @@ public abstract class SingleRequester
      */
     public final boolean toRetry(Exception exception) {
         // Expects |javax.ws.rs.WebApplicationException| is throws in case of HTTP error status
-        // such as implemented in |RetryHelper|.
+        // such as implemented in |JAXRSRetryHelper|.
         if (exception instanceof javax.ws.rs.WebApplicationException) {
             return isResponseStatusToRetry(((javax.ws.rs.WebApplicationException) exception).getResponse());
         }

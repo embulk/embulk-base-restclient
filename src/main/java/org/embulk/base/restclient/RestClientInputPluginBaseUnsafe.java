@@ -15,7 +15,6 @@ import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
 
 import org.embulk.base.restclient.record.ValueLocator;
-import org.embulk.base.restclient.request.RetryHelper;
 
 /**
  * RestClientInputPluginBaseUnsafe is an "unsafe" base class of input plugin implementations.

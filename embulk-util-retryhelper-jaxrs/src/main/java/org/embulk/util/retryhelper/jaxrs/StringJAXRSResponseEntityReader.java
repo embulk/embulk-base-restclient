@@ -1,7 +1,7 @@
-package org.embulk.base.restclient.request;
+package org.embulk.util.retryhelper.jaxrs;
 
-public class StringResponseEntityReader
-        implements ResponseReadable<String>
+public class StringJAXRSResponseEntityReader
+        implements JAXRSResponseReader<String>
 {
     public final String readResponse(javax.ws.rs.core.Response response)
     {
