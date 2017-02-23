@@ -25,9 +25,11 @@ import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.RecordImporter;
-import org.embulk.base.restclient.request.RetryHelper;
-import org.embulk.base.restclient.request.SingleRequester;
-import org.embulk.base.restclient.request.StringResponseEntityReader;
+
+import org.embulk.util.retryhelper.jaxrs.JAXRSClientCreator;
+import org.embulk.util.retryhelper.jaxrs.JAXRSRetryHelper;
+import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
+import org.embulk.util.retryhelper.jaxrs.StringJAXRSResponseEntityReader;
 
 import org.slf4j.Logger;
 
@@ -75,24 +77,34 @@ public class ExampleInputPluginDelegate
 
     @Override  // Overridden from |ServiceDataIngestable|
     public TaskReport ingestServiceData(final PluginTask task,
-                                        RetryHelper retryHelper,
                                         RecordImporter recordImporter,
                                         int taskIndex,
                                         PageBuilder pageBuilder)
     {
-        String content = fetch(retryHelper);
-        ArrayNode records = extractArrayField(content);
+        try (JAXRSRetryHelper retryHelper = new JAXRSRetryHelper(
+                 task.getMaximumRetries(),
+                 task.getInitialRetryIntervalMillis(),
+                 task.getMaximumRetryIntervalMillis(),
+                 new JAXRSClientCreator() {
+                     @Override
+                     public javax.ws.rs.client.Client create() {
+                         return javax.ws.rs.client.ClientBuilder.newBuilder().build();
+                     }
+                 })) {
+            String content = fetch(retryHelper);
+            ArrayNode records = extractArrayField(content);
 
-        for (JsonNode record : records) {
-            if (!record.isObject()) {
-                logger.warn(String.format(Locale.ENGLISH, "A record must be Json object: %s", record.toString()));
-                continue;
-            }
-            try {
-                recordImporter.importRecord(new JacksonServiceRecord((ObjectNode) record), pageBuilder);
-            }
-            catch (Exception e) {
-                logger.warn(String.format(Locale.ENGLISH, "Skipped json: %s", record.toString()), e);
+            for (JsonNode record : records) {
+                if (!record.isObject()) {
+                    logger.warn(String.format(Locale.ENGLISH, "A record must be Json object: %s", record.toString()));
+                    continue;
+                }
+                try {
+                    recordImporter.importRecord(new JacksonServiceRecord((ObjectNode) record), pageBuilder);
+                }
+                catch (Exception e) {
+                    logger.warn(String.format(Locale.ENGLISH, "Skipped json: %s", record.toString()), e);
+                }
             }
         }
 
@@ -111,11 +123,11 @@ public class ExampleInputPluginDelegate
         }
     }
 
-    private String fetch(RetryHelper retryHelper)
+    private String fetch(JAXRSRetryHelper retryHelper)
     {
         return retryHelper.requestWithRetry(
-            new StringResponseEntityReader(),
-            new SingleRequester() {
+            new StringJAXRSResponseEntityReader(),
+            new JAXRSSingleRequester() {
                 @Override
                 public Response requestOnce(javax.ws.rs.client.Client client)
                 {
@@ -129,31 +141,6 @@ public class ExampleInputPluginDelegate
                     return response.getStatus() / 100 != 4;
                 }
             });
-    }
-
-    @Override  // Overridden from |ClientCreatable|
-    public javax.ws.rs.client.Client createClient(PluginTask task)
-    {
-        // TODO(dmikurube): Configure org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT and READ_TIMEOUT.
-        return javax.ws.rs.client.ClientBuilder.newBuilder().build();
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureMaximumRetries(PluginTask task)
-    {
-        return task.getMaximumRetries();
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureInitialRetryIntervalMillis(PluginTask task)
-    {
-        return task.getInitialRetryIntervalMillis();
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureMaximumRetryIntervalMillis(PluginTask task)
-    {
-        return task.getMaximumRetryIntervalMillis();
     }
 
     private final Logger logger = Exec.getLogger(ExampleInputPluginDelegate.class);
