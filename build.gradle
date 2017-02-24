@@ -34,8 +34,15 @@ allprojects {
         provided    'org.embulk:embulk-core:0.8.15'
 
         testCompile 'junit:junit:4.+'
-        testCompile 'org.embulk:embulk-core:0.8.15:tests'
     }
+}
+
+dependencies {
+    testCompile 'org.embulk:embulk-core:0.8.15:tests'
+    testCompile project(':embulk-util-retryhelper-jaxrs')
+
+    // RESTEasy JAX-RS implementation is required only for testing.
+    testCompile 'org.jboss.resteasy:resteasy-client:3.0.19.Final'
 }
 
 def javaVersion = JavaVersion.VERSION_1_7;
@@ -64,7 +71,7 @@ sourceSets {
    test {
         java {
             srcDir 'src/test/java'
-            exclude 'org/embulk/input/shopify/*.java'
+            exclude 'org/embulk/input/shopify/Test*.java'
        }
    }
 }

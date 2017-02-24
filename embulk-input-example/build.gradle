@@ -2,7 +2,9 @@ group = 'org.embulk.base.restclient'
 version = "0.1.1"
 
 dependencies {
-    compile  project(':')
-    compile  project(':embulk-util-retryhelper-jaxrs')
-    compile  "org.glassfish.jersey.core:jersey-client:2.25.1"
+    compile     project(':')
+    compile     project(':embulk-util-retryhelper-jaxrs')
+    compile     'org.glassfish.jersey.core:jersey-client:2.25.1'
+
+    testCompile 'org.embulk:embulk-core:0.8.15:tests'
 }
