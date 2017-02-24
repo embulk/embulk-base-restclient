@@ -40,7 +40,7 @@ public class JAXRSRetryHelper
     /**
      * Creates a {@code JAXRSRetryHelper} instance with a ready-made JAX-RS {@code Client} instance.
      *
-     * Note that the {@code Client} instance is automatically closed when this {@code JAXRSRetryHelper} is closed.
+     * Note that the {@code Client} instance is not automatically closed.
      */
     public static JAXRSRetryHelper createWithReadyMadeClient(int maximumRetries,
                                                              int initialRetryIntervalMillis,
