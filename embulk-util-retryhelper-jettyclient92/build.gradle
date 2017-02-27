@@ -1,0 +1,6 @@
+group = 'org.embulk.base.restclient'
+version = '0.1.0'
+
+dependencies {
+    compile     'org.eclipse.jetty:jetty-client:9.2.14.v20151106'
+}
