@@ -1,6 +1,6 @@
 plugins {
     id "com.jfrog.bintray" version "1.7.3"
-    id "com.github.jruby-gradle.base" version "0.2.1"
+    id "com.github.jruby-gradle.base" version "1.4.0"
     id "java"
     id "maven" // install jar files to the local repo: $ gradle install
     id "maven-publish"
