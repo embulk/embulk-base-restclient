@@ -1,0 +1,6 @@
+group = 'org.embulk.base.restclient'
+version = '0.1.0'
+
+dependencies {
+    compile     'javax.ws.rs:javax.ws.rs-api:2.0.1'
+}

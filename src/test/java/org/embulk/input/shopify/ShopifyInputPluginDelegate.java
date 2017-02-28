@@ -34,9 +34,11 @@ import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.RecordImporter;
-import org.embulk.base.restclient.request.RetryHelper;
-import org.embulk.base.restclient.request.SingleRequester;
-import org.embulk.base.restclient.request.StringResponseEntityReader;
+
+import org.embulk.util.retryhelper.jaxrs.JAXRSClientCreator;
+import org.embulk.util.retryhelper.jaxrs.JAXRSRetryHelper;
+import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
+import org.embulk.util.retryhelper.jaxrs.StringJAXRSResponseEntityReader;
 
 public class ShopifyInputPluginDelegate
     implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask>
@@ -141,38 +143,52 @@ public class ShopifyInputPluginDelegate
 
     @Override  // Overridden from |ServiceDataIngestable|
     public TaskReport ingestServiceData(final PluginTask task,
-                                        RetryHelper retryHelper,
                                         RecordImporter recordImporter,
                                         int taskIndex,
                                         PageBuilder pageBuilder)
     {
-        int pageIndex = 1;
-        while (true) {
-            String content = fetchFromShopify(retryHelper, task, pageIndex);
-            ArrayNode records = extractArrayField(content);
+        try (JAXRSRetryHelper retryHelper = new JAXRSRetryHelper(
+                task.getRetryLimit(),
+                task.getInitialRetryWait(),
+                task.getMaxRetryWait(),
+                new JAXRSClientCreator() {
+                     @Override
+                     public javax.ws.rs.client.Client create() {
+                         return ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
+                             .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                             .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                             .socketTimeout(task.getSocketTimeout(), TimeUnit.MILLISECONDS)
+                             .connectionPoolSize(task.getConnectionPoolSize())
+                             .build();
+                     }
+                })) {
+            int pageIndex = 1;
+            while (true) {
+                String content = fetchFromShopify(retryHelper, task, pageIndex);
+                ArrayNode records = extractArrayField(content);
 
-            int count = 0;
-            for (JsonNode record : records) {
-                if (!record.isObject()) {
-                    logger.warn(String.format(Locale.ENGLISH, "A record must be Json object: %s", record.toString()));
-                    continue;
+                int count = 0;
+                for (JsonNode record : records) {
+                    if (!record.isObject()) {
+                        logger.warn(String.format(Locale.ENGLISH, "A record must be Json object: %s", record.toString()));
+                        continue;
+                    }
+
+                    try {
+                        recordImporter.importRecord(
+                            new JacksonServiceRecord((ObjectNode) record), pageBuilder);
+                    }
+                    catch (Exception e) {
+                        logger.warn(String.format(Locale.ENGLISH, "Skipped json: %s", record.toString()), e);
+                    }
+                    count++;
                 }
 
-                try {
-                    recordImporter.importRecord(
-                        new JacksonServiceRecord((ObjectNode) record), pageBuilder);
+                if (count == 0) {
+                    break;
                 }
-                catch (Exception e) {
-                    logger.warn(String.format(Locale.ENGLISH, "Skipped json: %s", record.toString()), e);
-                }
-                count++;
+                pageIndex++;
             }
-
-            if (count == 0) {
-                break;
-            }
-
-            pageIndex++;
         }
         return Exec.newTaskReport();
     }
@@ -189,13 +205,13 @@ public class ShopifyInputPluginDelegate
         }
     }
 
-    private String fetchFromShopify(RetryHelper retryHelper,
+    private String fetchFromShopify(JAXRSRetryHelper retryHelper,
                                     final PluginTask task,
                                     final int pageIndex)
     {
         return retryHelper.requestWithRetry(
-            new StringResponseEntityReader(),
-            new SingleRequester() {
+            new StringJAXRSResponseEntityReader(),
+            new JAXRSSingleRequester() {
                 @Override
                 public Response requestOnce(javax.ws.rs.client.Client client)
                 {
@@ -221,37 +237,6 @@ public class ShopifyInputPluginDelegate
                     return status / 100 != 4;  // Retry unless 4xx except for 429.
                 }
             });
-    }
-
-    @Override  // Overridden from |ClientCreatable|
-    public javax.ws.rs.client.Client createClient(PluginTask task)
-    {
-        javax.ws.rs.client.Client client =
-            ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
-            .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), TimeUnit.MILLISECONDS)
-            .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), TimeUnit.MILLISECONDS)
-            .socketTimeout(task.getSocketTimeout(), TimeUnit.MILLISECONDS)
-            .connectionPoolSize(task.getConnectionPoolSize())
-            .build();
-        return client;
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureMaximumRetries(PluginTask task)
-    {
-        return task.getRetryLimit();
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureInitialRetryIntervalMillis(PluginTask task)
-    {
-        return task.getInitialRetryWait();
-    }
-
-    @Override  // Overridden from |RetryConfigurable|
-    public int configureMaximumRetryIntervalMillis(PluginTask task)
-    {
-        return task.getMaxRetryWait();
     }
 
     private final Logger logger = Exec.getLogger(ShopifyInputPluginDelegate.class);
