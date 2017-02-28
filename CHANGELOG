@@ -1,3 +1,7 @@
+Release 0.3.0 - 2017-02-28
+
+* [update] Split `RetryHelper` into separate libraries so that developers can use their own HTTP client.
+
 Release 0.2.3 - 2017-02-15
 
 * [maintenance] Fix a null check in case the response does not have any value at an expected location. [#55](https://github.com/embulk/embulk-base-restclient/pull/55)
