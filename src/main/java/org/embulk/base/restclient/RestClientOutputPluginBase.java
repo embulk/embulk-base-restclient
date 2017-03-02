@@ -30,46 +30,13 @@ public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase>
                                          EmbulkDataEgestable<T> embulkDataEgester,
                                          RecordBufferBuildable<T> recordBufferBuilder,
                                          ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder,
-                                         TaskValidatable<T> taskValidator,
-                                         int taskCount)
-    {
-        super(taskClass,
-              embulkDataEgester,
-              recordBufferBuilder,
-              serviceRequestMapperBuilder,
-              taskValidator,
-              taskCount);
-    }
-
-    /**
-     * Creates a new {@code RestClientOutputPluginBase} instance.
-     *
-     * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
-     */
-    protected RestClientOutputPluginBase(Class<T> taskClass,
-                                         EmbulkDataEgestable<T> embulkDataEgester,
-                                         RecordBufferBuildable<T> recordBufferBuilder,
-                                         ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder,
                                          TaskValidatable<T> taskValidator)
     {
         super(taskClass,
               embulkDataEgester,
               recordBufferBuilder,
               serviceRequestMapperBuilder,
-              taskValidator,
-              1);
-    }
-
-    /**
-     * Creates a new {@code RestClientOutputPluginBase} instance.
-     *
-     * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
-     */
-    protected RestClientOutputPluginBase(Class<T> taskClass,
-                                         RestClientOutputPluginDelegate<T> delegate,
-                                         int taskCount)
-    {
-        super(taskClass, delegate, delegate, delegate, delegate, taskCount);
+              taskValidator);
     }
 
     /**
@@ -80,7 +47,7 @@ public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase>
     protected RestClientOutputPluginBase(Class<T> taskClass,
                                          RestClientOutputPluginDelegate<T> delegate)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, 1);
+        super(taskClass, delegate, delegate, delegate, delegate);
     }
 
     @Override

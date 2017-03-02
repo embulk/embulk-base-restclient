@@ -20,22 +20,19 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
                                                EmbulkDataEgestable<T> embulkDataEgester,
                                                RecordBufferBuildable<T> recordBufferBuilder,
                                                ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder,
-                                               TaskValidatable<T> taskValidator,
-                                               int taskCount)
+                                               TaskValidatable<T> taskValidator)
     {
         this.taskClass = taskClass;
         this.embulkDataEgester = embulkDataEgester;
         this.recordBufferBuilder = recordBufferBuilder;
         this.serviceRequestMapperBuilder = serviceRequestMapperBuilder;
         this.taskValidator = taskValidator;
-        this.taskCount = taskCount;
     }
 
     protected RestClientOutputPluginBaseUnsafe(Class<T> taskClass,
-                                               RestClientOutputPluginDelegate<T> delegate,
-                                               int taskCount)
+                                               RestClientOutputPluginDelegate<T> delegate)
     {
-        this(taskClass, delegate, delegate, delegate, delegate, taskCount);
+        this(taskClass, delegate, delegate, delegate, delegate);
     }
 
     @Override
@@ -43,7 +40,7 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
     {
         T task = loadConfig(config, this.taskClass);
         taskValidator.validateTask(task);
-        return resume(task.dump(), schema, this.taskCount, control);
+        return resume(task.dump(), schema, taskCount, control);
     }
 
     @Override
@@ -78,5 +75,4 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
     private final RecordBufferBuildable<T> recordBufferBuilder;
     private final ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder;
     private final TaskValidatable<T> taskValidator;
-    private final int taskCount;
 }

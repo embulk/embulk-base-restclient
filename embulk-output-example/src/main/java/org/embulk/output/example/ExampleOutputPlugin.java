@@ -7,6 +7,6 @@ public class ExampleOutputPlugin
 {
     public ExampleOutputPlugin()
     {
-        super(ExampleOutputPluginDelegate.PluginTask.class, new ExampleOutputPluginDelegate(), 1);
+        super(ExampleOutputPluginDelegate.PluginTask.class, new ExampleOutputPluginDelegate());
     }
 }
