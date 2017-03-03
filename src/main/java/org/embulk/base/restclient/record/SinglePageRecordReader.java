@@ -7,6 +7,9 @@ import org.embulk.spi.time.Timestamp;
 
 import org.msgpack.value.Value;
 
+/**
+ * SinglePageRecordReader is a {@code PageReader} wrapper which ensures that {@code nextRecord} is not called.
+ */
 public class SinglePageRecordReader
 {
     public SinglePageRecordReader(PageReader pageReader)

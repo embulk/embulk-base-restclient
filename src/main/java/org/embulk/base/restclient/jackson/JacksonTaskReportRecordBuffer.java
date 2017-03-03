@@ -14,6 +14,9 @@ import org.embulk.config.TaskReport;
 import org.embulk.base.restclient.record.RecordBuffer;
 import org.embulk.base.restclient.record.ServiceRecord;
 
+/**
+ * JacksonTaskReportRecordBuffer is an implementation of {@code RecordBuffer} which includes JSON output directly in {@code TaskReport}.
+ */
 public class JacksonTaskReportRecordBuffer
         extends RecordBuffer
 {
