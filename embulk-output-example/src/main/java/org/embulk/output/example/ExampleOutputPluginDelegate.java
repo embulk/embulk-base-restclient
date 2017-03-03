@@ -57,7 +57,7 @@ public class ExampleOutputPluginDelegate
     {
     }
 
-    // @Override  // Overridden from |ServiceRequestMapperBuildable|
+    @Override  // Overridden from |ServiceRequestMapperBuildable|
     public JacksonServiceRequestMapper buildServiceRequestMapper(PluginTask task)
     {
         return JacksonServiceRequestMapper.builder()
