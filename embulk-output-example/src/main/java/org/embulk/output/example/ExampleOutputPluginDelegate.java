@@ -52,8 +52,8 @@ public class ExampleOutputPluginDelegate
         public int getMaximumRetryIntervalMillis();
     }
 
-    @Override  // Overridden from |TaskValidatable|
-    public void validateTask(PluginTask task)
+    @Override  // Overridden from |OutputTaskValidatable|
+    public void validateOutputTask(PluginTask task, Schema embulkSchema, int taskCount)
     {
     }
 

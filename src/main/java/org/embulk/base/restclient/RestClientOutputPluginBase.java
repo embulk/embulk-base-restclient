@@ -29,14 +29,14 @@ public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase>
     protected RestClientOutputPluginBase(Class<T> taskClass,
                                          EmbulkDataEgestable<T> embulkDataEgester,
                                          RecordBufferBuildable<T> recordBufferBuilder,
-                                         ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder,
-                                         TaskValidatable<T> taskValidator)
+                                         OutputTaskValidatable<T> outputTaskValidator,
+                                         ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder)
     {
         super(taskClass,
               embulkDataEgester,
               recordBufferBuilder,
-              serviceRequestMapperBuilder,
-              taskValidator);
+              outputTaskValidator,
+              serviceRequestMapperBuilder);
     }
 
     /**

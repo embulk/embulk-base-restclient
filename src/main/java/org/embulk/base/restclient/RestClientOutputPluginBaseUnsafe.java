@@ -19,14 +19,14 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
     protected RestClientOutputPluginBaseUnsafe(Class<T> taskClass,
                                                EmbulkDataEgestable<T> embulkDataEgester,
                                                RecordBufferBuildable<T> recordBufferBuilder,
-                                               ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder,
-                                               TaskValidatable<T> taskValidator)
+                                               OutputTaskValidatable<T> outputTaskValidator,
+                                               ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder)
     {
         this.taskClass = taskClass;
         this.embulkDataEgester = embulkDataEgester;
         this.recordBufferBuilder = recordBufferBuilder;
+        this.outputTaskValidator = outputTaskValidator;
         this.serviceRequestMapperBuilder = serviceRequestMapperBuilder;
-        this.taskValidator = taskValidator;
     }
 
     protected RestClientOutputPluginBaseUnsafe(Class<T> taskClass,
@@ -39,7 +39,7 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
     public ConfigDiff transaction(ConfigSource config, Schema schema, int taskCount, OutputPlugin.Control control)
     {
         T task = loadConfig(config, this.taskClass);
-        taskValidator.validateTask(task);
+        this.outputTaskValidator.validateOutputTask(task, schema, taskCount);
         return resume(task.dump(), schema, taskCount, control);
     }
 
@@ -73,6 +73,6 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
     private final Class<T> taskClass;
     private final EmbulkDataEgestable<T> embulkDataEgester;
     private final RecordBufferBuildable<T> recordBufferBuilder;
+    private final OutputTaskValidatable<T> outputTaskValidator;
     private final ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder;
-    private final TaskValidatable<T> taskValidator;
 }
