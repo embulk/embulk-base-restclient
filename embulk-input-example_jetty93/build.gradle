@@ -1,8 +1,5 @@
 import com.github.jrubygradle.JRubyExec
 
-group = 'org.embulk.base.restclient'
-version = "0.1.0"
-
 dependencies {
     compile     project(':')
     compile     project(':embulk-util-retryhelper-jetty93')

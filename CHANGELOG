@@ -1,3 +1,8 @@
+Release 0.4.0 - 2017-03-06
+
+* [update] Add base classes for output plugins.
+* [incompatibility] `validateTask` is renamed to `validateInputTask`.
+
 Release 0.3.0 - 2017-02-28
 
 * [update] Split `RetryHelper` into separate libraries so that developers can use their own HTTP client.

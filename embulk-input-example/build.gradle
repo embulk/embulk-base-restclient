@@ -1,8 +1,5 @@
 import com.github.jrubygradle.JRubyExec
 
-group = 'org.embulk.base.restclient'
-version = "0.1.1"
-
 dependencies {
     compile     project(':')
     compile     project(':embulk-util-retryhelper-jaxrs')
