@@ -54,8 +54,8 @@ public class ExampleInputPluginDelegate
 
     private final StringJsonParser jsonParser = new StringJsonParser();
 
-    @Override  // Overridden from |TaskValidatable|
-    public void validateTask(PluginTask task)
+    @Override  // Overridden from |InputTaskValidatable|
+    public void validateInputTask(PluginTask task)
     {
     }
 

@@ -36,13 +36,13 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 {
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ConfigDiffBuildable<T> configDiffBuilder,
+                                              InputTaskValidatable<T> inputTaskValidator,
                                               ServiceDataIngestable<T> serviceDataIngester,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
-                                              TaskValidatable<T> taskValidator,
                                               int taskCount)
     {
         this.taskClass = taskClass;
-        this.taskValidator = taskValidator;
+        this.inputTaskValidator = inputTaskValidator;
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
         this.configDiffBuilder = configDiffBuilder;
         this.serviceDataIngester = serviceDataIngester;
@@ -51,15 +51,15 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ConfigDiffBuildable<T> configDiffBuilder,
+                                              InputTaskValidatable<T> inputTaskValidator,
                                               ServiceDataIngestable<T> serviceDataIngester,
-                                              ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
-                                              TaskValidatable<T> taskValidator)
+                                              ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
     {
         this(taskClass,
              configDiffBuilder,
+             inputTaskValidator,
              serviceDataIngester,
              serviceResponseMapperBuilder,
-             taskValidator,
              1);
     }
 
@@ -80,7 +80,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     public ConfigDiff transaction(ConfigSource config, InputPlugin.Control control)
     {
         T task = loadConfig(config, this.taskClass);
-        taskValidator.validateTask(task);
+        this.inputTaskValidator.validateInputTask(task);
         Schema schema = this.serviceResponseMapperBuilder.buildServiceResponseMapper(task).getEmbulkSchema();
         return resume(task.dump(), schema, this.taskCount, control);
     }
@@ -128,8 +128,8 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
     private final Class<T> taskClass;
     private final ConfigDiffBuildable<T> configDiffBuilder;
+    private final InputTaskValidatable<T> inputTaskValidator;
     private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
-    private final TaskValidatable<T> taskValidator;
     private final int taskCount;
 }
