@@ -22,10 +22,12 @@ import org.embulk.spi.Schema;
 
 import org.embulk.base.restclient.RestClientOutputPluginDelegate;
 import org.embulk.base.restclient.RestClientOutputTaskBase;
+import org.embulk.base.restclient.jackson.JacksonJsonPointerValueLocator;
 import org.embulk.base.restclient.jackson.JacksonServiceRequestMapper;
-import org.embulk.base.restclient.jackson.JacksonStraightStringValueScope;
 import org.embulk.base.restclient.jackson.JacksonTaskReportRecordBuffer;
 import org.embulk.base.restclient.jackson.JacksonTopLevelValueLocator;
+import org.embulk.base.restclient.jackson.scope.JacksonDirectIntegerScope;
+import org.embulk.base.restclient.jackson.scope.JacksonDirectStringScope;
 import org.embulk.base.restclient.record.RecordBuffer;
 
 import org.embulk.util.retryhelper.jaxrs.JAXRSClientCreator;
@@ -39,6 +41,9 @@ public class ExampleOutputPluginDelegate
     public interface PluginTask
             extends RestClientOutputTaskBase
     {
+        @Config("endpoint")
+        public String getEndpoint();
+
         @Config("maximum_retries")
         @ConfigDefault("7")
         public int getMaximumRetries();
@@ -61,7 +66,13 @@ public class ExampleOutputPluginDelegate
     public JacksonServiceRequestMapper buildServiceRequestMapper(PluginTask task)
     {
         return JacksonServiceRequestMapper.builder()
-            .add(new JacksonStraightStringValueScope("name"), new JacksonTopLevelValueLocator("name"))
+            .add(new JacksonDirectIntegerScope("id"), new JacksonTopLevelValueLocator("id"))
+            .add(new JacksonDirectStringScope("name"), new JacksonTopLevelValueLocator("name"))
+            .addNewObject(new JacksonTopLevelValueLocator("dict"))
+            .addNewObject(new JacksonJsonPointerValueLocator("/dict/sub1"))
+            .addNewObject(new JacksonJsonPointerValueLocator("/dict/sub1/sub2"))
+            .add(new JacksonDirectStringScope("foo"), new JacksonJsonPointerValueLocator("/dict/sub1/foo"))
+            .add(new JacksonDirectStringScope("bar"), new JacksonJsonPointerValueLocator("/dict/sub1/sub2/bar"))
             .build();
     }
 
@@ -96,13 +107,13 @@ public class ExampleOutputPluginDelegate
                          return javax.ws.rs.client.ClientBuilder.newBuilder().build();
                      }
                  })) {
-            push(retryHelper, json);
+            push(retryHelper, json, task.getEndpoint());
         }
 
         return Exec.newConfigDiff();
     }
 
-    private String push(JAXRSRetryHelper retryHelper, final JsonNode json)
+    private String push(JAXRSRetryHelper retryHelper, final JsonNode json, final String endpoint)
     {
         return retryHelper.requestWithRetry(
             new StringJAXRSResponseEntityReader(),
@@ -110,8 +121,7 @@ public class ExampleOutputPluginDelegate
                 @Override
                 public Response requestOnce(javax.ws.rs.client.Client client)
                 {
-                    final String url = String.format(Locale.ENGLISH, "http://localhost:8080");
-                    return client.target(url).request().post(
+                    return client.target(endpoint).request().post(
                         Entity.<String>entity(json.toString(), MediaType.APPLICATION_JSON));
                 }
 

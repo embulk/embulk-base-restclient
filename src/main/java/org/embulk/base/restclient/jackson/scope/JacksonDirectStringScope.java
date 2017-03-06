@@ -1,20 +1,20 @@
-package org.embulk.base.restclient.jackson;
+package org.embulk.base.restclient.jackson.scope;
 
 import org.embulk.spi.Column;
 import org.embulk.spi.Schema;
 
 import org.embulk.base.restclient.record.SinglePageRecordReader;
 
-public class JacksonStraightStringValueScope
-        extends JacksonStringValueScope
+public class JacksonDirectStringScope
+        extends JacksonStringScopeBase
 {
-    public JacksonStraightStringValueScope(String embulkColumnName)
+    public JacksonDirectStringScope(String embulkColumnName)
     {
         this.embulkColumnName = embulkColumnName;
     }
 
     @Override
-    public String scopeStringValue(SinglePageRecordReader singlePageRecordReader)
+    public String scopeString(SinglePageRecordReader singlePageRecordReader)
     {
         Schema embulkSchema = singlePageRecordReader.getSchema();
         Column column = cacheSingleColumn(embulkSchema, this.embulkColumnName);
