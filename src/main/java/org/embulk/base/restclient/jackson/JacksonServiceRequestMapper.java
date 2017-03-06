@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 
 import org.embulk.base.restclient.ServiceRequestMapper;
+import org.embulk.base.restclient.jackson.scope.JacksonNewObjectScope;
 import org.embulk.base.restclient.record.EmbulkValueScope;
 import org.embulk.base.restclient.record.RecordExporter;
 import org.embulk.base.restclient.record.ValueExporter;
@@ -44,6 +45,15 @@ public final class JacksonServiceRequestMapper
         private Builder()
         {
             this.mapBuilder = ImmutableListMultimap.builder();
+        }
+
+        public synchronized JacksonServiceRequestMapper.Builder addNewObject(
+                JacksonValueLocator valueLocator)
+        {
+            mapBuilder.put(new JacksonNewObjectScope(),
+                           new ColumnOptions<JacksonValueLocator>(valueLocator));
+            return this;
+
         }
 
         public synchronized JacksonServiceRequestMapper.Builder add(
