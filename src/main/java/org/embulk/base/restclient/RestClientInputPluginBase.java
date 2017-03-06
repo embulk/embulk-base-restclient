@@ -32,16 +32,16 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
      */
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ConfigDiffBuildable<T> configDiffBuilder,
+                                        InputTaskValidatable<T> inputTaskValidator,
                                         ServiceDataIngestable<T> serviceDataIngester,
                                         ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
-                                        TaskValidatable<T> taskValidator,
                                         int taskCount)
     {
         super(taskClass,
               configDiffBuilder,
+              inputTaskValidator,
               serviceDataIngester,
               serviceResponseMapperBuilder,
-              taskValidator,
               taskCount);
     }
 
@@ -52,15 +52,15 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
      */
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ConfigDiffBuildable<T> configDiffBuilder,
+                                        InputTaskValidatable<T> inputTaskValidator,
                                         ServiceDataIngestable<T> serviceDataIngester,
-                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
-                                        TaskValidatable<T> taskValidator)
+                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
     {
         super(taskClass,
               configDiffBuilder,
+              inputTaskValidator,
               serviceDataIngester,
               serviceResponseMapperBuilder,
-              taskValidator,
               1);
     }
 

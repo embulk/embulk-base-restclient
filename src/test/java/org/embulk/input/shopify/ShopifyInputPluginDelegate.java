@@ -90,8 +90,8 @@ public class ShopifyInputPluginDelegate
 
     private final StringJsonParser jsonParser = new StringJsonParser();
 
-    @Override  // Overridden from |TaskValidatable|
-    public void validateTask(PluginTask task)
+    @Override  // Overridden from |InputTaskValidatable|
+    public void validateInputTask(PluginTask task)
     {
         if (Strings.isNullOrEmpty(task.getApiKey())) {
             throw new ConfigException("'apikey' must not be null or empty string.");
