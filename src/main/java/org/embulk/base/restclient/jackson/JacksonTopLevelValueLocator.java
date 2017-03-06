@@ -12,9 +12,15 @@ public class JacksonTopLevelValueLocator
     }
 
     @Override
-    public JsonNode locateValue(ObjectNode record)
+    public JsonNode seekValue(ObjectNode record)
     {
         return record.get(this.name);
+    }
+
+    @Override
+    public void placeValue(ObjectNode record, JsonNode value)
+    {
+        record.set(this.name, value);
     }
 
     private String name;

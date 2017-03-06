@@ -18,9 +18,15 @@ public class JacksonJsonPointerValueLocator
     }
 
     @Override
-    public JsonNode locateValue(ObjectNode record)
+    public JsonNode seekValue(ObjectNode record)
     {
         return record.at(this.pointer);
+    }
+
+    @Override
+    public void placeValue(ObjectNode record, JsonNode value)
+    {
+        throw new UnsupportedOperationException("placeValue is not impleented in JacksonJsonPointerValueLocator.");
     }
 
     private final JsonPointer pointer;

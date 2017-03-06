@@ -83,5 +83,10 @@ public class JacksonServiceValue
         return timestampParser.parse(value.asText());
     }
 
-    private JsonNode value;
+    JsonNode getInternalJsonNode()
+    {
+        return this.value;
+    }
+
+    private final JsonNode value;
 }

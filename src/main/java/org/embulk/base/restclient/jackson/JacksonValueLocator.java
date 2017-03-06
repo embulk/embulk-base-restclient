@@ -8,5 +8,6 @@ import org.embulk.base.restclient.record.ValueLocator;
 public abstract class JacksonValueLocator
         extends ValueLocator
 {
-    public abstract JsonNode locateValue(ObjectNode record);
+    public abstract JsonNode seekValue(ObjectNode record);
+    public abstract void placeValue(ObjectNode record, JsonNode value);
 }
