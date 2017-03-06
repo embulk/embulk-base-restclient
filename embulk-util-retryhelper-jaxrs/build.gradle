@@ -1,6 +1,3 @@
-group = 'org.embulk.base.restclient'
-version = '0.1.0'
-
 dependencies {
     compile     'javax.ws.rs:javax.ws.rs-api:2.0.1'
 }
@@ -18,7 +15,7 @@ bintray {
         userOrg = 'embulk-base-restclient'
         repo = 'maven'
         name = project.name
-        desc = 'Base class library to access RESTful services'
+        desc = 'Utility library to retry HTTP requests through JAX-RS 2.0 Client with Embulk RetryExecutor'
         websiteUrl = 'https://github.com/embulk/embulk-base-restclient/tree/master/embulk-util-retryhelper-jaxrs'
         issueTrackerUrl = 'https://github.com/embulk/embulk-base-restclient/issues'
         vcsUrl = 'https://github.com/embulk/embulk-base-restclient.git'

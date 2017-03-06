@@ -9,9 +9,6 @@ plugins {
     //id "jacoco"
 }
 
-group = 'org.embulk.base.restclient'
-version = '0.3.0'
-
 subprojects {
     apply plugin: 'maven'
     apply plugin: 'maven-publish'
@@ -22,6 +19,9 @@ subprojects {
 }
 
 allprojects {
+    group = 'org.embulk.base.restclient'
+    version = '0.4.0'
+
     repositories {
         mavenCentral()
         jcenter()
