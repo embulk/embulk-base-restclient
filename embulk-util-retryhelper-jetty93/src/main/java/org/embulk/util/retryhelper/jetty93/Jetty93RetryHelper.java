@@ -106,7 +106,24 @@ public class Jetty93RetryHelper
                             singleRequester.requestOnce(clientStarted, listener);
                             Response response = responseReader.getResponse();
                             if (response.getStatus() / 100 != 2) {
-                                throw new HttpResponseException("Response not 2xx: " + response.getReason(), response);
+                                final String errorResponseBody;
+                                try {
+                                    errorResponseBody = responseReader.readResponseContentInString();
+                                }
+                                catch (Exception ex) {
+                                    throw new HttpResponseException(
+                                        "Response not 2xx: "
+                                        + response.getStatus() + " "
+                                        + response.getReason() + " "
+                                        + "Response body not available by: " + Throwables.getStackTraceAsString(ex),
+                                        response);
+                                }
+                                throw new HttpResponseException(
+                                    "Response not 2xx: "
+                                    + response.getStatus() + " "
+                                    + response.getReason() + " "
+                                    + errorResponseBody,
+                                    response);
                             }
                             return responseReader.readResponseContent();
                         }
