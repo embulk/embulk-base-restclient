@@ -41,6 +41,13 @@ public class StringJetty93ResponseEntityReader
         }
     }
 
+    @Override
+    public final String readResponseContentInString()
+            throws Exception
+    {
+        return this.readResponseContent();
+    }
+
     private final InputStreamResponseListener listener;
     private final long timeoutMillis;
 }

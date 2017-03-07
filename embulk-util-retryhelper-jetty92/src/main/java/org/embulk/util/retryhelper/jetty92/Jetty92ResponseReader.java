@@ -12,4 +12,5 @@ public interface Jetty92ResponseReader<T>
     Response.Listener getListener();
     Response getResponse() throws Exception;
     T readResponseContent() throws Exception;
+    String readResponseContentInString() throws Exception;
 }
