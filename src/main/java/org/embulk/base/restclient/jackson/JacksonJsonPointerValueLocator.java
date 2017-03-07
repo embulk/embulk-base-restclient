@@ -44,7 +44,6 @@ public class JacksonJsonPointerValueLocator
             }
             else {  // Must be a property of an object, not an index of an array
                 if (parent.isObject()) {
-                    System.out.println(last.getMatchingProperty());
                     ((ObjectNode) parent).set(last.getMatchingProperty(), value);
                 }
                 else {
