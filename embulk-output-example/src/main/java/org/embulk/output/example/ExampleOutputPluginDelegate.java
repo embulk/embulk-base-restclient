@@ -26,6 +26,7 @@ import org.embulk.base.restclient.jackson.JacksonJsonPointerValueLocator;
 import org.embulk.base.restclient.jackson.JacksonServiceRequestMapper;
 import org.embulk.base.restclient.jackson.JacksonTaskReportRecordBuffer;
 import org.embulk.base.restclient.jackson.JacksonTopLevelValueLocator;
+import org.embulk.base.restclient.jackson.scope.JacksonAllInObjectScope;
 import org.embulk.base.restclient.jackson.scope.JacksonDirectIntegerScope;
 import org.embulk.base.restclient.jackson.scope.JacksonDirectStringScope;
 import org.embulk.base.restclient.record.RecordBuffer;
@@ -73,6 +74,7 @@ public class ExampleOutputPluginDelegate
             .addNewObject(new JacksonJsonPointerValueLocator("/dict/sub1/sub2"))
             .add(new JacksonDirectStringScope("foo"), new JacksonJsonPointerValueLocator("/dict/sub1/foo"))
             .add(new JacksonDirectStringScope("bar"), new JacksonJsonPointerValueLocator("/dict/sub1/sub2/bar"))
+            .add(new JacksonAllInObjectScope(), new JacksonTopLevelValueLocator("entire"))
             .build();
     }
 
