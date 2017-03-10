@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.node.LongNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.embulk.base.restclient.record.SinglePageRecordReader;
-
 import org.embulk.spi.Column;
 import org.embulk.spi.ColumnVisitor;
+import org.embulk.spi.time.TimestampFormatter;
+
+import org.embulk.base.restclient.jackson.StringJsonParser;
+import org.embulk.base.restclient.record.SinglePageRecordReader;
 
 public class JacksonAllInObjectScope
         extends JacksonObjectScopeBase
@@ -20,9 +22,10 @@ public class JacksonAllInObjectScope
         this(null);
     }
 
-    public JacksonAllInObjectScope(String timestampFormat)
+    public JacksonAllInObjectScope(final TimestampFormatter timestampFormatter)
     {
-        this.timestampFormat = timestampFormat;
+        this.timestampFormatter = timestampFormatter;
+        this.jsonParser = new StringJsonParser();
     }
 
     @Override
@@ -36,50 +39,55 @@ public class JacksonAllInObjectScope
                 public void booleanColumn(Column column)
                 {
                     resultObject.put(column.getName(),
-                                     BooleanNode.valueOf(singlePageRecordReader.getBoolean(column)));
+                                     singlePageRecordReader.getBoolean(column));
                 }
 
                 @Override
                 public void longColumn(Column column)
                 {
                     resultObject.put(column.getName(),
-                                     new LongNode(singlePageRecordReader.getLong(column)));
+                                     singlePageRecordReader.getLong(column));
                 }
 
                 @Override
                 public void doubleColumn(Column column)
                 {
                     resultObject.put(column.getName(),
-                                     new DoubleNode(singlePageRecordReader.getDouble(column)));
+                                     singlePageRecordReader.getDouble(column));
                 }
 
                 @Override
                 public void stringColumn(Column column)
                 {
                     resultObject.put(column.getName(),
-                                     new TextNode(singlePageRecordReader.getString(column)));
+                                     singlePageRecordReader.getString(column));
                 }
 
                 @Override
                 public void timestampColumn(Column column)
                 {
-                    if (timestampFormat == null) {
+                    if (timestampFormatter == null) {
                         resultObject.put(column.getName(),
-                                         new LongNode(singlePageRecordReader.getTimestamp(column).getEpochSecond()));
+                                         singlePageRecordReader.getTimestamp(column).getEpochSecond());
                     }
                     else {
-                        // TODO(dmikurube): Implement timestamp formatting.
+                        resultObject.put(column.getName(),
+                                         timestampFormatter.format(singlePageRecordReader.getTimestamp(column)));
                     }
                 }
 
                 @Override
                 public void jsonColumn(Column column)
                 {
-                    // TODO(dmikurube): Implement conversion from msgpack |Value| to Jackson |JsonNode|.
+                    // TODO(dmikurube): Use jackson-datatype-msgpack.
+                    // See: https://github.com/embulk/embulk-base-restclient/issues/32
+                    resultObject.set(column.getName(),
+                                     jsonParser.parseJsonObject(singlePageRecordReader.getJson(column).toJson()));
                 }
             });
         return resultObject;
     }
 
-    private final String timestampFormat;
+    private final TimestampFormatter timestampFormatter;
+    private final StringJsonParser jsonParser;
 }
