@@ -106,17 +106,15 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
             this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
 
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
-            try {
-                return Preconditions.checkNotNull(
-                    this.serviceDataIngester.ingestServiceData(
-                        task,
-                        serviceResponseMapper.createRecordImporter(),
-                        taskIndex,
-                        pageBuilder));
-            }
-            finally {
-                pageBuilder.finish();
-            }
+	    // When failing around |PageBuidler| in |ingestServiceData|, |pageBuilder.finish()| should not be called.
+            TaskReport taskReport = Preconditions.checkNotNull(
+                this.serviceDataIngester.ingestServiceData(
+                    task,
+                    serviceResponseMapper.createRecordImporter(),
+                    taskIndex,
+                    pageBuilder));
+            pageBuilder.finish();
+            return taskReport;
         }
     }
 
