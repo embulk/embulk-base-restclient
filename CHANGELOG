@@ -1,3 +1,7 @@
+Release 0.4.3 - 2017-03-29
+
+* [maintenance] Fix how to call `PageBuidler#finish`. [#71](https://github.com/embulk/embulk-base-restclient/pull/71)
+
 Release 0.4.2 - 2017-03-10
 
 * [update] Add `JacksonAllInObjectScope` which picks up all Embulk columns into one JSON Object.
