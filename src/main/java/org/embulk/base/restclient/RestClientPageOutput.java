@@ -48,19 +48,19 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase>
     @Override
     public void finish()
     {
-    	// TODO(dmikurube): Implement.
+        // TODO(dmikurube): Implement.
     }
 
     @Override
     public void close()
     {
-    	// TODO(dmikurube): Implement.
+        // TODO(dmikurube): Implement.
     }
 
     @Override
     public void abort()
     {
-    	// TODO(dmikurube): Implement.
+        // TODO(dmikurube): Implement.
     }
 
     @Override
