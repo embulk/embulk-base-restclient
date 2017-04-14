@@ -13,6 +13,7 @@ import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
+import org.embulk.config.TaskSource;
 import org.embulk.spi.DataException;
 import org.embulk.spi.Exec;
 import org.embulk.spi.PageBuilder;
@@ -21,6 +22,7 @@ import org.embulk.spi.type.Types;
 
 import org.embulk.base.restclient.RestClientInputPluginDelegate;
 import org.embulk.base.restclient.RestClientInputTaskBase;
+import org.embulk.base.restclient.ServiceDataDispatcher;
 import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
@@ -73,6 +75,23 @@ public class ExampleInputPluginDelegate
         // should implement for incremental data loading
         // consider |incremental| config here
         return Exec.newConfigDiff();
+    }
+
+    @Override  // Overridden from |ServiceDataDispatcherBuildable|
+    public ServiceDataDispatcher buildServiceDataDispatcher(final PluginTask task)
+    {
+        return new ServiceDataDispatcher() {
+            @Override
+            public int splitToTasks(TaskSource taskSourceToHint)
+            {
+                return 1;
+            }
+
+            @Override
+            public void hintPerTask(int taskIndex, TaskSource taskSourceToHint)
+            {
+            }
+        };
     }
 
     @Override  // Overridden from |ServiceDataIngestable|

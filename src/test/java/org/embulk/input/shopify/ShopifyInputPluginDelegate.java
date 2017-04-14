@@ -18,6 +18,7 @@ import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigException;
 import org.embulk.config.TaskReport;
+import org.embulk.config.TaskSource;
 import org.embulk.spi.DataException;
 import org.embulk.spi.Exec;
 import org.embulk.spi.PageBuilder;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 
 import org.embulk.base.restclient.RestClientInputPluginDelegate;
 import org.embulk.base.restclient.RestClientInputTaskBase;
+import org.embulk.base.restclient.ServiceDataDispatcher;
 import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
@@ -191,6 +193,23 @@ public class ShopifyInputPluginDelegate
             }
         }
         return Exec.newTaskReport();
+    }
+
+    @Override  // Overridden from |ServiceDataDispatcherBuildable|
+    public ServiceDataDispatcher buildServiceDataDispatcher(final PluginTask task)
+    {
+        return new ServiceDataDispatcher() {
+            @Override
+            public int splitToTasks(TaskSource taskSourceToHint)
+            {
+                return 1;
+            }
+
+            @Override
+            public void hintPerTask(int taskIndex, TaskSource taskSourceToHint)
+            {
+            }
+        };
     }
 
     private ArrayNode extractArrayField(String content)
