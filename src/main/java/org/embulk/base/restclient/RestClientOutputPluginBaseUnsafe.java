@@ -65,7 +65,7 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
         return new RestClientPageOutput<T>(this.taskClass,
                                            task,
                                            serviceRequestMapper.createRecordExporter(),
-                                           this.recordBufferBuilder.buildRecordBuffer(task),
+                                           this.recordBufferBuilder.buildRecordBuffer(task, schema, taskIndex),
                                            schema,
                                            taskIndex);
     }

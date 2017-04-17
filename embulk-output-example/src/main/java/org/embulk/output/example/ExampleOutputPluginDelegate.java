@@ -79,7 +79,7 @@ public class ExampleOutputPluginDelegate
     }
 
     @Override  // Overridden from |RecordBufferBuildable|
-    public RecordBuffer buildRecordBuffer(PluginTask task)
+    public RecordBuffer buildRecordBuffer(PluginTask task, Schema schema, int taskIndex)
     {
         return new JacksonTaskReportRecordBuffer("records");
     }
