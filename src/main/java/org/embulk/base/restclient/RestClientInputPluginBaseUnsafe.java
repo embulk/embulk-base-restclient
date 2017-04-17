@@ -37,15 +37,15 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
                                               ConfigDiffBuildable<T> configDiffBuilder,
                                               InputTaskValidatable<T> inputTaskValidator,
-                                              ServiceDataDispatcherBuildable<T> serviceDataDispatcherBuilder,
                                               ServiceDataIngestable<T> serviceDataIngester,
+                                              ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
                                               ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
     {
         this.taskClass = taskClass;
         this.configDiffBuilder = configDiffBuilder;
         this.inputTaskValidator = inputTaskValidator;
-        this.serviceDataDispatcherBuilder = serviceDataDispatcherBuilder;
         this.serviceDataIngester = serviceDataIngester;
+        this.serviceDataSplitterBuilder = serviceDataSplitterBuilder;
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
     }
 
@@ -58,8 +58,14 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         this(taskClass,
              configDiffBuilder,
              inputTaskValidator,
-             new DefaultServiceDataDispatcherBuilder<T>(),
              serviceDataIngester,
+             new ServiceDataSplitterBuildable<T>() {
+                 @Override
+                 public ServiceDataSplitter buildServiceDataSplitter(T task)
+                 {
+                     return new DefaultServiceDataSplitter();
+                 }
+             },
              serviceResponseMapperBuilder);
     }
 
@@ -76,8 +82,8 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         this.inputTaskValidator.validateInputTask(task);
 
         TaskSource dumpedTaskSource = task.dump();
-        final int taskCount = this.serviceDataDispatcherBuilder
-            .buildServiceDataDispatcher(task)
+        final int taskCount = this.serviceDataSplitterBuilder
+            .buildServiceDataSplitter(task)
             .splitToTasks(dumpedTaskSource);
 
         final Schema schema = this.serviceResponseMapperBuilder.buildServiceResponseMapper(task).getEmbulkSchema();
@@ -101,9 +107,9 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
     {
         final T task = taskSource.loadTask(this.taskClass);
-        this.serviceDataDispatcherBuilder
-            .buildServiceDataDispatcher(task)
-            .hintPerTask(taskIndex, taskSource);
+        this.serviceDataSplitterBuilder
+            .buildServiceDataSplitter(task)
+            .hintPerTask(taskSource, schema, taskIndex);
 
         final ServiceResponseMapper<? extends ValueLocator> serviceResponseMapper =
             this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
@@ -130,7 +136,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     private final Class<T> taskClass;
     private final ConfigDiffBuildable<T> configDiffBuilder;
     private final InputTaskValidatable<T> inputTaskValidator;
-    private final ServiceDataDispatcherBuildable<T> serviceDataDispatcherBuilder;
+    private final ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder;
     private final ServiceDataIngestable<T> serviceDataIngester;
     private final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder;
 }

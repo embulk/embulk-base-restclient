@@ -29,15 +29,15 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ConfigDiffBuildable<T> configDiffBuilder,
                                         InputTaskValidatable<T> inputTaskValidator,
-                                        ServiceDataDispatcherBuildable<T> serviceDataDispatcherBuilder,
                                         ServiceDataIngestable<T> serviceDataIngester,
+                                        ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
                                         ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
     {
         super(taskClass,
               configDiffBuilder,
               inputTaskValidator,
-              serviceDataDispatcherBuilder,
               serviceDataIngester,
+              serviceDataSplitterBuilder,
               serviceResponseMapperBuilder);
     }
 

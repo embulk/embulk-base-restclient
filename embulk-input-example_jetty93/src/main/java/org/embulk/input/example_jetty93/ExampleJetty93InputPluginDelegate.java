@@ -23,9 +23,10 @@ import org.embulk.spi.PageBuilder;
 import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
 
+import org.embulk.base.restclient.DefaultServiceDataSplitter;
 import org.embulk.base.restclient.RestClientInputPluginDelegate;
 import org.embulk.base.restclient.RestClientInputTaskBase;
-import org.embulk.base.restclient.ServiceDataDispatcher;
+import org.embulk.base.restclient.ServiceDataSplitter;
 import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
@@ -80,21 +81,10 @@ public class ExampleJetty93InputPluginDelegate
         return Exec.newConfigDiff();
     }
 
-    @Override  // Overridden from |ServiceDataDispatcherBuildable|
-    public ServiceDataDispatcher buildServiceDataDispatcher(final PluginTask task)
+    @Override  // Overridden from |ServiceDataSplitterBuildable|
+    public ServiceDataSplitter buildServiceDataSplitter(final PluginTask task)
     {
-        return new ServiceDataDispatcher() {
-            @Override
-            public int splitToTasks(TaskSource taskSourceToHint)
-            {
-                return 1;
-            }
-
-            @Override
-            public void hintPerTask(int taskIndex, TaskSource taskSourceToHint)
-            {
-            }
-        };
+        return new DefaultServiceDataSplitter();
     }
 
     @Override  // Overridden from |ServiceDataIngestable|
