@@ -25,24 +25,20 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
      * Creates a new {@code RestClientInputPluginBase} instance.
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
-     *
-     * NOTE: Specify {@code taskCount} carefully. If you specify non-{@code 1}, you need to implement
-     * {@code ServiceDataIngestable} carefully to support parallel execution. Use another constructor
-     * without {@code taskCount} for ordinary cases.
      */
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         ConfigDiffBuildable<T> configDiffBuilder,
                                         InputTaskValidatable<T> inputTaskValidator,
                                         ServiceDataIngestable<T> serviceDataIngester,
-                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder,
-                                        int taskCount)
+                                        ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
+                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
     {
         super(taskClass,
               configDiffBuilder,
               inputTaskValidator,
               serviceDataIngester,
-              serviceResponseMapperBuilder,
-              taskCount);
+              serviceDataSplitterBuilder,
+              serviceResponseMapperBuilder);
     }
 
     /**
@@ -60,24 +56,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
               configDiffBuilder,
               inputTaskValidator,
               serviceDataIngester,
-              serviceResponseMapperBuilder,
-              1);
-    }
-
-    /**
-     * Creates a new {@code RestClientInputPluginBase} instance.
-     *
-     * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
-     *
-     * NOTE: Specify {@code taskCount} carefully. If you specify non-{@code 1}, you need to implement
-     * {@code ServiceDataIngestable} carefully to support parallel execution. Use another constructor
-     * without {@code taskCount} for ordinary cases.
-     */
-    protected RestClientInputPluginBase(Class<T> taskClass,
-                                        RestClientInputPluginDelegate<T> delegate,
-                                        int taskCount)
-    {
-        super(taskClass, delegate, delegate, delegate, delegate, taskCount);
+              serviceResponseMapperBuilder);
     }
 
     /**
@@ -88,7 +67,7 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
     protected RestClientInputPluginBase(Class<T> taskClass,
                                         RestClientInputPluginDelegate<T> delegate)
     {
-        super(taskClass, delegate, delegate, delegate, delegate, 1);
+        super(taskClass, delegate, delegate, delegate, delegate, delegate);
     }
 
     @Override

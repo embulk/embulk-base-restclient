@@ -7,5 +7,5 @@ import org.embulk.base.restclient.record.RecordImporter;
 
 public interface ServiceDataIngestable<T extends RestClientInputTaskBase>
 {
-    public TaskReport ingestServiceData(T task, RecordImporter recordImporter, int taskCount, PageBuilder pageBuilder);
+    public TaskReport ingestServiceData(T task, RecordImporter recordImporter, int taskIndex, PageBuilder pageBuilder);
 }
