@@ -3,6 +3,7 @@ Release 0.5.0 - 2017-04-19
 * [maintenance] Handle multi-Tasks in input plugins. [#76](https://github.com/embulk/embulk-base-restclient/pull/76)
 * [maintenance] Provide `Schema` and `taskIndex` to `RecordBuffer`. [#77](https://github.com/embulk/embulk-base-restclient/pull/77)
 * [incompatibility] `buildRecordBuffer` needs `Schema schema` and `int taskIndex` now.
+* [incompatibility] `buildServiceDataSplitter` needs to be implemented in `RestClientInputPluginDelegate`.
 
 Release 0.4.3 - 2017-03-29
 
