@@ -61,9 +61,9 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
              serviceDataIngester,
              new ServiceDataSplitterBuildable<T>() {
                  @Override
-                 public ServiceDataSplitter buildServiceDataSplitter(T task)
+                 public ServiceDataSplitter<T> buildServiceDataSplitter(T task)
                  {
-                     return new DefaultServiceDataSplitter();
+                     return new DefaultServiceDataSplitter<T>();
                  }
              },
              serviceResponseMapperBuilder);
@@ -81,10 +81,9 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         final T task = loadConfig(config, this.taskClass);
         this.inputTaskValidator.validateInputTask(task);
 
-        TaskSource dumpedTaskSource = task.dump();
         final int taskCount = this.serviceDataSplitterBuilder
             .buildServiceDataSplitter(task)
-            .splitToTasks(dumpedTaskSource);
+            .numberToSplitWithHintingInTask(task);
 
         final Schema schema = this.serviceResponseMapperBuilder.buildServiceResponseMapper(task).getEmbulkSchema();
         return resume(task.dump(), schema, taskCount, control);
@@ -109,7 +108,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         final T task = taskSource.loadTask(this.taskClass);
         this.serviceDataSplitterBuilder
             .buildServiceDataSplitter(task)
-            .hintPerTask(taskSource, schema, taskIndex);
+            .hintInEachSplitTask(task, schema, taskIndex);
 
         final ServiceResponseMapper<? extends ValueLocator> serviceResponseMapper =
             this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);

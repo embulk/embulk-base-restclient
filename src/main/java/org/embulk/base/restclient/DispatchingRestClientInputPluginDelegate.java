@@ -39,7 +39,7 @@ public abstract class DispatchingRestClientInputPluginDelegate<T extends RestCli
     }
 
     @Override  // Overridden from |ServiceDataSplitterBuildable|
-    public final ServiceDataSplitter buildServiceDataSplitter(final T task)
+    public final ServiceDataSplitter<T> buildServiceDataSplitter(final T task)
     {
         final RestClientInputPluginDelegate<T> delegate = this.cacheDelegate(task);
         return delegate.buildServiceDataSplitter(task);

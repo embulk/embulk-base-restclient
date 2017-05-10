@@ -82,9 +82,9 @@ public class ExampleJetty93InputPluginDelegate
     }
 
     @Override  // Overridden from |ServiceDataSplitterBuildable|
-    public ServiceDataSplitter buildServiceDataSplitter(final PluginTask task)
+    public ServiceDataSplitter<PluginTask> buildServiceDataSplitter(final PluginTask task)
     {
-        return new DefaultServiceDataSplitter();
+        return new DefaultServiceDataSplitter<PluginTask>();
     }
 
     @Override  // Overridden from |ServiceDataIngestable|
