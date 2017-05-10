@@ -1,3 +1,7 @@
+Release 0.5.1 - 2017-05-10
+
+* [update] Add `DispatchingRestClient...PluginDelegate` to implement plugins switching their behavior per Config.
+
 Release 0.5.0 - 2017-04-19
 
 * [maintenance] Handle multi-Tasks in input plugins. [#76](https://github.com/embulk/embulk-base-restclient/pull/76)
