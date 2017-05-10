@@ -3,17 +3,17 @@ package org.embulk.base.restclient;
 import org.embulk.config.TaskSource;
 import org.embulk.spi.Schema;
 
-public class DefaultServiceDataSplitter
-        extends ServiceDataSplitter
+public class DefaultServiceDataSplitter<T extends RestClientInputTaskBase>
+        extends ServiceDataSplitter<T>
 {
     @Override
-    public int splitToTasks(TaskSource taskSourceToHint)
+    public int numberToSplitWithHintingInTask(T taskToHint)
     {
         return 1;
     }
 
     @Override
-    public void hintPerTask(TaskSource taskSourceToHint, Schema schema, int taskIndex)
+    public void hintInEachSplitTask(T taskToHint, Schema schema, int taskIndex)
     {
     }
 }
