@@ -64,7 +64,7 @@ public class SinglePageRecordReader
 
     public String getString(Column column)
     {
-        return this.pageReader.getString(column);
+        return isNull(column) ? "" : this.pageReader.getString(column);
     }
 
     public String getString(int columnIndex)
