@@ -59,20 +59,23 @@ public class JacksonAllInObjectScope
                 @Override
                 public void stringColumn(Column column)
                 {
-                    resultObject.put(column.getName(),
-                                     singlePageRecordReader.getString(column));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.put(column.getName(),
+                                         singlePageRecordReader.getString(column));
+                    }
                 }
 
                 @Override
                 public void timestampColumn(Column column)
                 {
-                    if (timestampFormatter == null) {
-                        resultObject.put(column.getName(),
-                                         singlePageRecordReader.getTimestamp(column).getEpochSecond());
-                    }
-                    else {
-                        resultObject.put(column.getName(),
-                                         timestampFormatter.format(singlePageRecordReader.getTimestamp(column)));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        if (timestampFormatter == null) {
+                            resultObject.put(column.getName(),
+                                             singlePageRecordReader.getTimestamp(column).getEpochSecond());
+                        } else {
+                            resultObject.put(column.getName(),
+                                             timestampFormatter.format(singlePageRecordReader.getTimestamp(column)));
+                        }
                     }
                 }
 
@@ -81,8 +84,10 @@ public class JacksonAllInObjectScope
                 {
                     // TODO(dmikurube): Use jackson-datatype-msgpack.
                     // See: https://github.com/embulk/embulk-base-restclient/issues/32
-                    resultObject.set(column.getName(),
-                                     jsonParser.parseJsonObject(singlePageRecordReader.getJson(column).toJson()));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.set(column.getName(),
+                                jsonParser.parseJsonObject(singlePageRecordReader.getJson(column).toJson()));
+                    }
                 }
             });
         return resultObject;
