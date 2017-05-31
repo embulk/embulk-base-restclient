@@ -1,3 +1,8 @@
+Release 0.5.2 - 2017-05-31
+
+* [update] Update TimestampServiceDataSplitter for better API. [#85](https://github.com/embulk/embulk-base-restclient/pull/85)
+* [maintenance] Add Null check at JacksonAllInObjectScope to avoid NullPointerException [#87](https://github.com/embulk/embulk-base-restclient/pull/87)
+
 Release 0.5.1 - 2017-05-10
 
 * [update] Add `DispatchingRestClient...PluginDelegate` to implement plugins switching their behavior per Config.
