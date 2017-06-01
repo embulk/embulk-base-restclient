@@ -30,7 +30,7 @@ bintray {
 }
 publishing {
     publications {
-        bintrayMavenReleaseUtilJetty93(MavenPublication) {
+        bintrayMavenRelease(MavenPublication) {
             from components.java
             artifact testsJar
             artifact sourcesJar
