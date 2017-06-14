@@ -1,3 +1,7 @@
+Release 0.5.3 - 2017-06-14
+
+* [update] Add close and finish methods in RecordBuffer. [#90](https://github.com/embulk/embulk-base-restclient/pull/90)
+
 Release 0.5.2 - 2017-05-31
 
 * [update] Update TimestampServiceDataSplitter for better API. [#85](https://github.com/embulk/embulk-base-restclient/pull/85)
