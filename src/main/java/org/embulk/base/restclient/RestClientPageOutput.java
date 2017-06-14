@@ -48,13 +48,13 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase>
     @Override
     public void finish()
     {
-        // TODO(dmikurube): Implement.
+        this.recordBuffer.finish();
     }
 
     @Override
     public void close()
     {
-        // TODO(dmikurube): Implement.
+        this.recordBuffer.close();
     }
 
     @Override

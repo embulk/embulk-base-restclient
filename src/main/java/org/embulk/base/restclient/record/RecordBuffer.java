@@ -18,9 +18,29 @@ import org.embulk.config.TaskReport;
  *
  * Or, it is possible to commit directly from {@code RecordBuffer}. But, the destination must accept parallel
  * uploads, and developers may need to take care of transactions and orders.
+ *
+ * If {@code RecordBuffer} owns external resources for direct uploading, the resources need to be released in
+ * its {@code close} or {@code finish}. Releasing resources in {@code close} is the typical manner.
  */
 public abstract class RecordBuffer
 {
     public abstract void bufferRecord(ServiceRecord record);
+
+    /**
+     * Finishes the {@code RecordBuffer}.
+     *
+     * This method is called when {@code RestClientPageOutput#finish} is called. Implement this method usually to
+     * finish resources managed in {@code RecordBuffer}.
+     */
+    public abstract void finish();
+
+    /**
+     * Closes the {@code RecordBuffer}.
+     *
+     * This method is called when {@code RestClientPageOutput#close} is called. Implement this method usually to
+     * close resources managed in {@code RecordBuffer}.
+     */
+    public abstract void close();
+
     public abstract TaskReport commitWithTaskReportUpdated(TaskReport taskReport);
 }
