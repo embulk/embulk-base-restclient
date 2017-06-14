@@ -40,6 +40,16 @@ public class JacksonTaskReportRecordBuffer
     }
 
     @Override
+    public void finish()
+    {
+    }
+
+    @Override
+    public void close()
+    {
+    }
+
+    @Override
     public TaskReport commitWithTaskReportUpdated(TaskReport taskReport)
     {
         taskReport.set(this.attributeName, this.records);
