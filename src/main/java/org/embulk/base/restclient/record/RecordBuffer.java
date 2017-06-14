@@ -17,7 +17,12 @@ import org.embulk.config.TaskReport;
  * - Put the output to an external storage (e.g. S3), and include a pointer to the storage in {@code TaskReport}.
  *
  * Or, it is possible to commit directly from {@code RecordBuffer}. But, the destination must accept parallel
- * uploads, and developers may need to take care of transactions and orders.
+ * uploads, and developers may need to take care of transactions and orders. If {@code RecordBuffer} might own
+ * external resource for uploads, it might need to release the resource. The resource can be released in the
+ * finish or close method. In almost all cases, the external resource might have same
+ * lifecycle as {@code RecordBuffer}'s. The close method might be used for releasing the resource. The method is
+ * called when {@code PageOutput} (and {@code RecordBuffer}) is closed. If the resource needs to be released when
+ * {@code PageOutput} finishes, the finish method needs to be used.
  */
 public abstract class RecordBuffer
 {
