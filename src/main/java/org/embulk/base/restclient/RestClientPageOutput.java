@@ -54,7 +54,7 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase>
     @Override
     public void close()
     {
-	this.recordBuffer.close();
+        this.recordBuffer.close();
     }
 
     @Override
