@@ -61,7 +61,7 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
     {
         T task = taskSource.loadTask(this.taskClass);
         ServiceRequestMapper<? extends ValueLocator> serviceRequestMapper =
-            this.serviceRequestMapperBuilder.buildServiceRequestMapper(task);
+            this.serviceRequestMapperBuilder.buildServiceRequestMapper(task, schema);
         return new RestClientPageOutput<T>(this.taskClass,
                                            task,
                                            serviceRequestMapper.createRecordExporter(),

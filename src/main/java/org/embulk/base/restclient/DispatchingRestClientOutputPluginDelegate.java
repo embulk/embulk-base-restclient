@@ -23,10 +23,10 @@ public abstract class DispatchingRestClientOutputPluginDelegate<T extends RestCl
     }
 
     @Override  // Overridden from |ServiceRequestMapperBuildable|
-    public ServiceRequestMapper<? extends ValueLocator> buildServiceRequestMapper(T task)
+    public ServiceRequestMapper<? extends ValueLocator> buildServiceRequestMapper(T task, Schema schema)
     {
         final RestClientOutputPluginDelegate<T> delegate = this.cacheDelegate(task);
-        return delegate.buildServiceRequestMapper(task);
+        return delegate.buildServiceRequestMapper(task, schema);
     }
 
     @Override  // Overridden from |RecordBufferBuildable|

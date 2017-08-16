@@ -64,7 +64,7 @@ public class ExampleOutputPluginDelegate
     }
 
     @Override  // Overridden from |ServiceRequestMapperBuildable|
-    public JacksonServiceRequestMapper buildServiceRequestMapper(PluginTask task)
+    public JacksonServiceRequestMapper buildServiceRequestMapper(PluginTask task, Schema schema)
     {
         return JacksonServiceRequestMapper.builder()
             .add(new JacksonDirectIntegerScope("id"), new JacksonTopLevelValueLocator("id"))
