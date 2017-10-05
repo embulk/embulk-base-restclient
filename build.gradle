@@ -69,7 +69,7 @@ task enforceJavaVersion {
     doLast {
         def foundVersion = JavaVersion.current();
         if (foundVersion != javaVersion) {
-            if (project.hasProperty('ignoreJavaVersion')) {
+            if (project.hasProperty('ignoreJavaVersion') || System.getenv('TRAVIS') == 'true') {
                 println "[WARN] Java " + javaVersion + " is required, but found Java " + foundVersion + "."
             } else {
                 throw new IllegalStateException("[ERROR] Java " + javaVersion + " is required, but found Java " + foundVersion + ". (Specify -PignoreJavaVersion to ignore the check.)");
