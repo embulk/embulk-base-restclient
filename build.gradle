@@ -20,7 +20,7 @@ subprojects {
 
 allprojects {
     group = 'org.embulk.base.restclient'
-    version = '0.5.3'
+    version = '0.5.4'
 
     repositories {
         mavenCentral()
@@ -32,8 +32,8 @@ allprojects {
     }
 
     dependencies {
-        compile     'org.embulk:embulk-core:0.8.15'
-        provided    'org.embulk:embulk-core:0.8.15'
+        compile     'org.embulk:embulk-core:0.8.25'
+        provided    'org.embulk:embulk-core:0.8.25'
 
         testCompile 'junit:junit:4.+'
     }
@@ -54,7 +54,7 @@ allprojects {
 }
 
 dependencies {
-    testCompile 'org.embulk:embulk-core:0.8.15:tests'
+    testCompile 'org.embulk:embulk-core:0.8.25:tests'
     testCompile project(':embulk-util-retryhelper-jaxrs')
 
     // RESTEasy JAX-RS implementation is required only for testing.
