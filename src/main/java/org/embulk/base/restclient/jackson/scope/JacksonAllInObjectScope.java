@@ -38,22 +38,34 @@ public class JacksonAllInObjectScope
                 @Override
                 public void booleanColumn(Column column)
                 {
-                    resultObject.put(column.getName(),
-                                     singlePageRecordReader.getBoolean(column));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.put(column.getName(),
+                                singlePageRecordReader.getBoolean(column));
+                    } else {
+                        resultObject.putNull(column.getName());
+                    }
                 }
 
                 @Override
                 public void longColumn(Column column)
                 {
-                    resultObject.put(column.getName(),
-                                     singlePageRecordReader.getLong(column));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.put(column.getName(),
+                                singlePageRecordReader.getLong(column));
+                    } else {
+                        resultObject.putNull(column.getName());
+                    }
                 }
 
                 @Override
                 public void doubleColumn(Column column)
                 {
-                    resultObject.put(column.getName(),
-                                     singlePageRecordReader.getDouble(column));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.put(column.getName(),
+                                singlePageRecordReader.getDouble(column));
+                    } else {
+                        resultObject.putNull(column.getName());
+                    }
                 }
 
                 @Override
@@ -62,6 +74,8 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.put(column.getName(),
                                          singlePageRecordReader.getString(column));
+                    } else {
+                        resultObject.putNull(column.getName());
                     }
                 }
 
@@ -76,6 +90,8 @@ public class JacksonAllInObjectScope
                             resultObject.put(column.getName(),
                                              timestampFormatter.format(singlePageRecordReader.getTimestamp(column)));
                         }
+                    } else {
+                        resultObject.putNull(column.getName());
                     }
                 }
 
@@ -87,6 +103,8 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.set(column.getName(),
                                 jsonParser.parseJsonObject(singlePageRecordReader.getJson(column).toJson()));
+                    } else {
+                        resultObject.putNull(column.getName());
                     }
                 }
             });
