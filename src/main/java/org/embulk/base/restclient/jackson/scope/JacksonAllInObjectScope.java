@@ -19,13 +19,24 @@ public class JacksonAllInObjectScope
 {
     public JacksonAllInObjectScope()
     {
-        this(null);
+        this(null, false);
+    }
+
+    public JacksonAllInObjectScope(boolean fillsJsonNullForEmbulkNull)
+    {
+        this(null, fillsJsonNullForEmbulkNull);
     }
 
     public JacksonAllInObjectScope(final TimestampFormatter timestampFormatter)
     {
+        this(timestampFormatter, false);
+    }
+
+    public JacksonAllInObjectScope(final TimestampFormatter timestampFormatter, boolean fillsJsonNullForEmbulkNull)
+    {
         this.timestampFormatter = timestampFormatter;
         this.jsonParser = new StringJsonParser();
+        this.fillsJsonNullForEmbulkNull = fillsJsonNullForEmbulkNull;
     }
 
     @Override
@@ -41,7 +52,7 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.put(column.getName(),
                                 singlePageRecordReader.getBoolean(column));
-                    } else {
+                    } else if (fillsJsonNullForEmbulkNull) {
                         resultObject.putNull(column.getName());
                     }
                 }
@@ -52,7 +63,7 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.put(column.getName(),
                                 singlePageRecordReader.getLong(column));
-                    } else {
+                    } else if (fillsJsonNullForEmbulkNull)  {
                         resultObject.putNull(column.getName());
                     }
                 }
@@ -63,7 +74,7 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.put(column.getName(),
                                 singlePageRecordReader.getDouble(column));
-                    } else {
+                    } else if (fillsJsonNullForEmbulkNull) {
                         resultObject.putNull(column.getName());
                     }
                 }
@@ -74,7 +85,7 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.put(column.getName(),
                                          singlePageRecordReader.getString(column));
-                    } else {
+                    } else if (fillsJsonNullForEmbulkNull) {
                         resultObject.putNull(column.getName());
                     }
                 }
@@ -90,7 +101,7 @@ public class JacksonAllInObjectScope
                             resultObject.put(column.getName(),
                                              timestampFormatter.format(singlePageRecordReader.getTimestamp(column)));
                         }
-                    } else {
+                    } else if (fillsJsonNullForEmbulkNull) {
                         resultObject.putNull(column.getName());
                     }
                 }
@@ -113,4 +124,5 @@ public class JacksonAllInObjectScope
 
     private final TimestampFormatter timestampFormatter;
     private final StringJsonParser jsonParser;
+    private boolean fillsJsonNullForEmbulkNull;
 }

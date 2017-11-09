@@ -5,6 +5,6 @@ class OutputTestPlugin
 {
     OutputTestPlugin()
     {
-        super(OutputTestPluginDelegate.PluginTask.class, new OutputTestPluginDelegate());
+        super(OutputTestPluginDelegate.PluginTask.class, new OutputTestPluginDelegate(true));
     }
 }

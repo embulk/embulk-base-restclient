@@ -20,9 +20,10 @@ public class OutputTestPluginDelegate
 
     private static ArrayList<OutputTestRecordBuffer> buffers;
 
-    OutputTestPluginDelegate()
+    OutputTestPluginDelegate(boolean outputNulls)
     {
         buffers = new ArrayList<>();
+        this.outputNulls = outputNulls;
     }
 
     public interface PluginTask
@@ -43,7 +44,7 @@ public class OutputTestPluginDelegate
         TimestampFormatter formatter = new TimestampFormatter(task.getJRuby(), "%Y-%m-%dT%H:%M:%S.%3N%z", DateTimeZone.forID("UTC"));
 
         return JacksonServiceRequestMapper.builder()
-                .add(new JacksonAllInObjectScope(formatter), new JacksonTopLevelValueLocator("record"))
+                .add(new JacksonAllInObjectScope(formatter, this.outputNulls), new JacksonTopLevelValueLocator("record"))
                 .build();
     }
 
@@ -67,4 +68,6 @@ public class OutputTestPluginDelegate
     static ArrayList<OutputTestRecordBuffer> getBuffers() {
         return OutputTestPluginDelegate.buffers;
     }
+
+    private boolean outputNulls;
 }
