@@ -124,5 +124,5 @@ public class JacksonAllInObjectScope
 
     private final TimestampFormatter timestampFormatter;
     private final StringJsonParser jsonParser;
-    private boolean fillsJsonNullForEmbulkNull;
+    private final boolean fillsJsonNullForEmbulkNull;
 }
