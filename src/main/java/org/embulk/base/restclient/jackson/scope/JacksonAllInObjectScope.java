@@ -19,13 +19,24 @@ public class JacksonAllInObjectScope
 {
     public JacksonAllInObjectScope()
     {
-        this(null);
+        this(null, false);
+    }
+
+    public JacksonAllInObjectScope(boolean fillsJsonNullForEmbulkNull)
+    {
+        this(null, fillsJsonNullForEmbulkNull);
     }
 
     public JacksonAllInObjectScope(final TimestampFormatter timestampFormatter)
     {
+        this(timestampFormatter, false);
+    }
+
+    public JacksonAllInObjectScope(final TimestampFormatter timestampFormatter, boolean fillsJsonNullForEmbulkNull)
+    {
         this.timestampFormatter = timestampFormatter;
         this.jsonParser = new StringJsonParser();
+        this.fillsJsonNullForEmbulkNull = fillsJsonNullForEmbulkNull;
     }
 
     @Override
@@ -38,22 +49,34 @@ public class JacksonAllInObjectScope
                 @Override
                 public void booleanColumn(Column column)
                 {
-                    resultObject.put(column.getName(),
-                                     singlePageRecordReader.getBoolean(column));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.put(column.getName(),
+                                singlePageRecordReader.getBoolean(column));
+                    } else if (fillsJsonNullForEmbulkNull) {
+                        resultObject.putNull(column.getName());
+                    }
                 }
 
                 @Override
                 public void longColumn(Column column)
                 {
-                    resultObject.put(column.getName(),
-                                     singlePageRecordReader.getLong(column));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.put(column.getName(),
+                                singlePageRecordReader.getLong(column));
+                    } else if (fillsJsonNullForEmbulkNull)  {
+                        resultObject.putNull(column.getName());
+                    }
                 }
 
                 @Override
                 public void doubleColumn(Column column)
                 {
-                    resultObject.put(column.getName(),
-                                     singlePageRecordReader.getDouble(column));
+                    if (!singlePageRecordReader.isNull(column)) {
+                        resultObject.put(column.getName(),
+                                singlePageRecordReader.getDouble(column));
+                    } else if (fillsJsonNullForEmbulkNull) {
+                        resultObject.putNull(column.getName());
+                    }
                 }
 
                 @Override
@@ -62,6 +85,8 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.put(column.getName(),
                                          singlePageRecordReader.getString(column));
+                    } else if (fillsJsonNullForEmbulkNull) {
+                        resultObject.putNull(column.getName());
                     }
                 }
 
@@ -76,6 +101,8 @@ public class JacksonAllInObjectScope
                             resultObject.put(column.getName(),
                                              timestampFormatter.format(singlePageRecordReader.getTimestamp(column)));
                         }
+                    } else if (fillsJsonNullForEmbulkNull) {
+                        resultObject.putNull(column.getName());
                     }
                 }
 
@@ -87,6 +114,8 @@ public class JacksonAllInObjectScope
                     if (!singlePageRecordReader.isNull(column)) {
                         resultObject.set(column.getName(),
                                 jsonParser.parseJsonObject(singlePageRecordReader.getJson(column).toJson()));
+                    } else {
+                        resultObject.putNull(column.getName());
                     }
                 }
             });
@@ -95,4 +124,5 @@ public class JacksonAllInObjectScope
 
     private final TimestampFormatter timestampFormatter;
     private final StringJsonParser jsonParser;
+    private final boolean fillsJsonNullForEmbulkNull;
 }
