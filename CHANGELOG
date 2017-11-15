@@ -1,3 +1,11 @@
+Release 0.5.5 - 2017-11-15
+
+* [update] JacksonAllInObjectScipe to process null values for numeric types and booleans, with an additional option to fill null values for empty inputs. [#102](https://github.com/embulk/embulk-base-restclient/pull/102)
+
+Release 0.5.4 - 2017-10-12
+
+* [update] Add embulk-util-throttle-helper. [#93](https://github.com/embulk/embulk-base-restclient/pull/93)
+
 Release 0.5.3 - 2017-06-14
 
 * [update] Add close and finish methods in RecordBuffer. [#90](https://github.com/embulk/embulk-base-restclient/pull/90)
