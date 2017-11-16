@@ -41,7 +41,7 @@ public class OutputTestPluginDelegate
     @Override  // Overridden from |ServiceRequestMapperBuildable|
     public JacksonServiceRequestMapper buildServiceRequestMapper(PluginTask task)
     {
-        TimestampFormatter formatter = new TimestampFormatter(task.getJRuby(), "%Y-%m-%dT%H:%M:%S.%3N%z", DateTimeZone.forID("UTC"));
+        TimestampFormatter formatter = new TimestampFormatter("%Y-%m-%dT%H:%M:%S.%3N%z", DateTimeZone.forID("UTC"));
 
         return JacksonServiceRequestMapper.builder()
                 .add(new JacksonAllInObjectScope(formatter, this.outputNulls), new JacksonTopLevelValueLocator("record"))
