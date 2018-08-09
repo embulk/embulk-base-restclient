@@ -13,5 +13,5 @@ package org.embulk.util.retryhelper.jaxrs;
  */
 public interface JAXRSResponseReader<T>
 {
-    T readResponse(javax.ws.rs.core.Response response);
+    T readResponse(javax.ws.rs.core.Response response) throws Exception;
 }
