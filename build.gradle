@@ -1,5 +1,5 @@
 plugins {
-    id "com.jfrog.bintray" version "1.7.3"
+    id "com.jfrog.bintray" version "1.8.4"
     id "com.github.jruby-gradle.base" version "1.4.0"
     id "java"
     id "maven" // install jar files to the local repo: $ gradle install
@@ -36,6 +36,10 @@ allprojects {
         provided    'org.embulk:embulk-core:0.8.36'
 
         testCompile 'junit:junit:4.+'
+    }
+
+    tasks.withType(Javadoc) {
+        options.addStringOption("Xdoclint:none", "-quiet")
     }
 
     // add tests/javadoc/source jar tasks as artifacts to be released
