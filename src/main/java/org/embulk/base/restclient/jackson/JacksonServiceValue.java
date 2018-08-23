@@ -22,7 +22,7 @@ import org.embulk.base.restclient.record.ServiceValue;
  * { "flag": "True" }
  * }</pre>
  *
- * @see https://github.com/FasterXML/jackson-databind/blob/jackson-databind-2.5.0/src/main/java/com/fasterxml/jackson/databind/node/TextNode.java#L177-L189
+ * @see <a href="https://github.com/FasterXML/jackson-databind/blob/jackson-databind-2.5.0/src/main/java/com/fasterxml/jackson/databind/node/TextNode.java#L177-L189">TextNode#asBoolean</a>
  *
  * Implement another set of {@code ServiceValue} and {@code ServiceRecord} if a different style of
  * type conversion is required.
