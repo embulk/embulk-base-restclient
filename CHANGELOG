@@ -1,3 +1,8 @@
+Release 0.6.0 - 2018-08-23
+
+* [update] Allow `JAXRSResponseReader#readResponse` to throw any Exception. [#105](https://github.com/embulk/embulk-base-restclient/pull/105)
+* [incompatibility] Callers of `JAXRSResponseReader#readResponse` may need to handle Exception.
+
 Release 0.5.5 - 2017-11-15
 
 * [update] JacksonAllInObjectScipe to process null values for numeric types and booleans, with an additional option to fill null values for empty inputs. [#102](https://github.com/embulk/embulk-base-restclient/pull/102)
