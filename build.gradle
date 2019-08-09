@@ -5,7 +5,6 @@ plugins {
     id "maven" // install jar files to the local repo: $ gradle install
     id "maven-publish"
     id "checkstyle"
-    id "findbugs"
     //id "jacoco"
 }
 
@@ -20,22 +19,18 @@ subprojects {
 
 allprojects {
     group = 'org.embulk.base.restclient'
-    version = '0.6.0'
+    version = '0.7.0'
 
     repositories {
         mavenCentral()
         jcenter()
     }
 
-    configurations {
-        provided
-    }
-
     dependencies {
-        compile     'org.embulk:embulk-core:0.8.36'
-        provided    'org.embulk:embulk-core:0.8.36'
+        compileOnly "org.embulk:embulk-core:0.9.17"
 
-        testCompile 'junit:junit:4.+'
+        testCompile 'junit:junit:4.12'
+        testCompile "org.embulk:embulk-core:0.9.17"
     }
 
     tasks.withType(Javadoc) {
@@ -58,14 +53,14 @@ allprojects {
 }
 
 dependencies {
-    testCompile 'org.embulk:embulk-core:0.8.36:tests'
+    testCompile "org.embulk:embulk-core:0.9.17:tests"
     testCompile project(':embulk-util-retryhelper-jaxrs')
 
     // RESTEasy JAX-RS implementation is required only for testing.
     testCompile 'org.jboss.resteasy:resteasy-client:3.0.19.Final'
 }
 
-def javaVersion = JavaVersion.VERSION_1_7;
+def javaVersion = JavaVersion.VERSION_1_8;
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
 
@@ -150,13 +145,6 @@ publishing {
     }
 }
 
-task classpath(type: Copy, dependsOn: ["jar"]) {
-    doFirst { file('classpath').deleteDir() }
-    from (configurations.runtime - configurations.provided + files(jar.archivePath))
-    into 'classpath'
-}
-clean { delete 'classpath' }
-
 // checkstyle
 checkstyle {
     configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
@@ -173,9 +161,4 @@ checkstyleTest {
 task checkstyle(type: Checkstyle) {
     classpath = sourceSets.main.output + sourceSets.test.output
     source = sourceSets.main.allJava + sourceSets.test.allJava
-}
-
-// findbugs
-findbugs {
-    ignoreFailures = true
 }

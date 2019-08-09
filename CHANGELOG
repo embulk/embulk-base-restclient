@@ -1,3 +1,8 @@
+Release 0.7.0 - 2019-08-09
+
+* [incompatibility] Built for Embulk v0.9 and Java 8.
+* [incompatibility] The libraries no longer have "compile" dependencies on "embulk-core".
+
 Release 0.6.0 - 2018-08-23
 
 * [update] Allow `JAXRSResponseReader#readResponse` to throw any Exception. [#105](https://github.com/embulk/embulk-base-restclient/pull/105)
