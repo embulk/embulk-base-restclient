@@ -1,16 +1,21 @@
+// TODO: Build this example plugin with "org.embulk.embulk-plugins".
+// "org.embulk.embulk-plugins" v0.2.4 cannot process "compile project(':...')" unfortunately.
+
 import com.github.jrubygradle.JRubyExec
 
 dependencies {
     compile     project(':')
     compile     project(':embulk-util-retryhelper-jaxrs')
-    compile     'org.glassfish.jersey.core:jersey-client:2.25.1'
+    compile("org.glassfish.jersey.core:jersey-client:2.25.1") {
+        exclude group: "javax.inject", module: "javax.inject"
+    }
 
-    testCompile 'org.embulk:embulk-core:0.8.15:tests'
+    testCompile "org.embulk:embulk-core:0.9.17:tests"
 }
 
 task classpath(type: Copy, dependsOn: ["jar"]) {
     doFirst { file("classpath").deleteDir() }
-    from (configurations.runtime - configurations.provided + files(jar.archivePath))
+    from (configurations.runtime + files(jar.archivePath))
     into "classpath"
 }
 clean { delete "classpath" }
@@ -23,9 +28,11 @@ task gem(type: JRubyExec, dependsOn: ["gemspec", "classpath"]) {
 
 // It has no gemPush because it's just an example. It should not be uploaded to rubygems.
 
-task "package"(dependsOn: ["gemspec", "classpath"]) << {
-    println "> Build succeeded."
-    println "> You can run embulk with '-L ${file(".").absolutePath}' argument."
+task "package"(dependsOn: ["gemspec", "classpath"]) {
+    doLast {
+        println "> Build succeeded."
+        println "> You can run embulk with '-L ${file(".").absolutePath}' argument."
+    }
 }
 
 task gemspec {
