@@ -21,6 +21,13 @@ public class StringJetty93ResponseEntityReader
     @Override
     public final Response.Listener getListener()
     {
+        return newListener();
+    }
+
+    @Override
+    public final Response.Listener newListener()
+    {
+        this.listener = new InputStreamResponseListener();
         return this.listener;
     }
 
@@ -48,6 +55,6 @@ public class StringJetty93ResponseEntityReader
         return this.readResponseContent();
     }
 
-    private final InputStreamResponseListener listener;
+    private InputStreamResponseListener listener;
     private final long timeoutMillis;
 }

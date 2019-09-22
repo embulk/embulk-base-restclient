@@ -14,13 +14,19 @@ public class InputStreamJetty92ResponseEntityReader
 {
     public InputStreamJetty92ResponseEntityReader(long timeoutMillis)
     {
-        this.listener = new InputStreamResponseListener();
         this.timeoutMillis = timeoutMillis;
     }
 
     @Override
     public final Response.Listener getListener()
     {
+        return newListener();
+    }
+
+    @Override
+    public final Response.Listener newListener()
+    {
+        this.listener = new InputStreamResponseListener();
         return this.listener;
     }
 
@@ -48,6 +54,6 @@ public class InputStreamJetty92ResponseEntityReader
         }
     }
 
-    private final InputStreamResponseListener listener;
+    private InputStreamResponseListener listener;
     private final long timeoutMillis;
 }

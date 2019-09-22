@@ -9,18 +9,27 @@ import com.google.common.io.CharStreams;
 import org.eclipse.jetty.client.api.Response;
 import org.eclipse.jetty.client.util.InputStreamResponseListener;
 
+/**
+ * Response reader of http response.
+ */
 public class StringJetty92ResponseEntityReader
         implements Jetty92ResponseReader<String>
 {
     public StringJetty92ResponseEntityReader(long timeoutMillis)
     {
-        this.listener = new InputStreamResponseListener();
         this.timeoutMillis = timeoutMillis;
     }
 
     @Override
     public final Response.Listener getListener()
     {
+        return newListener();
+    }
+
+    @Override
+    public final Response.Listener newListener()
+    {
+        this.listener = new InputStreamResponseListener();
         return this.listener;
     }
 
@@ -48,6 +57,6 @@ public class StringJetty92ResponseEntityReader
         return this.readResponseContent();
     }
 
-    private final InputStreamResponseListener listener;
+    private InputStreamResponseListener listener;
     private final long timeoutMillis;
 }

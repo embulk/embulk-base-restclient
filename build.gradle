@@ -29,8 +29,10 @@ allprojects {
     dependencies {
         compileOnly "org.embulk:embulk-core:0.9.17"
 
-        testCompile 'junit:junit:4.12'
+        testCompile "junit:junit:4.12"
         testCompile "org.embulk:embulk-core:0.9.17"
+        testCompile "org.embulk:embulk-core:0.9.17:tests"
+        testCompile "org.embulk:embulk-test:0.9.17"
     }
 
     tasks.withType(Javadoc) {
