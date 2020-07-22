@@ -18,7 +18,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.embulk:embulk-core:0.9.23"
+    compileOnly "org.embulk:embulk-api:0.10.5"
+    compileOnly "org.embulk:embulk-core:0.10.5"
 
     compile project(":")
     compile "org.embulk.base.restclient:embulk-util-retryhelper-jaxrs:0.7.0"
@@ -26,10 +27,10 @@ dependencies {
         exclude group: "javax.inject", module: "javax.inject"
     }
 
-    testCompile "org.embulk:embulk-core:0.9.23"
-    testCompile "org.embulk:embulk-core:0.9.23:tests"
-    testCompile "org.embulk:embulk-deps-buffer:0.9.23"
-    testCompile "org.embulk:embulk-deps-config:0.9.23"
+    testCompile "org.embulk:embulk-api:0.10.5"
+    testCompile "org.embulk:embulk-core:0.10.5:tests"
+    testCompile "org.embulk:embulk-deps-buffer:0.10.5"
+    testCompile "org.embulk:embulk-deps-config:0.10.5"
 }
 
 embulkPlugin {

@@ -1,9 +1,6 @@
 package org.embulk.base.restclient;
 
 import java.util.List;
-
-import com.google.common.base.Preconditions;
-
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -115,12 +112,14 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
         try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
             // When failing around |PageBuidler| in |ingestServiceData|, |pageBuilder.finish()| should not be called.
-            TaskReport taskReport = Preconditions.checkNotNull(
-                this.serviceDataIngester.ingestServiceData(
+            final TaskReport taskReport = this.serviceDataIngester.ingestServiceData(
                     task,
                     serviceResponseMapper.createRecordImporter(),
                     taskIndex,
-                    pageBuilder));
+                    pageBuilder);
+            if (taskReport == null) {
+                throw new NullPointerException("TaskReport is unexpectedly null.");
+            }
             pageBuilder.finish();
             return taskReport;
         }

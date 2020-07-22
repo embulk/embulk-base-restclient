@@ -2,8 +2,7 @@ package org.embulk.base.restclient;
 
 import java.util.Collection;
 import java.util.Map;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -43,7 +42,7 @@ public abstract class ServiceResponseMapper<T extends ValueLocator>
         public ColumnOptions(U valueLocator)
         {
             this.valueLocator = valueLocator;
-            this.timestampFormat = Optional.absent();
+            this.timestampFormat = Optional.empty();
         }
 
         public ColumnOptions(U valueLocator, String timestampFormat)
