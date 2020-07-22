@@ -1,8 +1,4 @@
 rootProject.name = 'embulk-base-restclient'
-include 'embulk-util-retryhelper-jaxrs'
-include 'embulk-util-retryhelper-jetty92'
-include 'embulk-util-retryhelper-jetty93'
-include 'embulk-util-throttle-helper'
 include 'embulk-input-example'
 include 'embulk-input-example_jetty93'
 include 'embulk-output-example'

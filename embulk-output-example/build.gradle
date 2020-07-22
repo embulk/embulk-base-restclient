@@ -5,7 +5,7 @@ import com.github.jrubygradle.JRubyExec
 
 dependencies {
     compile     project(':')
-    compile     project(':embulk-util-retryhelper-jaxrs')
+    compile "org.embulk.base.restclient:embulk-util-retryhelper-jaxrs:0.7.0"
     compile("org.glassfish.jersey.core:jersey-client:2.25.1") {
         exclude group: "javax.inject", module: "javax.inject"
     }
