@@ -1,0 +1,8 @@
+# This is a Gradle generated file for dependency locking.
+# Manual edits can break the build and are not advised.
+# This file is expected to be part of source control.
+org.eclipse.jetty:jetty-client:9.3.16.v20170120
+org.eclipse.jetty:jetty-http:9.3.16.v20170120
+org.eclipse.jetty:jetty-io:9.3.16.v20170120
+org.eclipse.jetty:jetty-util:9.3.16.v20170120
+org.embulk.base.restclient:embulk-util-retryhelper-jetty93:0.7.0
