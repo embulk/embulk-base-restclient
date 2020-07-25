@@ -5,7 +5,7 @@ import com.github.jrubygradle.JRubyExec
 
 dependencies {
     compile     project(':')
-    compile     project(':embulk-util-retryhelper-jetty93')
+    compile "org.embulk.base.restclient:embulk-util-retryhelper-jetty93:0.7.0"
 
     testCompile "org.embulk:embulk-core:0.9.17:tests"
 }
