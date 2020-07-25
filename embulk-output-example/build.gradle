@@ -1,64 +1,47 @@
-// TODO: Build this example plugin with "org.embulk.embulk-plugins".
-// "org.embulk.embulk-plugins" v0.2.4 cannot process "compile project(':...')" unfortunately.
+apply plugin: "java"
+apply plugin: "maven-publish"
+apply plugin: "org.embulk.embulk-plugins"
 
-import com.github.jrubygradle.JRubyExec
+group = "${rootProject.group}"
+version = "${rootProject.version}"
+description = "Loads records from Example."
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url "https://dl.bintray.com/embulk-base-restclient/maven"
+    }
+}
 
 dependencies {
-    compile     project(':')
+    compileOnly "org.embulk:embulk-core:0.9.23"
+
+    compile project(":")
     compile "org.embulk.base.restclient:embulk-util-retryhelper-jaxrs:0.7.0"
     compile("org.glassfish.jersey.core:jersey-client:2.25.1") {
         exclude group: "javax.inject", module: "javax.inject"
     }
 
-    testCompile "org.embulk:embulk-core:0.9.17:tests"
+    testCompile "org.embulk:embulk-core:0.9.23"
+    testCompile "org.embulk:embulk-core:0.9.23:tests"
+    testCompile "org.embulk:embulk-deps-buffer:0.9.23"
+    testCompile "org.embulk:embulk-deps-config:0.9.23"
 }
 
-task classpath(type: Copy, dependsOn: ["jar"]) {
-    doFirst { file("classpath").deleteDir() }
-    from (configurations.runtime + files(jar.archivePath))
-    into "classpath"
-}
-clean { delete "classpath" }
-
-task gem(type: JRubyExec, dependsOn: ["gemspec", "classpath"]) {
-    jrubyArgs "-rrubygems/gem_runner", "-eGem::GemRunner.new.run(ARGV)", "build"
-    scriptArgs "${project.name}.gemspec"
-    doLast { ant.move(file: "${project.name}-${project.version}.gem", todir: "pkg") }
+embulkPlugin {
+    mainClass = "org.embulk.output.example.ExampleOutputPlugin"
+    category = "output"
+    type = "example"
 }
 
-// It has no gemPush because it's just an example. It should not be uploaded to rubygems.
-
-task "package"(dependsOn: ["gemspec", "classpath"]) {
-    doLast {
-        println "> Build succeeded."
-        println "> You can run embulk with '-L ${file(".").absolutePath}' argument."
-    }
+gem {
+    authors = [ "Dai MIKURUBE" ]
+    email = [ "dmikurube@treasure-data.com" ]
+    summary = "Example output plugin for Embulk"
+    homepage = "https://github.com/embulk/embulk-base-restclient/tree/master/embulk-output-example"
+    licenses = [ "Apache-2.0" ]
 }
-
-task gemspec {
-    ext.gemspecFile = file("${project.name}.gemspec")
-    inputs.file "build.gradle"
-    outputs.file gemspecFile
-    doLast { gemspecFile.write($/
-Gem::Specification.new do |spec|
-  spec.name          = "${project.name}"
-  spec.version       = "${project.version}"
-  spec.authors       = ["Dai MIKURUBE"]
-  spec.summary       = %[Example output plugin for Embulk]
-  spec.description   = %[Loads records from Example.]
-  spec.email         = ["dmikurube@treasure-data.com"]
-  spec.licenses      = ["MIT"]
-  spec.homepage      = "https://github.com/embulk/embulk-base-restclient/tree/master/embulk-output-example"
-
-  spec.files         = `git ls-files`.split("\n") + Dir["classpath/*.jar"]
-  spec.test_files    = spec.files.grep(%r"^(test|spec)/")
-  spec.require_paths = ["lib"]
-
-  #spec.add_dependency 'YOUR_GEM_DEPENDENCY', ['~> YOUR_GEM_DEPENDENCY_VERSION']
-  spec.add_development_dependency 'bundler', ['~> 1.0']
-  spec.add_development_dependency 'rake', ['>= 10.0']
-end
-/$)
-    }
-}
-clean { delete "${project.name}.gemspec" }
