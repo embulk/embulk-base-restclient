@@ -92,7 +92,14 @@ public class ExampleOutputPluginDelegate
     {
         ArrayNode records = JsonNodeFactory.instance.arrayNode();
         for (TaskReport taskReport : taskReports) {
-            records.addAll(JacksonTaskReportRecordBuffer.resumeFromTaskReport(taskReport, "records"));
+            final List<?> reportRecords = taskReport.get(List.class, "records");
+            for (final Object reportRecord : reportRecords) {
+                if (reportRecord instanceof JsonNode) {
+                    records.add((JsonNode) reportRecord);
+                } else {
+                    throw new RuntimeException("TaskReport: \"record\" does not consist of JSON nodes.");
+                }
+            }
         }
 
         ObjectNode json = JsonNodeFactory.instance.objectNode();
