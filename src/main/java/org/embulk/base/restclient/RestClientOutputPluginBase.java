@@ -1,7 +1,6 @@
 package org.embulk.base.restclient;
 
 import java.util.List;
-
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -18,20 +17,18 @@ import org.embulk.spi.TransactionalPageOutput;
  * override the plugin methods, it is really discouraged. Contact the library authors when the base
  * class does not cover use cases.
  */
-public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase>
-        extends RestClientOutputPluginBaseUnsafe<T>
-{
+public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase> extends RestClientOutputPluginBaseUnsafe<T> {
     /**
      * Creates a new {@code RestClientOutputPluginBase} instance.
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
-    protected RestClientOutputPluginBase(Class<T> taskClass,
-                                         EmbulkDataEgestable<T> embulkDataEgester,
-                                         RecordBufferBuildable<T> recordBufferBuilder,
-                                         OutputTaskValidatable<T> outputTaskValidator,
-                                         ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder)
-    {
+    protected RestClientOutputPluginBase(
+            final Class<T> taskClass,
+            final EmbulkDataEgestable<T> embulkDataEgester,
+            final RecordBufferBuildable<T> recordBufferBuilder,
+            final OutputTaskValidatable<T> outputTaskValidator,
+            final ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder) {
         super(taskClass,
               embulkDataEgester,
               recordBufferBuilder,
@@ -44,33 +41,30 @@ public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase>
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
-    protected RestClientOutputPluginBase(Class<T> taskClass,
-                                         RestClientOutputPluginDelegate<T> delegate)
-    {
+    protected RestClientOutputPluginBase(final Class<T> taskClass, final RestClientOutputPluginDelegate<T> delegate) {
         super(taskClass, delegate, delegate, delegate, delegate);
     }
 
     @Override
-    public final ConfigDiff transaction(ConfigSource config, Schema schema, int taskCount, OutputPlugin.Control control)
-    {
+    public final ConfigDiff transaction(
+            final ConfigSource config, final Schema schema, final int taskCount, final OutputPlugin.Control control) {
         return super.transaction(config, schema, taskCount, control);
     }
 
     @Override
-    public final ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, OutputPlugin.Control control)
-    {
+    public final ConfigDiff resume(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final OutputPlugin.Control control) {
         return super.resume(taskSource, schema, taskCount, control);
     }
 
     @Override
-    public final void cleanup(TaskSource taskSource, Schema schema, int taskCount, List<TaskReport> successTaskReports)
-    {
+    public final void cleanup(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final List<TaskReport> successTaskReports) {
         super.cleanup(taskSource, schema, taskCount, successTaskReports);
     }
 
     @Override
-    public final TransactionalPageOutput open(TaskSource taskSource, Schema schema, int taskIndex)
-    {
+    public final TransactionalPageOutput open(final TaskSource taskSource, final Schema schema, final int taskIndex) {
         return super.open(taskSource, schema, taskIndex);
     }
 }

@@ -1,7 +1,7 @@
 package org.embulk.base.restclient;
 
 import java.util.List;
-
+import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -10,18 +10,15 @@ import org.embulk.spi.OutputPlugin;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TransactionalPageOutput;
 
-import org.embulk.base.restclient.record.ValueLocator;
-
 public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase>
         extends RestClientPluginBase<T>
-        implements OutputPlugin
-{
-    protected RestClientOutputPluginBaseUnsafe(Class<T> taskClass,
-                                               EmbulkDataEgestable<T> embulkDataEgester,
-                                               RecordBufferBuildable<T> recordBufferBuilder,
-                                               OutputTaskValidatable<T> outputTaskValidator,
-                                               ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder)
-    {
+        implements OutputPlugin {
+    protected RestClientOutputPluginBaseUnsafe(
+            final Class<T> taskClass,
+            final EmbulkDataEgestable<T> embulkDataEgester,
+            final RecordBufferBuildable<T> recordBufferBuilder,
+            final OutputTaskValidatable<T> outputTaskValidator,
+            final ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder) {
         this.taskClass = taskClass;
         this.embulkDataEgester = embulkDataEgester;
         this.recordBufferBuilder = recordBufferBuilder;
@@ -29,39 +26,36 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
         this.serviceRequestMapperBuilder = serviceRequestMapperBuilder;
     }
 
-    protected RestClientOutputPluginBaseUnsafe(Class<T> taskClass,
-                                               RestClientOutputPluginDelegate<T> delegate)
-    {
+    protected RestClientOutputPluginBaseUnsafe(final Class<T> taskClass, final RestClientOutputPluginDelegate<T> delegate) {
         this(taskClass, delegate, delegate, delegate, delegate);
     }
 
     @Override
-    public ConfigDiff transaction(ConfigSource config, Schema schema, int taskCount, OutputPlugin.Control control)
-    {
-        T task = loadConfig(config, this.taskClass);
+    public ConfigDiff transaction(
+            final ConfigSource config, final Schema schema, final int taskCount, final OutputPlugin.Control control) {
+        final T task = loadConfig(config, this.taskClass);
         this.outputTaskValidator.validateOutputTask(task, schema, taskCount);
         return resume(task.dump(), schema, taskCount, control);
     }
 
     @Override
-    public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, OutputPlugin.Control control)
-    {
-        T task = taskSource.loadTask(this.taskClass);
-        List<TaskReport> taskReports = control.run(taskSource);
+    public ConfigDiff resume(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final OutputPlugin.Control control) {
+        final T task = taskSource.loadTask(this.taskClass);
+        final List<TaskReport> taskReports = control.run(taskSource);
         return this.embulkDataEgester.egestEmbulkData(task, schema, taskCount, taskReports);
     }
 
     @Override
-    public void cleanup(TaskSource taskSource, Schema schema, int taskCount, List<TaskReport> successTaskReports)
-    {
+    public void cleanup(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final List<TaskReport> successTaskReports) {
     }
 
     @Override
-    public TransactionalPageOutput open(TaskSource taskSource, Schema schema, int taskIndex)
-    {
-        T task = taskSource.loadTask(this.taskClass);
-        ServiceRequestMapper<? extends ValueLocator> serviceRequestMapper =
-            this.serviceRequestMapperBuilder.buildServiceRequestMapper(task);
+    public TransactionalPageOutput open(final TaskSource taskSource, final Schema schema, final int taskIndex) {
+        final T task = taskSource.loadTask(this.taskClass);
+        final ServiceRequestMapper<? extends ValueLocator> serviceRequestMapper =
+                this.serviceRequestMapperBuilder.buildServiceRequestMapper(task);
         return new RestClientPageOutput<T>(this.taskClass,
                                            task,
                                            serviceRequestMapper.createRecordExporter(),

@@ -8,37 +8,32 @@ import org.embulk.config.TaskReport;
 import org.embulk.spi.Schema;
 
 public abstract class DispatchingRestClientOutputPluginDelegate<T extends RestClientOutputTaskBase>
-        implements RestClientOutputPluginDelegate<T>
-{
-    public DispatchingRestClientOutputPluginDelegate()
-    {
+        implements RestClientOutputPluginDelegate<T> {
+    public DispatchingRestClientOutputPluginDelegate() {
         this.delegateSelected = null;
     }
 
     @Override  // Overridden from |OutputTaskValidatable|
-    public void validateOutputTask(T task, Schema embulkSchema, int taskCount)
-    {
+    public void validateOutputTask(final T task, final Schema embulkSchema, final int taskCount) {
         final RestClientOutputPluginDelegate<T> delegate = this.cacheDelegate(task);
         delegate.validateOutputTask(task, embulkSchema, taskCount);
     }
 
     @Override  // Overridden from |ServiceRequestMapperBuildable|
-    public ServiceRequestMapper<? extends ValueLocator> buildServiceRequestMapper(T task)
-    {
+    public ServiceRequestMapper<? extends ValueLocator> buildServiceRequestMapper(final T task) {
         final RestClientOutputPluginDelegate<T> delegate = this.cacheDelegate(task);
         return delegate.buildServiceRequestMapper(task);
     }
 
     @Override  // Overridden from |RecordBufferBuildable|
-    public RecordBuffer buildRecordBuffer(T task, Schema schema, int taskIndex)
-    {
+    public RecordBuffer buildRecordBuffer(final T task, final Schema schema, final int taskIndex) {
         final RestClientOutputPluginDelegate<T> delegate = this.cacheDelegate(task);
         return delegate.buildRecordBuffer(task, schema, taskIndex);
     }
 
     @Override  // Overridden from |EmbulkDataEgestable|
-    public final ConfigDiff egestEmbulkData(T task, Schema schema, int taskCount, List<TaskReport> taskReports)
-    {
+    public final ConfigDiff egestEmbulkData(
+            final T task, final Schema schema, final int taskCount, final List<TaskReport> taskReports) {
         final RestClientOutputPluginDelegate<T> delegate = this.cacheDelegate(task);
         return delegate.egestEmbulkData(task, schema, taskCount, taskReports);
     }
@@ -50,10 +45,9 @@ public abstract class DispatchingRestClientOutputPluginDelegate<T extends RestCl
      */
     protected abstract RestClientOutputPluginDelegate<T> dispatchPerTask(T task);
 
-    private RestClientOutputPluginDelegate<T> cacheDelegate(T task)
-    {
+    private RestClientOutputPluginDelegate<T> cacheDelegate(final T task) {
         if (this.delegateSelected == null) {
-            this.delegateSelected = dispatchPerTask(task);
+            this.delegateSelected = this.dispatchPerTask(task);
         }
         return this.delegateSelected;
     }

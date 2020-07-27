@@ -90,9 +90,13 @@ tasks.withType(Checkstyle) {
 }
 
 checkstyle {
-    configFile = file("${project.rootDir}/config/checkstyle/checkstyle.xml")
-    toolVersion = '6.14.1'
-    ignoreFailures = true
+    toolVersion "8.7"
+    configFile = file("${projectDir}/config/checkstyle/checkstyle.xml")
+    configProperties = [
+        "checkstyle.config.path": file("${projectDir}/config/checkstyle")
+    ]
+    ignoreFailures = false
+    maxWarnings = 0  // https://github.com/gradle/gradle/issues/881
 }
 
 publishing {

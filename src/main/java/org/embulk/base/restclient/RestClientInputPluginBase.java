@@ -1,7 +1,6 @@
 package org.embulk.base.restclient;
 
 import java.util.List;
-
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -18,21 +17,19 @@ import org.embulk.spi.Schema;
  * override the plugin methods, it is really discouraged. Contact the library authors when the base
  * class does not cover use cases.
  */
-public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
-        extends RestClientInputPluginBaseUnsafe<T>
-{
+public class RestClientInputPluginBase<T extends RestClientInputTaskBase> extends RestClientInputPluginBaseUnsafe<T> {
     /**
      * Creates a new {@code RestClientInputPluginBase} instance.
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
-    protected RestClientInputPluginBase(Class<T> taskClass,
-                                        ConfigDiffBuildable<T> configDiffBuilder,
-                                        InputTaskValidatable<T> inputTaskValidator,
-                                        ServiceDataIngestable<T> serviceDataIngester,
-                                        ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
-                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
-    {
+    protected RestClientInputPluginBase(
+            final Class<T> taskClass,
+            final ConfigDiffBuildable<T> configDiffBuilder,
+            final InputTaskValidatable<T> inputTaskValidator,
+            final ServiceDataIngestable<T> serviceDataIngester,
+            final ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
+            final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
         super(taskClass,
               configDiffBuilder,
               inputTaskValidator,
@@ -46,12 +43,12 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
-    protected RestClientInputPluginBase(Class<T> taskClass,
-                                        ConfigDiffBuildable<T> configDiffBuilder,
-                                        InputTaskValidatable<T> inputTaskValidator,
-                                        ServiceDataIngestable<T> serviceDataIngester,
-                                        ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
-    {
+    protected RestClientInputPluginBase(
+            final Class<T> taskClass,
+            final ConfigDiffBuildable<T> configDiffBuilder,
+            final InputTaskValidatable<T> inputTaskValidator,
+            final ServiceDataIngestable<T> serviceDataIngester,
+            final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
         super(taskClass,
               configDiffBuilder,
               inputTaskValidator,
@@ -64,39 +61,34 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase>
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
-    protected RestClientInputPluginBase(Class<T> taskClass,
-                                        RestClientInputPluginDelegate<T> delegate)
-    {
+    protected RestClientInputPluginBase(final Class<T> taskClass, final RestClientInputPluginDelegate<T> delegate) {
         super(taskClass, delegate, delegate, delegate, delegate, delegate);
     }
 
     @Override
-    public final ConfigDiff transaction(ConfigSource config, InputPlugin.Control control)
-    {
+    public final ConfigDiff transaction(final ConfigSource config, final InputPlugin.Control control) {
         return super.transaction(config, control);
     }
 
     @Override
-    public final ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
-    {
+    public final ConfigDiff resume(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final InputPlugin.Control control) {
         return super.resume(taskSource, schema, taskCount, control);
     }
 
     @Override
-    public final void cleanup(TaskSource taskSource, Schema schema, int taskCount, List<TaskReport> successTaskReports)
-    {
+    public final void cleanup(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final List<TaskReport> successTaskReports) {
         super.cleanup(taskSource, schema, taskCount, successTaskReports);
     }
 
     @Override
-    public final TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
-    {
+    public final TaskReport run(final TaskSource taskSource, final Schema schema, final int taskIndex, final PageOutput output) {
         return super.run(taskSource, schema, taskIndex, output);
     }
 
     @Override
-    public final ConfigDiff guess(ConfigSource config)
-    {
+    public final ConfigDiff guess(final ConfigSource config) {
         return super.guess(config);
     }
 }
