@@ -31,13 +31,11 @@ import org.embulk.base.restclient.record.values.JsonValueImporter;
 import org.embulk.base.restclient.record.values.LongValueImporter;
 import org.embulk.base.restclient.record.values.StringValueImporter;
 import org.embulk.base.restclient.record.values.TimestampValueImporter;
-import org.embulk.config.Task;
 import org.embulk.spi.Column;
-import org.embulk.spi.Exec;
 import org.embulk.spi.json.JsonParser;
-import org.embulk.spi.time.TimestampParser;
 import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
+import org.embulk.util.timestamp.TimestampFormatter;
 
 /**
  * |JacksonServiceResponseMapper| represents how to locate values in a JSON-based response,
@@ -123,12 +121,6 @@ public final class JacksonServiceResponseMapper extends ServiceResponseMapper<Ja
         private int index;
     }
 
-    private interface InternalTimestampParserTask extends Task, TimestampParser.Task {
-    }
-
-    private interface InternalTimestampColumnOption extends Task, TimestampParser.TimestampColumnOption {
-    }
-
     private ValueImporter createValueImporter(final Column column, final ColumnOptions<JacksonValueLocator> columnOptions) {
         final Type type = column.getType();
         final JacksonValueLocator locator = columnOptions.getValueLocator();
@@ -142,12 +134,9 @@ public final class JacksonServiceResponseMapper extends ServiceResponseMapper<Ja
         } else if (type.equals(Types.STRING)) {
             return new StringValueImporter(column, locator);
         } else if (type.equals(Types.TIMESTAMP)) {
-            final TimestampParser timestampParser = new TimestampParser(
-                    Exec.newConfigSource().loadConfig(InternalTimestampParserTask.class),
-                    (timestampFormat.isPresent()
-                         ? Exec.newConfigSource().set("format", timestampFormat.get())
-                         : Exec.newConfigSource()).loadConfig(InternalTimestampColumnOption.class));
-            return new TimestampValueImporter(column, locator, timestampParser);
+            final TimestampFormatter timestampFormatter =
+                    TimestampFormatter.builder(timestampFormat.orElse("%Y-%m-%d %H:%M:%S.%N %z"), true).build();
+            return new TimestampValueImporter(column, locator, timestampFormatter);
         } else if (type.equals(Types.JSON)) {
             final JsonParser jsonParser = new JsonParser();
             return new JsonValueImporter(column, locator, jsonParser);

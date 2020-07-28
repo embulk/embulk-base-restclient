@@ -5,6 +5,8 @@ javax.annotation:javax.annotation-api:1.2
 javax.ws.rs:javax.ws.rs-api:2.0.1
 org.embulk:embulk-util-retryhelper-jaxrs:0.8.0
 org.embulk:embulk-util-retryhelper:0.8.0
+org.embulk:embulk-util-rubytime:0.3.0
+org.embulk:embulk-util-timestamp:0.2.0
 org.glassfish.hk2.external:aopalliance-repackaged:2.5.0-b32
 org.glassfish.hk2.external:javax.inject:2.5.0-b32
 org.glassfish.hk2:hk2-api:2.5.0-b32

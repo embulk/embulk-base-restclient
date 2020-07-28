@@ -22,7 +22,7 @@ import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.SinglePageRecordReader;
 import org.embulk.spi.Column;
 import org.embulk.spi.ColumnVisitor;
-import org.embulk.spi.time.TimestampFormatter;
+import org.embulk.util.timestamp.TimestampFormatter;
 
 public class JacksonAllInObjectScope extends JacksonObjectScopeBase {
     public JacksonAllInObjectScope() {

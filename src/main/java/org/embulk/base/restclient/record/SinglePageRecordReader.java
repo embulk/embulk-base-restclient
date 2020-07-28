@@ -16,10 +16,10 @@
 
 package org.embulk.base.restclient.record;
 
+import java.time.Instant;
 import org.embulk.spi.Column;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
-import org.embulk.spi.time.Timestamp;
 import org.msgpack.value.Value;
 
 /**
@@ -74,12 +74,12 @@ public class SinglePageRecordReader {
         return this.pageReader.getString(columnIndex);
     }
 
-    public Timestamp getTimestamp(final Column column) {
-        return this.pageReader.getTimestamp(column);
+    public Instant getTimestamp(final Column column) {
+        return this.pageReader.getTimestamp(column).getInstant();
     }
 
-    public Timestamp getTimestamp(final int columnIndex) {
-        return this.pageReader.getTimestamp(columnIndex);
+    public Instant getTimestamp(final int columnIndex) {
+        return this.pageReader.getTimestamp(columnIndex).getInstant();
     }
 
     public Value getJson(final Column column) {

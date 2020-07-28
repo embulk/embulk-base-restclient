@@ -16,9 +16,9 @@
 
 package org.embulk.base.restclient.record;
 
+import java.time.Instant;
 import org.embulk.spi.json.JsonParser;
-import org.embulk.spi.time.Timestamp;
-import org.embulk.spi.time.TimestampParser;
+import org.embulk.util.timestamp.TimestampFormatter;
 import org.msgpack.value.Value;
 
 public abstract class ServiceValue {
@@ -34,5 +34,5 @@ public abstract class ServiceValue {
 
     public abstract String stringValue();
 
-    public abstract Timestamp timestampValue(TimestampParser timestampParser);
+    public abstract Instant timestampValue(TimestampFormatter timestampFormatter);
 }

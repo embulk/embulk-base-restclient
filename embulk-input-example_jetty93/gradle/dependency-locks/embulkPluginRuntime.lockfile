@@ -7,3 +7,5 @@ org.eclipse.jetty:jetty-io:9.3.16.v20170120
 org.eclipse.jetty:jetty-util:9.3.16.v20170120
 org.embulk:embulk-util-retryhelper-jetty93:0.8.0
 org.embulk:embulk-util-retryhelper:0.8.0
+org.embulk:embulk-util-rubytime:0.3.0
+org.embulk:embulk-util-timestamp:0.2.0

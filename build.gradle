@@ -1,6 +1,7 @@
 plugins {
     id "com.jfrog.bintray" version "1.8.4"
     id "java"
+    id "java-library"
     id "maven" // install jar files to the local repo: $ gradle install
     id "maven-publish"
     id "checkstyle"
@@ -30,6 +31,8 @@ repositories {
 dependencies {
     compileOnly "org.embulk:embulk-api:0.10.5"
     compileOnly "org.embulk:embulk-core:0.10.5"
+
+    api "org.embulk:embulk-util-timestamp:0.2.0"
 
     testCompile "junit:junit:4.13"
     testCompile "org.embulk:embulk-api:0.10.5"

@@ -19,6 +19,7 @@ package org.embulk.base.restclient;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.embulk.EmbulkTestRuntime;
@@ -113,7 +114,14 @@ public class RestClientPageOutputTest {
 
         // id, long, timestamp, boolean, double, string
         final List<Page> pages = PageTestUtils.buildPage(
-                runtime.getBufferAllocator(), schema, 2L, 42L, Timestamp.ofEpochSecond(1509738161), true, 123.45, "embulk");
+                runtime.getBufferAllocator(),
+                schema,
+                2L,
+                42L,
+                Timestamp.ofInstant(Instant.ofEpochSecond(1509738161)),
+                true,
+                123.45,
+                "embulk");
         assertThat(pages.size(), is(1));
         for (final Page page : pages) {
             output.add(page);

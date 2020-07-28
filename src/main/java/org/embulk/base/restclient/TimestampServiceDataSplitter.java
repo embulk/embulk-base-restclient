@@ -16,22 +16,22 @@
 
 package org.embulk.base.restclient;
 
+import java.time.Instant;
 import org.embulk.spi.Schema;
-import org.embulk.spi.time.Timestamp;
 
 public abstract class TimestampServiceDataSplitter<T extends RestClientInputTaskBase> extends ServiceDataSplitter<T> {
     @Override
     public final int numberToSplitWithHintingInTask(final T taskToHint) {
-        final Timestamp beginningOfOverall = this.getBeginningOfOverall(taskToHint);
-        final Timestamp endingOfOverall = this.getEndingOfOverall(taskToHint);
+        final Instant beginningOfOverall = this.getBeginningOfOverall(taskToHint);
+        final Instant endingOfOverall = this.getEndingOfOverall(taskToHint);
         final SplitCalculator calculator = this.getSplitCalculator(taskToHint);
         return calculator.calculateNumberToSplit(beginningOfOverall, endingOfOverall);
     }
 
     @Override
     public final void hintInEachSplitTask(final T taskToHint, final Schema schema, final int taskIndex) {
-        final Timestamp beginningOfOverall = this.getBeginningOfOverall(taskToHint);
-        final Timestamp endingOfOverall = this.getEndingOfOverall(taskToHint);
+        final Instant beginningOfOverall = this.getBeginningOfOverall(taskToHint);
+        final Instant endingOfOverall = this.getEndingOfOverall(taskToHint);
         final SplitCalculator calculator = this.getSplitCalculator(taskToHint);
 
         this.setTimestampsOfEachTask(
@@ -41,16 +41,16 @@ public abstract class TimestampServiceDataSplitter<T extends RestClientInputTask
     }
 
     public abstract static class SplitCalculator {
-        public abstract int calculateNumberToSplit(Timestamp beginning, Timestamp ending);
+        public abstract int calculateNumberToSplit(Instant beginning, Instant ending);
 
-        public abstract Timestamp calculateBeginningOfEachTask(
-                Timestamp beginningOfOverall,
-                Timestamp endingOfOverall,
+        public abstract Instant calculateBeginningOfEachTask(
+                Instant beginningOfOverall,
+                Instant endingOfOverall,
                 int taskIndex);
 
-        public abstract Timestamp calculateEndingOfEachTask(
-                Timestamp beginningOfOverall,
-                Timestamp endingOfOverall,
+        public abstract Instant calculateEndingOfEachTask(
+                Instant beginningOfOverall,
+                Instant endingOfOverall,
                 int taskIndex);
     }
 
@@ -62,7 +62,7 @@ public abstract class TimestampServiceDataSplitter<T extends RestClientInputTask
      * This method is to be implemented in plugin's concrete ServiceDataSplitter class.
      * Called only from |numberToSplitWithHintingInTask| and |hintInEachSplitTask|.
      */
-    protected abstract Timestamp getBeginningOfOverall(T task);
+    protected abstract Instant getBeginningOfOverall(T task);
 
     /**
      * Returns the overall endning time from the given Task.
@@ -70,7 +70,7 @@ public abstract class TimestampServiceDataSplitter<T extends RestClientInputTask
      * This method is to be implemented in plugin's concrete ServiceDataSplitter class.
      * Called only from |numberToSplitWithHintingInTask| and |hintInEachSplitTask|.
      */
-    protected abstract Timestamp getEndingOfOverall(T task);
+    protected abstract Instant getEndingOfOverall(T task);
 
     /**
      * Returns an appropriate SplitCalculator for the given Task.
@@ -86,5 +86,5 @@ public abstract class TimestampServiceDataSplitter<T extends RestClientInputTask
      * This method is to be implemented in plugin's concrete ServiceDataSplitter class.
      * Called only from |numberToSplitWithHintingInTask| and |hintInEachSplitTask|.
      */
-    protected abstract void setTimestampsOfEachTask(T task, Timestamp beginning, Timestamp ending);
+    protected abstract void setTimestampsOfEachTask(T task, Instant beginning, Instant ending);
 }
