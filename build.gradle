@@ -75,6 +75,18 @@ javadoc {
     }
 }
 
+jar {
+    from rootProject.file("LICENSE")
+}
+
+sourcesJar {
+    from rootProject.file("LICENSE")
+}
+
+javadocJar {
+    from rootProject.file("LICENSE")
+}
+
 test {
     testLogging {
         outputs.upToDateWhen { false }
