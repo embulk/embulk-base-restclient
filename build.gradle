@@ -150,6 +150,10 @@ publishing {
 
                 developers {
                     developer {
+                        name = "Muga Nishizawa"
+                        email = "muga.nishizawa@gmail.com"
+                    }
+                    developer {
                         name = "Dai MIKURUBE"
                         email = "dmikurube@treasure-data.com"
                     }
