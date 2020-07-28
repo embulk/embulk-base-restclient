@@ -19,7 +19,6 @@ package org.embulk.base.restclient;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import org.embulk.EmbulkTestRuntime;
@@ -70,8 +69,10 @@ public class NoNullsRestClientPageOutputTest {
         final PluginTask task = config.loadConfig(PluginTask.class);
         this.plugin.transaction(config, schema, 0, new OutputPlugin.Control() {
                 @Override
-                public List<TaskReport> run(TaskSource taskSource) {
-                    return Lists.newArrayList(Exec.newTaskReport());
+                public List<TaskReport> run(final TaskSource taskSource) {
+                    final ArrayList<TaskReport> newList = new ArrayList<>();
+                    newList.add(Exec.newTaskReport());
+                    return newList;
                 }
             });
         final TransactionalPageOutput output = this.plugin.open(task.dump(), schema, 0);
@@ -101,8 +102,10 @@ public class NoNullsRestClientPageOutputTest {
         final PluginTask task = config.loadConfig(PluginTask.class);
         this.plugin.transaction(config, schema, 0, new OutputPlugin.Control() {
                 @Override
-                public List<TaskReport> run(TaskSource taskSource) {
-                    return Lists.newArrayList(Exec.newTaskReport());
+                public List<TaskReport> run(final TaskSource taskSource) {
+                    final ArrayList<TaskReport> newList = new ArrayList<>();
+                    newList.add(Exec.newTaskReport());
+                    return newList;
                 }
             });
         final TransactionalPageOutput output = this.plugin.open(task.dump(), schema, 0);

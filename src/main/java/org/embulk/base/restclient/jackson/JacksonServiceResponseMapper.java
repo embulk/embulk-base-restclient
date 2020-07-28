@@ -16,11 +16,12 @@
 
 package org.embulk.base.restclient.jackson;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ListMultimap;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.embulk.base.restclient.ServiceResponseMapper;
 import org.embulk.base.restclient.record.RecordImporter;
 import org.embulk.base.restclient.record.ValueImporter;
@@ -49,7 +50,7 @@ public final class JacksonServiceResponseMapper extends ServiceResponseMapper<Ja
      * |JacksonServiceSchema| must be created through |JacksonServiceSchema.Builder|.
      * This constructor is private to guarantee the restriction.
      */
-    protected JacksonServiceResponseMapper(final ListMultimap<Column, ColumnOptions<JacksonValueLocator>> map) {
+    protected JacksonServiceResponseMapper(final List<Map.Entry<Column, ColumnOptions<JacksonValueLocator>>> map) {
         super(map);
     }
 
@@ -59,23 +60,25 @@ public final class JacksonServiceResponseMapper extends ServiceResponseMapper<Ja
 
     @Override
     public RecordImporter createRecordImporter() {
-        final ImmutableList.Builder<ValueImporter> listBuilder = ImmutableList.builder();
-        for (final Map.Entry<Column, ColumnOptions<JacksonValueLocator>> entry : entries()) {
+        final ArrayList<ValueImporter> listBuilder = new ArrayList<>();
+        for (final Map.Entry<Column, ColumnOptions<JacksonValueLocator>> entry : this.entries()) {
             listBuilder.add(createValueImporter(entry.getKey(), entry.getValue()));
         }
-        return new RecordImporter(listBuilder.build());
+        return new RecordImporter(Collections.unmodifiableList(listBuilder));
     }
 
     public static final class Builder {
         private Builder() {
-            this.mapBuilder = ImmutableListMultimap.builder();
+            this.mapBuilder = new ArrayList<>();
             this.index = 0;
         }
 
-        public synchronized JacksonServiceResponseMapper.Builder add(final String embulkColumnName, final Type embulkColumnType) {
-            this.mapBuilder.put(
+        public synchronized JacksonServiceResponseMapper.Builder add(
+                final String embulkColumnName,
+                final Type embulkColumnType) {
+            this.mapBuilder.add(new AbstractMap.SimpleEntry<>(
                     new Column(index++, embulkColumnName, embulkColumnType),
-                    new ColumnOptions<JacksonValueLocator>(new JacksonTopLevelValueLocator(embulkColumnName)));
+                    new ColumnOptions<JacksonValueLocator>(new JacksonTopLevelValueLocator(embulkColumnName))));
             return this;
         }
 
@@ -83,11 +86,11 @@ public final class JacksonServiceResponseMapper extends ServiceResponseMapper<Ja
                 final String embulkColumnName,
                 final Type embulkColumnType,
                 final String embulkColumnTimestampFormat) {
-            this.mapBuilder.put(
+            this.mapBuilder.add(new AbstractMap.SimpleEntry<>(
                     new Column(index++, embulkColumnName, embulkColumnType),
                     new ColumnOptions<JacksonValueLocator>(
                             new JacksonTopLevelValueLocator(embulkColumnName),
-                            embulkColumnTimestampFormat));
+                            embulkColumnTimestampFormat)));
             return this;
         }
 
@@ -95,9 +98,9 @@ public final class JacksonServiceResponseMapper extends ServiceResponseMapper<Ja
                 final JacksonValueLocator valueLocator,
                 final String embulkColumnName,
                 final Type embulkColumnType) {
-            this.mapBuilder.put(
+            this.mapBuilder.add(new AbstractMap.SimpleEntry<>(
                     new Column(index++, embulkColumnName, embulkColumnType),
-                    new ColumnOptions<JacksonValueLocator>(valueLocator));
+                    new ColumnOptions<JacksonValueLocator>(valueLocator)));
             return this;
         }
 
@@ -106,17 +109,17 @@ public final class JacksonServiceResponseMapper extends ServiceResponseMapper<Ja
                 final String embulkColumnName,
                 final Type embulkColumnType,
                 final String embulkColumnTimestampFormat) {
-            this.mapBuilder.put(
+            this.mapBuilder.add(new AbstractMap.SimpleEntry<>(
                     new Column(index++, embulkColumnName, embulkColumnType),
-                    new ColumnOptions<JacksonValueLocator>(valueLocator, embulkColumnTimestampFormat));
+                    new ColumnOptions<JacksonValueLocator>(valueLocator, embulkColumnTimestampFormat)));
             return this;
         }
 
         public JacksonServiceResponseMapper build() {
-            return new JacksonServiceResponseMapper(mapBuilder.build());
+            return new JacksonServiceResponseMapper(this.mapBuilder);
         }
 
-        private final ImmutableListMultimap.Builder<Column, ColumnOptions<JacksonValueLocator>> mapBuilder;
+        private final ArrayList<Map.Entry<Column, ColumnOptions<JacksonValueLocator>>> mapBuilder;
         private int index;
     }
 

@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.google.common.base.Throwables;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import org.embulk.base.restclient.OutputTestPluginDelegate.PluginTask;
 import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.record.RecordBuffer;
@@ -54,7 +54,7 @@ public class OutputTestRecordBuffer extends RecordBuffer {
         } catch (final ClassCastException ex) {
             throw new RuntimeException(ex);
         } catch (final IOException ex) {
-            throw Throwables.propagate(ex);
+            throw new UncheckedIOException(ex);
         }
     }
 

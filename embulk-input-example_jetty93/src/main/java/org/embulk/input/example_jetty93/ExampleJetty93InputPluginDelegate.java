@@ -23,8 +23,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import com.google.common.io.CharStreams;
-
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.client.api.ContentResponse;
 

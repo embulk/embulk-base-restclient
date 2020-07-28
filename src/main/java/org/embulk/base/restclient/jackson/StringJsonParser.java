@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Throwables;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import org.embulk.spi.DataException;
 
 public class StringJsonParser {
@@ -55,7 +55,7 @@ public class StringJsonParser {
         try {
             return mapper.readTree(jsonText);
         } catch (final IOException e) {
-            throw Throwables.propagate(e);
+            throw new UncheckedIOException(e);
         }
     }
 

@@ -16,9 +16,10 @@
 
 package org.embulk.base.restclient.jackson;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ListMultimap;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.embulk.base.restclient.ServiceRequestMapper;
 import org.embulk.base.restclient.jackson.scope.JacksonNewObjectScope;
@@ -31,7 +32,7 @@ import org.embulk.base.restclient.record.ValueExporter;
  * how the values are placed in a JSON-based request.
  */
 public final class JacksonServiceRequestMapper extends ServiceRequestMapper<JacksonValueLocator> {
-    protected JacksonServiceRequestMapper(final ListMultimap<EmbulkValueScope, ColumnOptions<JacksonValueLocator>> map) {
+    protected JacksonServiceRequestMapper(final List<Map.Entry<EmbulkValueScope, ColumnOptions<JacksonValueLocator>>> map) {
         super(map);
     }
 
@@ -41,22 +42,22 @@ public final class JacksonServiceRequestMapper extends ServiceRequestMapper<Jack
 
     @Override
     public RecordExporter createRecordExporter() {
-        final ImmutableList.Builder<ValueExporter> listBuilder = ImmutableList.builder();
+        final ArrayList<ValueExporter> listBuilder = new ArrayList<>();
         for (final Map.Entry<EmbulkValueScope, ColumnOptions<JacksonValueLocator>> entry : entries()) {
             listBuilder.add(createValueExporter(entry.getKey(), entry.getValue()));
         }
-        return new RecordExporter(listBuilder.build(), JacksonServiceRecord.builder());
+        return new RecordExporter(Collections.unmodifiableList(listBuilder), JacksonServiceRecord.builder());
     }
 
     public static final class Builder {
         private Builder() {
-            this.mapBuilder = ImmutableListMultimap.builder();
+            this.mapBuilder = new ArrayList<>();
         }
 
         public synchronized JacksonServiceRequestMapper.Builder addNewObject(final JacksonValueLocator valueLocator) {
-            this.mapBuilder.put(
+            this.mapBuilder.add(new AbstractMap.SimpleEntry<>(
                     new JacksonNewObjectScope(),
-                    new ColumnOptions<JacksonValueLocator>(valueLocator));
+                    new ColumnOptions<JacksonValueLocator>(valueLocator)));
             return this;
 
         }
@@ -64,16 +65,19 @@ public final class JacksonServiceRequestMapper extends ServiceRequestMapper<Jack
         public synchronized JacksonServiceRequestMapper.Builder add(
                 final EmbulkValueScope scope,
                 final JacksonValueLocator valueLocator) {
-            this.mapBuilder.put(scope, new ColumnOptions<JacksonValueLocator>(valueLocator));
+            this.mapBuilder.add(new AbstractMap.SimpleEntry<>(scope, new ColumnOptions<JacksonValueLocator>(valueLocator)));
             return this;
-
         }
 
         public JacksonServiceRequestMapper build() {
-            return new JacksonServiceRequestMapper(mapBuilder.build());
+            final ArrayList<Map.Entry<EmbulkValueScope, ColumnOptions<JacksonValueLocator>>> built = new ArrayList<>();
+            for (final Map.Entry<EmbulkValueScope, ColumnOptions<JacksonValueLocator>> entry : this.mapBuilder) {
+                built.add(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()));
+            }
+            return new JacksonServiceRequestMapper(Collections.unmodifiableList(mapBuilder));
         }
 
-        private final ImmutableListMultimap.Builder<EmbulkValueScope, ColumnOptions<JacksonValueLocator>> mapBuilder;
+        private final ArrayList<Map.Entry<EmbulkValueScope, ColumnOptions<JacksonValueLocator>>> mapBuilder;
     }
 
     private ValueExporter createValueExporter(
