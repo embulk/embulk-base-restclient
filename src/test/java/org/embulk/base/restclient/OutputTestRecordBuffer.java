@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import org.embulk.base.restclient.OutputTestPluginDelegate.PluginTask;
@@ -38,7 +37,7 @@ public class OutputTestRecordBuffer extends RecordBuffer {
         this.mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, false);
-        this.records = JsonNodeFactory.instance.arrayNode();
+        this.records = OBJECT_MAPPER.createArrayNode();
     }
 
     @Override
@@ -75,6 +74,8 @@ public class OutputTestRecordBuffer extends RecordBuffer {
     public String toString() {
         return this.records.toString();
     }
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private final String attributeName;

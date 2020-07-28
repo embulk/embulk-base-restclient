@@ -16,7 +16,7 @@
 
 package org.embulk.base.restclient.jackson;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ServiceValue;
@@ -33,12 +33,12 @@ public class JacksonServiceRecord extends ServiceRecord {
 
     public static class Builder extends ServiceRecord.Builder {
         public Builder() {
-            this.node = JsonNodeFactory.instance.objectNode();
+            this.node = MAPPER.createObjectNode();
         }
 
         @Override
         public void reset() {
-            this.node = JsonNodeFactory.instance.objectNode();
+            this.node = MAPPER.createObjectNode();
         }
 
         @Override
@@ -66,6 +66,8 @@ public class JacksonServiceRecord extends ServiceRecord {
             this.reset();
             return built;
         }
+
+        private static final ObjectMapper MAPPER = new ObjectMapper();
 
         private ObjectNode node;
     }

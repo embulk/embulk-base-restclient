@@ -16,7 +16,7 @@
 
 package org.embulk.base.restclient.jackson.scope;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.SinglePageRecordReader;
@@ -45,7 +45,7 @@ public class JacksonAllInObjectScope extends JacksonObjectScopeBase {
 
     @Override
     public ObjectNode scopeObject(final SinglePageRecordReader singlePageRecordReader) {
-        final ObjectNode resultObject = JsonNodeFactory.instance.objectNode();
+        final ObjectNode resultObject = OBJECT_MAPPER.createObjectNode();
 
         singlePageRecordReader.getSchema().visitColumns(new ColumnVisitor() {
                 @Override
@@ -114,6 +114,8 @@ public class JacksonAllInObjectScope extends JacksonObjectScopeBase {
             });
         return resultObject;
     }
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final TimestampFormatter timestampFormatter;
     private final StringJsonParser jsonParser;

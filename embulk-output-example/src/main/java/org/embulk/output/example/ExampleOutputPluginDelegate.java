@@ -25,9 +25,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import org.embulk.config.Config;
 import org.embulk.config.ConfigDefault;
@@ -106,7 +106,7 @@ public class ExampleOutputPluginDelegate
                                       int taskIndex,
                                       List<TaskReport> taskReports)
     {
-        ArrayNode records = JsonNodeFactory.instance.arrayNode();
+        ArrayNode records = OBJECT_MAPPER.createArrayNode();
         for (TaskReport taskReport : taskReports) {
             final List<?> reportRecords = taskReport.get(List.class, "records");
             for (final Object reportRecord : reportRecords) {
@@ -118,7 +118,7 @@ public class ExampleOutputPluginDelegate
             }
         }
 
-        ObjectNode json = JsonNodeFactory.instance.objectNode();
+        ObjectNode json = OBJECT_MAPPER.createObjectNode();
         json.put("timestamp", Calendar.getInstance().getTime().getTime());
         json.set("records", records);
 
@@ -157,4 +157,6 @@ public class ExampleOutputPluginDelegate
                 }
             });
     }
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 }
