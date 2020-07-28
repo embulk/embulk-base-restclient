@@ -1,6 +1,9 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
+com.fasterxml.jackson.core:jackson-annotations:2.6.7
+com.fasterxml.jackson.core:jackson-core:2.6.7
+com.fasterxml.jackson.core:jackson-databind:2.6.7
 org.eclipse.jetty:jetty-client:9.3.16.v20170120
 org.eclipse.jetty:jetty-http:9.3.16.v20170120
 org.eclipse.jetty:jetty-io:9.3.16.v20170120
@@ -9,3 +12,4 @@ org.embulk:embulk-util-retryhelper-jetty93:0.8.0
 org.embulk:embulk-util-retryhelper:0.8.0
 org.embulk:embulk-util-rubytime:0.3.0
 org.embulk:embulk-util-timestamp:0.2.0
+org.msgpack:msgpack-core:0.8.11
