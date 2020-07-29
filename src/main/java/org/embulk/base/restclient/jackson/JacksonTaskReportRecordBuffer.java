@@ -56,31 +56,6 @@ public class JacksonTaskReportRecordBuffer
         return taskReport;
     }
 
-    public static List<JsonNode> resumeFromTaskReport(TaskReport taskReport, String attributeName)
-    {
-        Iterable<Map.Entry<String, JsonNode>> attributes = taskReport.getAttributes();
-
-        JsonNode foundAttribute = null;
-        for (Map.Entry<String, JsonNode> attribute : attributes) {
-            if (attribute.getKey().equals(attributeName)) {
-                foundAttribute = attribute.getValue();
-                break;
-            }
-        }
-        if (foundAttribute == null) {
-            throw new RuntimeException("FATAL: Unexpected format in TaskReport: " + attributeName + " not found.");
-        }
-        if (!foundAttribute.isArray()) {
-            throw new RuntimeException("FATAL: Unexpected format in TaskReport: " + attributeName + " is not an array.");
-        }
-
-        ImmutableList.Builder<JsonNode> jsonNodesBuilder = ImmutableList.builder();
-        for (JsonNode record : foundAttribute) {
-            jsonNodesBuilder.add(record);
-        }
-        return jsonNodesBuilder.build();
-    }
-
     private final ArrayDeque<ObjectNode> records;
     private final String attributeName;
 }
