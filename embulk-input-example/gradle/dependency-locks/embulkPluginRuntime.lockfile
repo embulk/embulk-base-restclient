@@ -1,6 +1,9 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
+com.fasterxml.jackson.core:jackson-annotations:2.6.7
+com.fasterxml.jackson.core:jackson-core:2.6.7
+com.fasterxml.jackson.core:jackson-databind:2.6.7
 javax.annotation:javax.annotation-api:1.2
 javax.ws.rs:javax.ws.rs-api:2.0.1
 org.embulk:embulk-util-retryhelper-jaxrs:0.8.0
@@ -17,3 +20,4 @@ org.glassfish.jersey.bundles.repackaged:jersey-guava:2.25.1
 org.glassfish.jersey.core:jersey-client:2.25.1
 org.glassfish.jersey.core:jersey-common:2.25.1
 org.javassist:javassist:3.20.0-GA
+org.msgpack:msgpack-core:0.8.11

@@ -28,10 +28,20 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.embulk:embulk-api:0.10.5"
-    compileOnly "org.embulk:embulk-core:0.10.5"
+    compileOnly("org.embulk:embulk-api:0.10.5") {
+        exclude group: "*"
+    }
+    compileOnly("org.embulk:embulk-core:0.10.5") {
+        exclude group: "*"
+    }
 
+    // Excluding all transitive dependencies from embulk-api and embulk-core,
+    // and declaring necessary dependencies explicitly.
     api "org.embulk:embulk-util-timestamp:0.2.0"
+    api "com.fasterxml.jackson.core:jackson-annotations:2.6.7"
+    api "com.fasterxml.jackson.core:jackson-core:2.6.7"
+    api "com.fasterxml.jackson.core:jackson-databind:2.6.7"
+    api "org.msgpack:msgpack-core:0.8.11"
 
     testImplementation "junit:junit:4.13"
     testImplementation "org.embulk:embulk-api:0.10.5"
@@ -139,6 +149,10 @@ publishing {
                 }
 
                 developers {
+                    developer {
+                        name = "Muga Nishizawa"
+                        email = "muga.nishizawa@gmail.com"
+                    }
                     developer {
                         name = "Dai MIKURUBE"
                         email = "dmikurube@treasure-data.com"
