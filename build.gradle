@@ -2,7 +2,6 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
     id "java"
     id "java-library"
-    id "maven" // install jar files to the local repo: $ gradle install
     id "maven-publish"
     id "checkstyle"
     id "org.embulk.embulk-plugins" version "0.4.2" apply false
@@ -34,17 +33,17 @@ dependencies {
 
     api "org.embulk:embulk-util-timestamp:0.2.0"
 
-    testCompile "junit:junit:4.13"
-    testCompile "org.embulk:embulk-api:0.10.5"
-    testCompile "org.embulk:embulk-core:0.10.5"
-    testCompile "org.embulk:embulk-core:0.10.5:tests"
-    testCompile "org.embulk:embulk-deps-buffer:0.10.5"
-    testCompile "org.embulk:embulk-deps-config:0.10.5"
-    testCompile "org.embulk:embulk-deps-timestamp:0.10.5"
-    testCompile "org.embulk:embulk-util-retryhelper-jaxrs:0.8.0"
+    testImplementation "junit:junit:4.13"
+    testImplementation "org.embulk:embulk-api:0.10.5"
+    testImplementation "org.embulk:embulk-core:0.10.5"
+    testImplementation "org.embulk:embulk-core:0.10.5:tests"
+    testImplementation "org.embulk:embulk-deps-buffer:0.10.5"
+    testImplementation "org.embulk:embulk-deps-config:0.10.5"
+    testImplementation "org.embulk:embulk-deps-timestamp:0.10.5"
+    testImplementation "org.embulk:embulk-util-retryhelper-jaxrs:0.8.0"
 
     // RESTEasy JAX-RS implementation is required only for testing.
-    testCompile "org.jboss.resteasy:resteasy-client:3.0.19.Final"
+    testImplementation "org.jboss.resteasy:resteasy-client:3.0.19.Final"
 }
 
 // TODO(dmikurube): Replace these tests with embulk-input-example.

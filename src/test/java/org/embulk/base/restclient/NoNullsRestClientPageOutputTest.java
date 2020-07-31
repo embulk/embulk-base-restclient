@@ -16,8 +16,8 @@
 
 package org.embulk.base.restclient;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 import java.time.Instant;
 import java.util.ArrayList;
