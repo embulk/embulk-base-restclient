@@ -28,14 +28,17 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.embulk:embulk-core:0.9.23"
+    compileOnly "org.embulk:embulk-api:0.10.5"
+    compileOnly "org.embulk:embulk-core:0.10.5"
 
     testCompile "junit:junit:4.13"
-    testCompile "org.embulk:embulk-core:0.9.23"
-    testCompile "org.embulk:embulk-core:0.9.23:tests"
-    testCompile "org.embulk:embulk-deps-buffer:0.9.23"
-    testCompile "org.embulk:embulk-deps-config:0.9.23"
-    testCompile "org.embulk.base.restclient:embulk-util-retryhelper-jaxrs:0.7.0"
+    testCompile "org.embulk:embulk-api:0.10.5"
+    testCompile "org.embulk:embulk-core:0.10.5"
+    testCompile "org.embulk:embulk-core:0.10.5:tests"
+    testCompile "org.embulk:embulk-deps-buffer:0.10.5"
+    testCompile "org.embulk:embulk-deps-config:0.10.5"
+    testCompile "org.embulk:embulk-deps-timestamp:0.10.5"
+    testCompile "org.embulk:embulk-util-retryhelper-jaxrs:0.8.0"
 
     // RESTEasy JAX-RS implementation is required only for testing.
     testCompile "org.jboss.resteasy:resteasy-client:3.0.19.Final"

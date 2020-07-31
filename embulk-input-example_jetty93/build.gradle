@@ -18,15 +18,19 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.embulk:embulk-core:0.9.23"
+    compileOnly "org.embulk:embulk-api:0.10.5"
+    compileOnly "org.embulk:embulk-core:0.10.5"
 
     compile project(":")
-    compile "org.embulk.base.restclient:embulk-util-retryhelper-jetty93:0.7.0"
+    compile("org.embulk:embulk-util-retryhelper-jetty93:0.8.0") {
+        exclude group: "org.slf4j", module: "slf4j-api"
+    }
 
-    testCompile "org.embulk:embulk-core:0.9.23"
-    testCompile "org.embulk:embulk-core:0.9.23:tests"
-    testCompile "org.embulk:embulk-deps-buffer:0.9.23"
-    testCompile "org.embulk:embulk-deps-config:0.9.23"
+    testCompile "org.embulk:embulk-api:0.10.5"
+    testCompile "org.embulk:embulk-core:0.10.5"
+    testCompile "org.embulk:embulk-core:0.10.5:tests"
+    testCompile "org.embulk:embulk-deps-buffer:0.10.5"
+    testCompile "org.embulk:embulk-deps-config:0.10.5"
 }
 
 embulkPlugin {
