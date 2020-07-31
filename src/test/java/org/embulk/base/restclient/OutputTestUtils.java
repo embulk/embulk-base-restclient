@@ -7,39 +7,31 @@ import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
 
 class OutputTestUtils {
-
-    private static String JSON_PATH_PREFIX;
-
-    void initializeConstant()
-    {
-        //noinspection ConstantConditions
+    void initializeConstant() {
+        // noinspection ConstantConditions
         JSON_PATH_PREFIX = OutputTestUtils.class.getClassLoader().getResource("sample_01.json").getPath();
     }
 
-    ConfigSource configJSON()
-    {
+    ConfigSource configJson() {
         return Exec.newConfigSource()
-                .set("in", inputConfigJSON())
-                .set("parser", parserConfigJSON());
+                .set("in", inputConfigJson())
+                .set("parser", parserConfigJson());
     }
 
-    private ImmutableMap<String, Object> inputConfigJSON()
-    {
-        ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<>();
+    private ImmutableMap<String, Object> inputConfigJson() {
+        final ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<>();
         builder.put("type", "file");
         builder.put("path_prefix", JSON_PATH_PREFIX);
         builder.put("last_path", "");
         return builder.build();
     }
 
-    private ImmutableMap<String, Object> parserConfigJSON()
-    {
-        ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<>();
+    private ImmutableMap<String, Object> parserConfigJson() {
+        final ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<>();
         return builder.build();
     }
 
-    Schema JSONSchema()
-    {
+    Schema jsonSchema() {
         return Schema.builder()
                 .add("id", Types.LONG)
                 .add("long", Types.LONG)
@@ -50,4 +42,5 @@ class OutputTestUtils {
                 .build();
     }
 
+    private static String JSON_PATH_PREFIX;
 }

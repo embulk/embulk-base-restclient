@@ -23,18 +23,15 @@ import org.embulk.spi.SchemaConfigException;
  * 2) picks up arbitrary values from the record, and
  * 3) returns {@code ServiceValue} which contains any single value.
  */
-public abstract class EmbulkValueScope
-{
-    protected EmbulkValueScope()
-    {
+public abstract class EmbulkValueScope {
+    protected EmbulkValueScope() {
         this.cachedSchema = null;
         this.cachedSingleColumn = null;
     }
 
     public abstract ServiceValue scopeEmbulkValues(SinglePageRecordReader singlePageRecordReader);
 
-    protected final Column cacheSingleColumn(Schema schema, String columnName)
-    {
+    protected final Column cacheSingleColumn(final Schema schema, final String columnName) {
         // Do not check the schema equality because checking schema equality needs O(N).
         if (this.cachedSchema == null) {
             this.cachedSchema = schema;
@@ -49,8 +46,8 @@ public abstract class EmbulkValueScope
             }
 
             // Check the schema only at the specified column.
-            int cachedColumnIndex = this.cachedSingleColumn.getIndex();
-            Column columnByIndex = schema.getColumn(cachedColumnIndex);
+            final int cachedColumnIndex = this.cachedSingleColumn.getIndex();
+            final Column columnByIndex = schema.getColumn(cachedColumnIndex);
             if (!columnByIndex.equals(this.cachedSingleColumn)) {
                 throw new SchemaConfigException("Incompatible Embulk Column: "
                                                 + columnByIndex.toString()
@@ -65,8 +62,7 @@ public abstract class EmbulkValueScope
                                                 + " : "
                                                 + columnName);
             }
-        }
-        else {
+        } else {
             this.cachedSingleColumn = schema.lookupColumn(columnName);
         }
         return this.cachedSingleColumn;

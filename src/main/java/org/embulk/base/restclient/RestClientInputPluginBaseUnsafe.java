@@ -1,9 +1,8 @@
 package org.embulk.base.restclient;
 
-import java.util.List;
-
 import com.google.common.base.Preconditions;
-
+import java.util.List;
+import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
@@ -13,8 +12,6 @@ import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
-
-import org.embulk.base.restclient.record.ValueLocator;
 
 /**
  * RestClientInputPluginBaseUnsafe is an "unsafe" base class of input plugin implementations.
@@ -32,15 +29,14 @@ import org.embulk.base.restclient.record.ValueLocator;
  */
 public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         extends RestClientPluginBase<T>
-        implements InputPlugin
-{
-    protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
-                                              ConfigDiffBuildable<T> configDiffBuilder,
-                                              InputTaskValidatable<T> inputTaskValidator,
-                                              ServiceDataIngestable<T> serviceDataIngester,
-                                              ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
-                                              ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
-    {
+        implements InputPlugin {
+    protected RestClientInputPluginBaseUnsafe(
+            final Class<T> taskClass,
+            final ConfigDiffBuildable<T> configDiffBuilder,
+            final InputTaskValidatable<T> inputTaskValidator,
+            final ServiceDataIngestable<T> serviceDataIngester,
+            final ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
+            final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
         this.taskClass = taskClass;
         this.configDiffBuilder = configDiffBuilder;
         this.inputTaskValidator = inputTaskValidator;
@@ -49,74 +45,69 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         this.serviceResponseMapperBuilder = serviceResponseMapperBuilder;
     }
 
-    protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
-                                              ConfigDiffBuildable<T> configDiffBuilder,
-                                              InputTaskValidatable<T> inputTaskValidator,
-                                              ServiceDataIngestable<T> serviceDataIngester,
-                                              ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder)
-    {
-        this(taskClass,
-             configDiffBuilder,
-             inputTaskValidator,
-             serviceDataIngester,
-             new ServiceDataSplitterBuildable<T>() {
-                 @Override
-                 public ServiceDataSplitter<T> buildServiceDataSplitter(T task)
-                 {
-                     return new DefaultServiceDataSplitter<T>();
-                 }
-             },
-             serviceResponseMapperBuilder);
+    protected RestClientInputPluginBaseUnsafe(
+            final Class<T> taskClass,
+            final ConfigDiffBuildable<T> configDiffBuilder,
+            final InputTaskValidatable<T> inputTaskValidator,
+            final ServiceDataIngestable<T> serviceDataIngester,
+            final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
+        this(
+                taskClass,
+                configDiffBuilder,
+                inputTaskValidator,
+                serviceDataIngester,
+                new ServiceDataSplitterBuildable<T>() {
+                    @Override
+                    public ServiceDataSplitter<T> buildServiceDataSplitter(final T task) {
+                        return new DefaultServiceDataSplitter<T>();
+                    }
+                },
+                serviceResponseMapperBuilder);
     }
 
-    protected RestClientInputPluginBaseUnsafe(Class<T> taskClass,
-                                              RestClientInputPluginDelegate<T> delegate)
-    {
+    protected RestClientInputPluginBaseUnsafe(final Class<T> taskClass, final RestClientInputPluginDelegate<T> delegate) {
         this(taskClass, delegate, delegate, delegate, delegate, delegate);
     }
 
     @Override
-    public ConfigDiff transaction(ConfigSource config, InputPlugin.Control control)
-    {
+    public ConfigDiff transaction(final ConfigSource config, final InputPlugin.Control control) {
         final T task = loadConfig(config, this.taskClass);
         this.inputTaskValidator.validateInputTask(task);
 
         final int taskCount = this.serviceDataSplitterBuilder
-            .buildServiceDataSplitter(task)
-            .numberToSplitWithHintingInTask(task);
+                .buildServiceDataSplitter(task)
+                .numberToSplitWithHintingInTask(task);
 
         final Schema schema = this.serviceResponseMapperBuilder.buildServiceResponseMapper(task).getEmbulkSchema();
         return resume(task.dump(), schema, taskCount, control);
     }
 
     @Override
-    public ConfigDiff resume(TaskSource taskSource, Schema schema, int taskCount, InputPlugin.Control control)
-    {
+    public ConfigDiff resume(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final InputPlugin.Control control) {
         final T task = taskSource.loadTask(this.taskClass);
         final List<TaskReport> taskReports = control.run(taskSource, schema, taskCount);
         return this.configDiffBuilder.buildConfigDiff(task, schema, taskCount, taskReports);
     }
 
     @Override
-    public void cleanup(TaskSource taskSource, Schema schema, int taskCount, List<TaskReport> successTaskReports)
-    {
+    public void cleanup(
+            final TaskSource taskSource, final Schema schema, final int taskCount, final List<TaskReport> successTaskReports) {
     }
 
     @Override
-    public TaskReport run(TaskSource taskSource, Schema schema, int taskIndex, PageOutput output)
-    {
+    public TaskReport run(final TaskSource taskSource, final Schema schema, final int taskIndex, final PageOutput output) {
         final T task = taskSource.loadTask(this.taskClass);
         this.serviceDataSplitterBuilder
             .buildServiceDataSplitter(task)
             .hintInEachSplitTask(task, schema, taskIndex);
 
         final ServiceResponseMapper<? extends ValueLocator> serviceResponseMapper =
-            this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
+                this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
 
-        try (PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
+        try (final PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
             // When failing around |PageBuidler| in |ingestServiceData|, |pageBuilder.finish()| should not be called.
-            TaskReport taskReport = Preconditions.checkNotNull(
-                this.serviceDataIngester.ingestServiceData(
+            final TaskReport taskReport = Preconditions.checkNotNull(this.serviceDataIngester.ingestServiceData(
                     task,
                     serviceResponseMapper.createRecordImporter(),
                     taskIndex,
@@ -127,8 +118,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     }
 
     @Override
-    public ConfigDiff guess(ConfigSource config)
-    {
+    public ConfigDiff guess(final ConfigSource config) {
         return Exec.newConfigDiff();
     }
 

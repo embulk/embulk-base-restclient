@@ -4,6 +4,5 @@ public interface RestClientOutputPluginDelegate<T extends RestClientOutputTaskBa
         extends EmbulkDataEgestable<T>,
                 RecordBufferBuildable<T>,
                 OutputTaskValidatable<T>,
-                ServiceRequestMapperBuildable<T>
-{
+                ServiceRequestMapperBuildable<T> {
 }

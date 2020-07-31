@@ -1,5 +1,7 @@
 package org.embulk.base.restclient;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.embulk.base.restclient.jackson.JacksonServiceRequestMapper;
 import org.embulk.base.restclient.jackson.JacksonTopLevelValueLocator;
 import org.embulk.base.restclient.jackson.scope.JacksonAllInObjectScope;
@@ -11,37 +13,22 @@ import org.embulk.spi.Schema;
 import org.embulk.spi.time.TimestampFormatter;
 import org.joda.time.DateTimeZone;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class OutputTestPluginDelegate
-        implements RestClientOutputPluginDelegate<OutputTestPluginDelegate.PluginTask>
-{
-
-    private static ArrayList<OutputTestRecordBuffer> buffers;
-
-    OutputTestPluginDelegate(boolean outputNulls)
-    {
+public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<OutputTestPluginDelegate.PluginTask> {
+    OutputTestPluginDelegate(final boolean outputNulls) {
         buffers = new ArrayList<>();
         this.outputNulls = outputNulls;
     }
 
-    public interface PluginTask
-            extends RestClientOutputTaskBase, TimestampFormatter.Task
-    {
-
+    public interface PluginTask extends RestClientOutputTaskBase, TimestampFormatter.Task {
     }
 
     @Override  // Overridden from |OutputTaskValidatable|
-    public void validateOutputTask(PluginTask task, Schema embulkSchema, int taskCount)
-    {
-
+    public void validateOutputTask(final PluginTask task, final Schema embulkSchema, final int taskCount) {
     }
 
     @Override  // Overridden from |ServiceRequestMapperBuildable|
-    public JacksonServiceRequestMapper buildServiceRequestMapper(PluginTask task)
-    {
-        TimestampFormatter formatter = new TimestampFormatter("%Y-%m-%dT%H:%M:%S.%3N%z", DateTimeZone.forID("UTC"));
+    public JacksonServiceRequestMapper buildServiceRequestMapper(final PluginTask task) {
+        final TimestampFormatter formatter = new TimestampFormatter("%Y-%m-%dT%H:%M:%S.%3N%z", DateTimeZone.forID("UTC"));
 
         return JacksonServiceRequestMapper.builder()
                 .add(new JacksonAllInObjectScope(formatter, this.outputNulls), new JacksonTopLevelValueLocator("record"))
@@ -49,19 +36,18 @@ public class OutputTestPluginDelegate
     }
 
     @Override  // Overridden from |RecordBufferBuildable|
-    public RecordBuffer buildRecordBuffer(PluginTask task, Schema schema, int taskIndex)
-    {
-        OutputTestRecordBuffer buffer = new OutputTestRecordBuffer("records", task);
+    public RecordBuffer buildRecordBuffer(final PluginTask task, final Schema schema, final int taskIndex) {
+        final OutputTestRecordBuffer buffer = new OutputTestRecordBuffer("records", task);
         OutputTestPluginDelegate.buffers.add(buffer);
         return buffer;
     }
 
     @Override
-    public ConfigDiff egestEmbulkData(final PluginTask task,
-                                      Schema schema,
-                                      int taskIndex,
-                                      List<TaskReport> taskReports)
-    {
+    public ConfigDiff egestEmbulkData(
+            final PluginTask task,
+            final Schema schema,
+            final int taskIndex,
+            final List<TaskReport> taskReports) {
         return Exec.newConfigDiff();
     }
 
@@ -69,5 +55,7 @@ public class OutputTestPluginDelegate
         return OutputTestPluginDelegate.buffers;
     }
 
-    private boolean outputNulls;
+    private static ArrayList<OutputTestRecordBuffer> buffers;
+
+    private final boolean outputNulls;
 }

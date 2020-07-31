@@ -1,9 +1,12 @@
 package org.embulk.base.restclient.jackson;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.embulk.base.restclient.record.ServiceValue;
+import org.embulk.spi.json.JsonParser;
+import org.embulk.spi.time.Timestamp;
+import org.embulk.spi.time.TimestampParser;
+import org.msgpack.value.Value;
 
 /**
  * JacksonServiceValue represents a value in a JSON response to be converted to an Embulk column value.
@@ -27,11 +30,8 @@ import org.embulk.base.restclient.record.ServiceValue;
  * Implement another set of {@code ServiceValue} and {@code ServiceRecord} if a different style of
  * type conversion is required.
  */
-public class JacksonServiceValue
-        extends ServiceValue
-{
-    public JacksonServiceValue(JsonNode value)
-    {
+public class JacksonServiceValue extends ServiceValue {
+    public JacksonServiceValue(final JsonNode value) {
         if (value == null) {
             this.value = NullNode.getInstance();
         } else {
@@ -40,26 +40,22 @@ public class JacksonServiceValue
     }
 
     @Override
-    public boolean isNull()
-    {
+    public boolean isNull() {
         return value.isNull();
     }
 
     @Override
-    public boolean booleanValue()
-    {
+    public boolean booleanValue() {
         return value.asBoolean();
     }
 
     @Override
-    public double doubleValue()
-    {
+    public double doubleValue() {
         return value.asDouble();
     }
 
     @Override
-    public org.msgpack.value.Value jsonValue(org.embulk.spi.json.JsonParser jsonParser)
-    {
+    public Value jsonValue(final JsonParser jsonParser) {
         // TODO(dmikurube): Use jackson-datatype-msgpack.
         // See: https://github.com/embulk/embulk-base-restclient/issues/32
         // Using |JsonNode#toString| instead of |JsonNode#asText| so that an empty JSON value can be parsed.
@@ -68,25 +64,21 @@ public class JacksonServiceValue
     }
 
     @Override
-    public long longValue()
-    {
+    public long longValue() {
         return value.asLong();
     }
 
     @Override
-    public String stringValue()
-    {
+    public String stringValue() {
         return value.asText();
     }
 
     @Override
-    public org.embulk.spi.time.Timestamp timestampValue(org.embulk.spi.time.TimestampParser timestampParser)
-    {
+    public Timestamp timestampValue(final TimestampParser timestampParser) {
         return timestampParser.parse(value.asText());
     }
 
-    JsonNode getInternalJsonNode()
-    {
+    JsonNode getInternalJsonNode() {
         return this.value;
     }
 

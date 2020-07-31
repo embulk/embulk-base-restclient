@@ -1,34 +1,15 @@
 package org.embulk.input.shopify;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
-import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import com.google.common.base.Strings;
-
-import org.embulk.config.Config;
-import org.embulk.config.ConfigDefault;
-import org.embulk.config.ConfigDiff;
-import org.embulk.config.ConfigException;
-import org.embulk.config.TaskReport;
-import org.embulk.config.TaskSource;
-import org.embulk.spi.DataException;
-import org.embulk.spi.Exec;
-import org.embulk.spi.PageBuilder;
-import org.embulk.spi.Schema;
-import org.embulk.spi.type.Types;
-
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-
-import org.slf4j.Logger;
-
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.DatatypeConverter;
 import org.embulk.base.restclient.DefaultServiceDataSplitter;
 import org.embulk.base.restclient.RestClientInputPluginDelegate;
 import org.embulk.base.restclient.RestClientInputTaskBase;
@@ -37,18 +18,25 @@ import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.RecordImporter;
-
+import org.embulk.config.Config;
+import org.embulk.config.ConfigDefault;
+import org.embulk.config.ConfigDiff;
+import org.embulk.config.ConfigException;
+import org.embulk.config.TaskReport;
+import org.embulk.spi.DataException;
+import org.embulk.spi.Exec;
+import org.embulk.spi.PageBuilder;
+import org.embulk.spi.Schema;
+import org.embulk.spi.type.Types;
 import org.embulk.util.retryhelper.jaxrs.JAXRSClientCreator;
 import org.embulk.util.retryhelper.jaxrs.JAXRSRetryHelper;
 import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
 import org.embulk.util.retryhelper.jaxrs.StringJAXRSResponseEntityReader;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.slf4j.Logger;
 
-public class ShopifyInputPluginDelegate
-    implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask>
-{
-    public interface PluginTask
-            extends RestClientInputTaskBase
-    {
+public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask> {
+    public interface PluginTask extends RestClientInputTaskBase {
         // client retry setting
         @Config("retry_limit")
         @ConfigDefault("7")
@@ -91,11 +79,8 @@ public class ShopifyInputPluginDelegate
         public String getStoreName();
     }
 
-    private final StringJsonParser jsonParser = new StringJsonParser();
-
     @Override  // Overridden from |InputTaskValidatable|
-    public void validateInputTask(PluginTask task)
-    {
+    public void validateInputTask(final PluginTask task) {
         if (Strings.isNullOrEmpty(task.getApiKey())) {
             throw new ConfigException("'apikey' must not be null or empty string.");
         }
@@ -110,8 +95,7 @@ public class ShopifyInputPluginDelegate
     }
 
     @Override  // Overridden from |ServiceResponseMapperBuildable|
-    public JacksonServiceResponseMapper buildServiceResponseMapper(PluginTask task)
-    {
+    public JacksonServiceResponseMapper buildServiceResponseMapper(final PluginTask task) {
         return JacksonServiceResponseMapper.builder()
             .add("id", Types.LONG)
             .add("email", Types.STRING)
@@ -136,52 +120,45 @@ public class ShopifyInputPluginDelegate
     }
 
     @Override  // Overridden from |ConfigDiffBuildable|
-    public ConfigDiff buildConfigDiff(PluginTask task, Schema schema, int taskCount, List<TaskReport> taskReports)
-    {
+    public ConfigDiff buildConfigDiff(
+            final PluginTask task, final Schema schema, final int taskCount, final List<TaskReport> taskReports) {
         // should implement for incremental data loading
         return Exec.newConfigDiff();
     }
 
-    private static final int PAGE_LIMIT = 250;
-
     @Override  // Overridden from |ServiceDataIngestable|
-    public TaskReport ingestServiceData(final PluginTask task,
-                                        RecordImporter recordImporter,
-                                        int taskIndex,
-                                        PageBuilder pageBuilder)
-    {
-        try (JAXRSRetryHelper retryHelper = new JAXRSRetryHelper(
+    public TaskReport ingestServiceData(
+            final PluginTask task, final RecordImporter recordImporter, final int taskIndex, final PageBuilder pageBuilder) {
+        try (final JAXRSRetryHelper retryHelper = new JAXRSRetryHelper(
                 task.getRetryLimit(),
                 task.getInitialRetryWait(),
                 task.getMaxRetryWait(),
                 new JAXRSClientCreator() {
-                     @Override
-                     public javax.ws.rs.client.Client create() {
-                         return ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
-                             .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), TimeUnit.MILLISECONDS)
-                             .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), TimeUnit.MILLISECONDS)
-                             .socketTimeout(task.getSocketTimeout(), TimeUnit.MILLISECONDS)
-                             .connectionPoolSize(task.getConnectionPoolSize())
-                             .build();
-                     }
+                    @Override
+                    public Client create() {
+                        return ((ResteasyClientBuilder) ResteasyClientBuilder.newBuilder())
+                            .connectionCheckoutTimeout(task.getConnectionCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                            .establishConnectionTimeout(task.getEstablishCheckoutTimeout(), TimeUnit.MILLISECONDS)
+                            .socketTimeout(task.getSocketTimeout(), TimeUnit.MILLISECONDS)
+                            .connectionPoolSize(task.getConnectionPoolSize())
+                            .build();
+                    }
                 })) {
             int pageIndex = 1;
             while (true) {
-                String content = fetchFromShopify(retryHelper, task, pageIndex);
-                ArrayNode records = extractArrayField(content);
+                final String content = fetchFromShopify(retryHelper, task, pageIndex);
+                final ArrayNode records = extractArrayField(content);
 
                 int count = 0;
-                for (JsonNode record : records) {
+                for (final JsonNode record : records) {
                     if (!record.isObject()) {
                         logger.warn(String.format(Locale.ENGLISH, "A record must be Json object: %s", record.toString()));
                         continue;
                     }
 
                     try {
-                        recordImporter.importRecord(
-                            new JacksonServiceRecord((ObjectNode) record), pageBuilder);
-                    }
-                    catch (Exception e) {
+                        recordImporter.importRecord(new JacksonServiceRecord((ObjectNode) record), pageBuilder);
+                    } catch (final Exception e) {
                         logger.warn(String.format(Locale.ENGLISH, "Skipped json: %s", record.toString()), e);
                     }
                     count++;
@@ -197,49 +174,42 @@ public class ShopifyInputPluginDelegate
     }
 
     @Override  // Overridden from |ServiceDataSplitterBuildable|
-    public ServiceDataSplitter<PluginTask> buildServiceDataSplitter(final PluginTask task)
-    {
+    public ServiceDataSplitter<PluginTask> buildServiceDataSplitter(final PluginTask task) {
         return new DefaultServiceDataSplitter<PluginTask>();
     }
 
-    private ArrayNode extractArrayField(String content)
-    {
-        ObjectNode jsonObject = jsonParser.parseJsonObject(content);
-        JsonNode jn = jsonObject.get("customers");
+    private ArrayNode extractArrayField(final String content) {
+        final ObjectNode jsonObject = jsonParser.parseJsonObject(content);
+        final JsonNode jn = jsonObject.get("customers");
         if (jn.isArray()) {
             return (ArrayNode) jn;
-        }
-        else {
+        } else {
             throw new DataException("Expected array node: " + jsonObject.toString());
         }
     }
 
-    private String fetchFromShopify(JAXRSRetryHelper retryHelper,
-                                    final PluginTask task,
-                                    final int pageIndex)
-    {
+    private String fetchFromShopify(final JAXRSRetryHelper retryHelper, final PluginTask task, final int pageIndex) {
         return retryHelper.requestWithRetry(
             new StringJAXRSResponseEntityReader(),
             new JAXRSSingleRequester() {
                 @Override
-                public Response requestOnce(javax.ws.rs.client.Client client)
-                {
-                    final String url = String.format(Locale.ENGLISH, "https://%s.myshopify.com/admin/customers.json", task.getStoreName());
+                public Response requestOnce(final Client client) {
+                    final String url = String.format(
+                            Locale.ENGLISH, "https://%s.myshopify.com/admin/customers.json", task.getStoreName());
                     final String userpass = String.format(Locale.ENGLISH, "%s:%s", task.getApiKey(), task.getPassword());
 
                     return client
-                        .target(url)
-                        .queryParam("page", pageIndex)
-                        .queryParam("limit", PAGE_LIMIT)
-                        .request()
-                        .header("AUTHORIZATION", "Basic " + DatatypeConverter.printBase64Binary(userpass.getBytes()))
-                        .get();
+                            .target(url)
+                            .queryParam("page", pageIndex)
+                            .queryParam("limit", PAGE_LIMIT)
+                            .request()
+                            .header("AUTHORIZATION", "Basic " + DatatypeConverter.printBase64Binary(userpass.getBytes()))
+                            .get();
                 }
 
                 @Override
-                public boolean isResponseStatusToRetry(javax.ws.rs.core.Response response)
-                {
-                    int status = response.getStatus();
+                public boolean isResponseStatusToRetry(final Response response) {
+                    final int status = response.getStatus();
                     if (status == 429) {
                         return true;  // Retry if 429.
                     }
@@ -249,4 +219,8 @@ public class ShopifyInputPluginDelegate
     }
 
     private final Logger logger = Exec.getLogger(ShopifyInputPluginDelegate.class);
+
+    private static final int PAGE_LIMIT = 250;
+
+    private final StringJsonParser jsonParser = new StringJsonParser();
 }

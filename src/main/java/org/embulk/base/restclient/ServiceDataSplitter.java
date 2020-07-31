@@ -1,6 +1,5 @@
 package org.embulk.base.restclient;
 
-import org.embulk.config.TaskSource;
 import org.embulk.spi.Schema;
 
 /**
@@ -9,8 +8,7 @@ import org.embulk.spi.Schema;
  * ServiceDataSplitter just calculates how many tasks to split, and provides hints to
  * {@code ServideDataIngestable#ingestServiceData} through the plugin's {@code Task}.
  */
-public abstract class ServiceDataSplitter<T extends RestClientInputTaskBase>
-{
+public abstract class ServiceDataSplitter<T extends RestClientInputTaskBase> {
     /**
      * Calculates and returns how many tasks to split for the given Config.
      *

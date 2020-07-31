@@ -2,18 +2,15 @@ package org.embulk.base.restclient.record;
 
 import java.util.List;
 
-public class RecordExporter
-{
-    public RecordExporter(List<ValueExporter> valueExporters, ServiceRecord.Builder serviceRecordBuilder)
-    {
+public class RecordExporter {
+    public RecordExporter(final List<ValueExporter> valueExporters, final ServiceRecord.Builder serviceRecordBuilder) {
         this.valueExporters = valueExporters;
         this.serviceRecordBuilder = serviceRecordBuilder;
     }
 
-    public ServiceRecord exportRecord(SinglePageRecordReader singlePageRecordReader)
-    {
+    public ServiceRecord exportRecord(final SinglePageRecordReader singlePageRecordReader) {
         this.serviceRecordBuilder.reset();
-        for (ValueExporter valueExporter : this.valueExporters) {
+        for (final ValueExporter valueExporter : this.valueExporters) {
             // |EmbulkValueScope| and |ValueLocator| are contained in |ValueExporter|.
             valueExporter.exportValueToBuildRecord(singlePageRecordReader, this.serviceRecordBuilder);
         }

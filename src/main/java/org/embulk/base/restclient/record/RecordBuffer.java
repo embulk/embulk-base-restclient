@@ -22,8 +22,7 @@ import org.embulk.config.TaskReport;
  * If {@code RecordBuffer} owns external resources for direct uploading, the resources need to be released in
  * its {@code close} or {@code finish}. Releasing resources in {@code close} is the typical manner.
  */
-public abstract class RecordBuffer
-{
+public abstract class RecordBuffer {
     public abstract void bufferRecord(ServiceRecord record);
 
     /**

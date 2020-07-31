@@ -4,91 +4,73 @@ import org.embulk.spi.Column;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
 import org.embulk.spi.time.Timestamp;
-
 import org.msgpack.value.Value;
 
 /**
  * SinglePageRecordReader is a {@code PageReader} wrapper which ensures that {@code nextRecord} is not called.
  */
-public class SinglePageRecordReader
-{
-    public SinglePageRecordReader(PageReader pageReader)
-    {
+public class SinglePageRecordReader {
+    public SinglePageRecordReader(final PageReader pageReader) {
         this.pageReader = pageReader;
     }
 
-    public Schema getSchema()
-    {
+    public Schema getSchema() {
         return this.pageReader.getSchema();
     }
 
-    public boolean isNull(Column column)
-    {
+    public boolean isNull(final Column column) {
         return this.pageReader.isNull(column);
     }
 
-    public boolean isNull(int columnIndex)
-    {
+    public boolean isNull(final int columnIndex) {
         return this.pageReader.isNull(columnIndex);
     }
 
-    public boolean getBoolean(Column column)
-    {
+    public boolean getBoolean(final Column column) {
         return this.pageReader.getBoolean(column);
     }
 
-    public boolean getBoolean(int columnIndex)
-    {
+    public boolean getBoolean(final int columnIndex) {
         return this.pageReader.getBoolean(columnIndex);
     }
 
-    public long getLong(Column column)
-    {
+    public long getLong(final Column column) {
         return this.pageReader.getLong(column);
     }
 
-    public long getLong(int columnIndex)
-    {
+    public long getLong(final int columnIndex) {
         return this.pageReader.getLong(columnIndex);
     }
 
-    public double getDouble(Column column)
-    {
+    public double getDouble(final Column column) {
         return this.pageReader.getDouble(column);
     }
 
-    public double getDouble(int columnIndex)
-    {
+    public double getDouble(final int columnIndex) {
         return this.pageReader.getDouble(columnIndex);
     }
 
-    public String getString(Column column)
-    {
+    public String getString(final Column column) {
         return this.pageReader.getString(column);
     }
 
-    public String getString(int columnIndex)
-    {
+    public String getString(final int columnIndex) {
         return this.pageReader.getString(columnIndex);
     }
 
-    public Timestamp getTimestamp(Column column)
-    {
+    public Timestamp getTimestamp(final Column column) {
         return this.pageReader.getTimestamp(column);
     }
 
-    public Timestamp getTimestamp(int columnIndex)
-    {
+    public Timestamp getTimestamp(final int columnIndex) {
         return this.pageReader.getTimestamp(columnIndex);
     }
 
-    public Value getJson(Column column)
-    {
+    public Value getJson(final Column column) {
         return this.pageReader.getJson(column);
     }
 
-    public Value getJson(int columnIndex)
-    {
+    public Value getJson(final int columnIndex) {
         return this.pageReader.getJson(columnIndex);
     }
 

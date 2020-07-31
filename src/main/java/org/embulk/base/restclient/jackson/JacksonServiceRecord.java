@@ -2,54 +2,42 @@ package org.embulk.base.restclient.jackson;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ServiceValue;
 import org.embulk.base.restclient.record.ValueLocator;
 
-public class JacksonServiceRecord
-        extends ServiceRecord
-{
-    public JacksonServiceRecord(ObjectNode record)
-    {
+public class JacksonServiceRecord extends ServiceRecord {
+    public JacksonServiceRecord(final ObjectNode record) {
         this.record = record;
     }
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder
-            extends ServiceRecord.Builder
-    {
-        public Builder()
-        {
+    public static class Builder extends ServiceRecord.Builder {
+        public Builder() {
             this.node = JsonNodeFactory.instance.objectNode();
         }
 
         @Override
-        public void reset()
-        {
+        public void reset() {
             this.node = JsonNodeFactory.instance.objectNode();
         }
 
         @Override
-        public void add(ServiceValue serviceValue, ValueLocator valueLocator)
-        {
+        public void add(final ServiceValue serviceValue, final ValueLocator valueLocator) {
             final JacksonServiceValue jacksonServiceValue;
             try {
                 jacksonServiceValue = (JacksonServiceValue) serviceValue;
-            }
-            catch (ClassCastException ex) {
+            } catch (final ClassCastException ex) {
                 throw new RuntimeException("Non-JacksonServiceValue is given to place in JacksonServiceRecord:", ex);
             }
 
             final JacksonValueLocator jacksonValueLocator;
             try {
                 jacksonValueLocator = (JacksonValueLocator) valueLocator;
-            }
-            catch (ClassCastException ex) {
+            } catch (final ClassCastException ex) {
                 throw new RuntimeException("Non-JacksonValueLocator is used to place a value in JacksonServiceRecord:", ex);
             }
 
@@ -57,9 +45,8 @@ public class JacksonServiceRecord
         }
 
         @Override
-        public ServiceRecord build()
-        {
-            JacksonServiceRecord built = new JacksonServiceRecord(this.node);
+        public ServiceRecord build() {
+            final JacksonServiceRecord built = new JacksonServiceRecord(this.node);
             this.reset();
             return built;
         }
@@ -68,8 +55,7 @@ public class JacksonServiceRecord
     }
 
     @Override
-    public JacksonServiceValue getValue(ValueLocator locator)
-    {
+    public JacksonServiceValue getValue(final ValueLocator locator) {
         // Based on the implementation of |JacksonServiceResponseSchema|,
         // the |ValueLocator| should be always |JacksonValueLocator|.
         // The class cast should always success.
@@ -77,23 +63,21 @@ public class JacksonServiceRecord
         // NOTE: Just casting (with catching |ClassCastException|) is
         // faster than checking (instanceof) and then casting if
         // the |ClassCastException| never or hardly happens.
-        JacksonValueLocator jacksonLocator;
+        final JacksonValueLocator jacksonLocator;
         try {
             jacksonLocator = (JacksonValueLocator) locator;
-        } catch (ClassCastException ex) {
+        } catch (final ClassCastException ex) {
             throw new RuntimeException("Non-JacksonValueLocator is used to locate a value in JacksonServiceRecord", ex);
         }
         return new JacksonServiceValue(jacksonLocator.seekValue(record));
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.record.toString();
     }
 
-    ObjectNode getInternalJsonNode()
-    {
+    ObjectNode getInternalJsonNode() {
         return this.record;
     }
 

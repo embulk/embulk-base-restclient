@@ -5,28 +5,22 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class JacksonJsonPointerValueLocator
-        extends JacksonValueLocator
-{
-    public JacksonJsonPointerValueLocator(String pointerString)
-    {
+public class JacksonJsonPointerValueLocator extends JacksonValueLocator {
+    public JacksonJsonPointerValueLocator(final String pointerString) {
         this.pointer = JsonPointer.compile(pointerString);
     }
 
-    public JacksonJsonPointerValueLocator(JsonPointer pointer)
-    {
+    public JacksonJsonPointerValueLocator(final JsonPointer pointer) {
         this.pointer = pointer;
     }
 
     @Override
-    public JsonNode seekValue(ObjectNode record)
-    {
+    public JsonNode seekValue(final ObjectNode record) {
         return record.at(this.pointer);
     }
 
     @Override
-    public void placeValue(ObjectNode record, JsonNode value)
-    {
+    public void placeValue(final ObjectNode record, final JsonNode value) {
         final JsonPointer head = this.pointer.head();
         final JsonPointer last = this.pointer.last();
         if (last.mayMatchProperty()) {  // Can be an index of an array, or a property of an object
@@ -34,24 +28,19 @@ public class JacksonJsonPointerValueLocator
             if (last.mayMatchElement()) {  // Can be an index of an array
                 if (parent.isArray()) {
                     ((ArrayNode) parent).set(last.getMatchingIndex(), value);
-                }
-                else if (parent.isObject()) {
+                } else if (parent.isObject()) {
                     ((ObjectNode) parent).set(last.getMatchingProperty(), value);
-                }
-                else {
+                } else {
                     throw new RuntimeException("Placing a property onto non-object nor non-array.");
                 }
-            }
-            else {  // Must be a property of an object, not an index of an array
+            } else {  // Must be a property of an object, not an index of an array
                 if (parent.isObject()) {
                     ((ObjectNode) parent).set(last.getMatchingProperty(), value);
-                }
-                else {
+                } else {
                     throw new RuntimeException("Placing a property onto non-object.");
                 }
             }
-        }
-        else {
+        } else {
             throw new RuntimeException("FATAL: JSON Pointer must not match any element.");
         }
     }
