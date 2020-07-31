@@ -16,7 +16,9 @@
 
 package org.embulk.base.restclient;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.embulk.config.ConfigSource;
 import org.embulk.spi.Exec;
 import org.embulk.spi.Schema;
@@ -34,17 +36,17 @@ class OutputTestUtils {
                 .set("parser", parserConfigJson());
     }
 
-    private ImmutableMap<String, Object> inputConfigJson() {
-        final ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<>();
+    private Map<String, Object> inputConfigJson() {
+        final HashMap<String, Object> builder = new HashMap<>();
         builder.put("type", "file");
         builder.put("path_prefix", JSON_PATH_PREFIX);
         builder.put("last_path", "");
-        return builder.build();
+        return Collections.unmodifiableMap(builder);
     }
 
-    private ImmutableMap<String, Object> parserConfigJson() {
-        final ImmutableMap.Builder<String, Object> builder = new ImmutableMap.Builder<>();
-        return builder.build();
+    private Map<String, Object> parserConfigJson() {
+        final HashMap<String, Object> builder = new HashMap<>();
+        return Collections.unmodifiableMap(builder);
     }
 
     Schema jsonSchema() {

@@ -19,7 +19,6 @@ package org.embulk.base.restclient;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import org.embulk.EmbulkTestRuntime;
@@ -71,7 +70,9 @@ public class RestClientPageOutputTest {
         this.plugin.transaction(config, schema, 0, new OutputPlugin.Control() {
                 @Override
                 public List<TaskReport> run(final TaskSource taskSource) {
-                    return Lists.newArrayList(Exec.newTaskReport());
+                    final ArrayList<TaskReport> newList = new ArrayList<>();
+                    newList.add(Exec.newTaskReport());
+                    return newList;
                 }
             });
         final TransactionalPageOutput output = this.plugin.open(task.dump(), schema, 0);
@@ -103,7 +104,9 @@ public class RestClientPageOutputTest {
         this.plugin.transaction(config, schema, 0, new OutputPlugin.Control() {
                 @Override
                 public List<TaskReport> run(final TaskSource taskSource) {
-                    return Lists.newArrayList(Exec.newTaskReport());
+                    final ArrayList<TaskReport> newList = new ArrayList<>();
+                    newList.add(Exec.newTaskReport());
+                    return newList;
                 }
             });
         final TransactionalPageOutput output = plugin.open(task.dump(), schema, 0);

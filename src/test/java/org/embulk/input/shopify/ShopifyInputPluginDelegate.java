@@ -19,7 +19,6 @@ package org.embulk.input.shopify;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -97,15 +96,15 @@ public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate
 
     @Override  // Overridden from |InputTaskValidatable|
     public void validateInputTask(final PluginTask task) {
-        if (Strings.isNullOrEmpty(task.getApiKey())) {
+        if (task.getApiKey() == null || task.getApiKey().isEmpty()) {
             throw new ConfigException("'apikey' must not be null or empty string.");
         }
 
-        if (Strings.isNullOrEmpty(task.getPassword())) {
+        if (task.getPassword() == null || task.getPassword().isEmpty()) {
             throw new ConfigException("'password' must not be null or empty string.");
         }
 
-        if (Strings.isNullOrEmpty(task.getStoreName())) {
+        if (task.getStoreName() == null || task.getStoreName().isEmpty()) {
             throw new ConfigException("'store_name' must not be null or empty string.");
         }
     }
