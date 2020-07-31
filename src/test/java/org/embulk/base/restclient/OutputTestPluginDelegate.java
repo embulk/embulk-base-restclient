@@ -26,8 +26,7 @@ import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
 import org.embulk.spi.Exec;
 import org.embulk.spi.Schema;
-import org.embulk.spi.time.TimestampFormatter;
-import org.joda.time.DateTimeZone;
+import org.embulk.util.timestamp.TimestampFormatter;
 
 public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<OutputTestPluginDelegate.PluginTask> {
     OutputTestPluginDelegate(final boolean outputNulls) {
@@ -35,7 +34,7 @@ public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<
         this.outputNulls = outputNulls;
     }
 
-    public interface PluginTask extends RestClientOutputTaskBase, TimestampFormatter.Task {
+    public interface PluginTask extends RestClientOutputTaskBase {
     }
 
     @Override  // Overridden from |OutputTaskValidatable|
@@ -44,7 +43,8 @@ public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<
 
     @Override  // Overridden from |ServiceRequestMapperBuildable|
     public JacksonServiceRequestMapper buildServiceRequestMapper(final PluginTask task) {
-        final TimestampFormatter formatter = new TimestampFormatter("%Y-%m-%dT%H:%M:%S.%3N%z", DateTimeZone.forID("UTC"));
+        final TimestampFormatter formatter =
+                TimestampFormatter.builder("%Y-%m-%dT%H:%M:%S.%3N%z", true).build();
 
         return JacksonServiceRequestMapper.builder()
                 .add(new JacksonAllInObjectScope(formatter, this.outputNulls), new JacksonTopLevelValueLocator("record"))

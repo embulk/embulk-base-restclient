@@ -23,12 +23,14 @@ import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.spi.Column;
 import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
-import org.embulk.spi.time.TimestampParser;
+import org.embulk.spi.time.Timestamp;
+import org.embulk.util.timestamp.TimestampFormatter;
 
 public class TimestampValueImporter extends ValueImporter {
-    public TimestampValueImporter(final Column column, final ValueLocator valueLocator, final TimestampParser timestampParser) {
+    public TimestampValueImporter(
+            final Column column, final ValueLocator valueLocator, final TimestampFormatter timestampFormatter) {
         super(column, valueLocator);
-        this.timestampParser = timestampParser;
+        this.timestampFormatter = timestampFormatter;
     }
 
     @Override
@@ -38,7 +40,7 @@ public class TimestampValueImporter extends ValueImporter {
             if (value == null || value.isNull()) {
                 pageBuilder.setNull(getColumnToImport());
             } else {
-                pageBuilder.setTimestamp(getColumnToImport(), value.timestampValue(timestampParser));
+                pageBuilder.setTimestamp(getColumnToImport(), Timestamp.ofInstant(value.timestampValue(timestampFormatter)));
             }
         } catch (final Exception ex) {
             throw new DataException(
@@ -48,5 +50,5 @@ public class TimestampValueImporter extends ValueImporter {
         }
     }
 
-    private final TimestampParser timestampParser;
+    private final TimestampFormatter timestampFormatter;
 }

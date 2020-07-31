@@ -18,10 +18,10 @@ package org.embulk.base.restclient.jackson;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+import java.time.Instant;
 import org.embulk.base.restclient.record.ServiceValue;
 import org.embulk.spi.json.JsonParser;
-import org.embulk.spi.time.Timestamp;
-import org.embulk.spi.time.TimestampParser;
+import org.embulk.util.timestamp.TimestampFormatter;
 import org.msgpack.value.Value;
 
 /**
@@ -90,8 +90,8 @@ public class JacksonServiceValue extends ServiceValue {
     }
 
     @Override
-    public Timestamp timestampValue(final TimestampParser timestampParser) {
-        return timestampParser.parse(value.asText());
+    public Instant timestampValue(final TimestampFormatter timestampFormatter) {
+        return timestampFormatter.parse(value.asText());
     }
 
     JsonNode getInternalJsonNode() {
