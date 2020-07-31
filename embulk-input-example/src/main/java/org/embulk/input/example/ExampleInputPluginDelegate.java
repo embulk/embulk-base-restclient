@@ -51,6 +51,7 @@ import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
 import org.embulk.util.retryhelper.jaxrs.StringJAXRSResponseEntityReader;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExampleInputPluginDelegate
         implements RestClientInputPluginDelegate<ExampleInputPluginDelegate.PluginTask>
@@ -168,5 +169,5 @@ public class ExampleInputPluginDelegate
             });
     }
 
-    private final Logger logger = Exec.getLogger(ExampleInputPluginDelegate.class);
+    private final Logger logger = LoggerFactory.getLogger(ExampleInputPluginDelegate.class);
 }

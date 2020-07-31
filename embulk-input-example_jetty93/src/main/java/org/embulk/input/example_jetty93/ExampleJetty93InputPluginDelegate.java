@@ -52,6 +52,7 @@ import org.embulk.util.retryhelper.jetty93.Jetty93SingleRequester;
 import org.embulk.util.retryhelper.jetty93.StringJetty93ResponseEntityReader;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExampleJetty93InputPluginDelegate
         implements RestClientInputPluginDelegate<ExampleJetty93InputPluginDelegate.PluginTask>
@@ -167,5 +168,5 @@ public class ExampleJetty93InputPluginDelegate
             });
     }
 
-    private final Logger logger = Exec.getLogger(ExampleJetty93InputPluginDelegate.class);
+    private final Logger logger = LoggerFactory.getLogger(ExampleJetty93InputPluginDelegate.class);
 }

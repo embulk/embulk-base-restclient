@@ -49,6 +49,7 @@ import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
 import org.embulk.util.retryhelper.jaxrs.StringJAXRSResponseEntityReader;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask> {
     public interface PluginTask extends RestClientInputTaskBase {
@@ -233,7 +234,7 @@ public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate
             });
     }
 
-    private final Logger logger = Exec.getLogger(ShopifyInputPluginDelegate.class);
+    private final Logger logger = LoggerFactory.getLogger(ShopifyInputPluginDelegate.class);
 
     private static final int PAGE_LIMIT = 250;
 
