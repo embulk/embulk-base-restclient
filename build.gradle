@@ -31,7 +31,7 @@ dependencies {
     compileOnly("org.embulk:embulk-api:0.10.12") {
         exclude group: "*"
     }
-    compileOnly("org.embulk:embulk-api:0.10.12") {
+    compileOnly("org.embulk:embulk-spi:0.10.12") {
         exclude group: "*"
     }
     compileOnly("org.embulk:embulk-core:0.10.12") {
