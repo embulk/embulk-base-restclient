@@ -148,8 +148,23 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
     @SuppressWarnings("deprecation")  // https://github.com/embulk/embulk-base-restclient/issues/132
     private static PageBuilder getPageBuilder(final BufferAllocator bufferAllocator, final Schema schema, final PageOutput output) {
-        return new PageBuilder(bufferAllocator, schema, output);
+        if (HAS_EXEC_GET_PAGE_BUILDER) {
+            return Exec.getPageBuilder(bufferAllocator, schema, output);
+        } else {
+            return new PageBuilder(bufferAllocator, schema, output);
+        }
     }
+
+    private static boolean hasExecGetPageBuilder() {
+        try {
+            Exec.class.getMethod("getPageBuilder", BufferAllocator.class, Schema.class, PageOutput.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static final boolean HAS_EXEC_GET_PAGE_BUILDER = hasExecGetPageBuilder();
 
     private final Class<T> taskClass;
     private final ConfigDiffBuildable<T> configDiffBuilder;
