@@ -25,13 +25,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.embulk.config.Config;
-import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
 import org.embulk.config.TaskSource;
 import org.embulk.spi.DataException;
-import org.embulk.spi.Exec;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
@@ -44,7 +41,9 @@ import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.RecordImporter;
-
+import org.embulk.util.config.Config;
+import org.embulk.util.config.ConfigDefault;
+import org.embulk.util.config.ConfigMapperFactory;
 import org.embulk.util.retryhelper.jaxrs.JAXRSClientCreator;
 import org.embulk.util.retryhelper.jaxrs.JAXRSRetryHelper;
 import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
@@ -56,6 +55,10 @@ import org.slf4j.LoggerFactory;
 public class ExampleInputPluginDelegate
         implements RestClientInputPluginDelegate<ExampleInputPluginDelegate.PluginTask>
 {
+    public ExampleInputPluginDelegate(final ConfigMapperFactory configMapperFactory) {
+        this.configMapperFactory = configMapperFactory;
+    }
+
     public interface PluginTask
             extends RestClientInputTaskBase
     {
@@ -92,7 +95,7 @@ public class ExampleInputPluginDelegate
     {
         // should implement for incremental data loading
         // consider |incremental| config here
-        return Exec.newConfigDiff();
+        return this.configMapperFactory.newConfigDiff();
     }
 
     @Override  // Overridden from |ServiceDataSplitterBuildable|
@@ -134,7 +137,7 @@ public class ExampleInputPluginDelegate
             }
         }
 
-        return Exec.newTaskReport();
+        return this.configMapperFactory.newTaskReport();
     }
 
     private ArrayNode extractArrayField(String content)
@@ -170,4 +173,6 @@ public class ExampleInputPluginDelegate
     }
 
     private final Logger logger = LoggerFactory.getLogger(ExampleInputPluginDelegate.class);
+
+    private final ConfigMapperFactory configMapperFactory;
 }

@@ -17,12 +17,17 @@
 package org.embulk.output.example;
 
 import org.embulk.base.restclient.RestClientOutputPluginBase;
+import org.embulk.util.config.ConfigMapperFactory;
 
 public class ExampleOutputPlugin
         extends RestClientOutputPluginBase<ExampleOutputPluginDelegate.PluginTask>
 {
     public ExampleOutputPlugin()
     {
-        super(ExampleOutputPluginDelegate.PluginTask.class, new ExampleOutputPluginDelegate());
+        super(CONFIG_MAPPER_FACTORY,
+              ExampleOutputPluginDelegate.PluginTask.class,
+              new ExampleOutputPluginDelegate(CONFIG_MAPPER_FACTORY));
     }
+
+    private static final ConfigMapperFactory CONFIG_MAPPER_FACTORY = ConfigMapperFactory.builder().addDefaultModules().build();
 }

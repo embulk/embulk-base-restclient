@@ -21,23 +21,25 @@ import org.embulk.base.restclient.record.RecordExporter;
 import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.SinglePageRecordReader;
 import org.embulk.config.TaskReport;
-import org.embulk.spi.Exec;
 import org.embulk.spi.Page;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TransactionalPageOutput;
+import org.embulk.util.config.ConfigMapperFactory;
 
 /**
  * RestClientPageOutput is a default |PageOutput| used by |RestClientOutputPluginBase|.
  */
 public class RestClientPageOutput<T extends RestClientOutputTaskBase> implements TransactionalPageOutput {
     public RestClientPageOutput(
+            final ConfigMapperFactory configMapperFactory,
             final Class<T> taskClass,
             final T task,
             final RecordExporter recordExporter,
             final RecordBuffer recordBuffer,
             final Schema embulkSchema,
             final int taskIndex) {
+        this.configMapperFactory = configMapperFactory;
         this.taskClass = taskClass;
         this.task = task;
         this.recordExporter = recordExporter;
@@ -74,9 +76,10 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase> implements
 
     @Override
     public TaskReport commit() {
-        return this.recordBuffer.commitWithTaskReportUpdated(Exec.newTaskReport());
+        return this.recordBuffer.commitWithTaskReportUpdated(this.configMapperFactory.newTaskReport());
     }
 
+    private final ConfigMapperFactory configMapperFactory;
     private final Class<T> taskClass;
     private final T task;
     private final RecordExporter recordExporter;

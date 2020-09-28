@@ -17,9 +17,14 @@
 package org.embulk.input.shopify;
 
 import org.embulk.base.restclient.RestClientInputPluginBase;
+import org.embulk.util.config.ConfigMapperFactory;
 
 public class ShopifyInputPlugin extends RestClientInputPluginBase<ShopifyInputPluginDelegate.PluginTask> {
     public ShopifyInputPlugin() {
-        super(ShopifyInputPluginDelegate.PluginTask.class, new ShopifyInputPluginDelegate());
+        super(CONFIG_MAPPER_FACTORY,
+              ShopifyInputPluginDelegate.PluginTask.class,
+              new ShopifyInputPluginDelegate(CONFIG_MAPPER_FACTORY));
     }
+
+    private static final ConfigMapperFactory CONFIG_MAPPER_FACTORY = ConfigMapperFactory.builder().addDefaultModules().build();
 }

@@ -17,12 +17,17 @@
 package org.embulk.input.example;
 
 import org.embulk.base.restclient.RestClientInputPluginBase;
+import org.embulk.util.config.ConfigMapperFactory;
 
 public class ExampleInputPlugin
         extends RestClientInputPluginBase<ExampleInputPluginDelegate.PluginTask>
 {
     public ExampleInputPlugin()
     {
-        super(ExampleInputPluginDelegate.PluginTask.class, new ExampleInputPluginDelegate());
+        super(CONFIG_MAPPER_FACTORY,
+              ExampleInputPluginDelegate.PluginTask.class,
+              new ExampleInputPluginDelegate(CONFIG_MAPPER_FACTORY));
     }
+
+    private static final ConfigMapperFactory CONFIG_MAPPER_FACTORY = ConfigMapperFactory.builder().addDefaultModules().build();
 }

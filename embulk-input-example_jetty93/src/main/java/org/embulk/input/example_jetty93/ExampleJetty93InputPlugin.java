@@ -17,12 +17,17 @@
 package org.embulk.input.example_jetty93;
 
 import org.embulk.base.restclient.RestClientInputPluginBase;
+import org.embulk.util.config.ConfigMapperFactory;
 
 public class ExampleJetty93InputPlugin
         extends RestClientInputPluginBase<ExampleJetty93InputPluginDelegate.PluginTask>
 {
     public ExampleJetty93InputPlugin()
     {
-        super(ExampleJetty93InputPluginDelegate.PluginTask.class, new ExampleJetty93InputPluginDelegate());
+        super(CONFIG_MAPPER_FACTORY,
+              ExampleJetty93InputPluginDelegate.PluginTask.class,
+              new ExampleJetty93InputPluginDelegate(CONFIG_MAPPER_FACTORY));
     }
+
+    private static final ConfigMapperFactory CONFIG_MAPPER_FACTORY = ConfigMapperFactory.builder().addDefaultModules().build();
 }

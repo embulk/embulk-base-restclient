@@ -27,6 +27,7 @@ import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
+import org.embulk.util.config.ConfigMapperFactory;
 
 /**
  * RestClientInputPluginBaseUnsafe is an "unsafe" base class of input plugin implementations.
@@ -46,12 +47,14 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         extends RestClientPluginBase<T>
         implements InputPlugin {
     protected RestClientInputPluginBaseUnsafe(
+            final ConfigMapperFactory configMapperFactory,
             final Class<T> taskClass,
             final ConfigDiffBuildable<T> configDiffBuilder,
             final InputTaskValidatable<T> inputTaskValidator,
             final ServiceDataIngestable<T> serviceDataIngester,
             final ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
             final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
+        super(configMapperFactory);
         this.taskClass = taskClass;
         this.configDiffBuilder = configDiffBuilder;
         this.inputTaskValidator = inputTaskValidator;
@@ -61,12 +64,14 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     }
 
     protected RestClientInputPluginBaseUnsafe(
+            final ConfigMapperFactory configMapperFactory,
             final Class<T> taskClass,
             final ConfigDiffBuildable<T> configDiffBuilder,
             final InputTaskValidatable<T> inputTaskValidator,
             final ServiceDataIngestable<T> serviceDataIngester,
             final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
         this(
+                configMapperFactory,
                 taskClass,
                 configDiffBuilder,
                 inputTaskValidator,
@@ -80,8 +85,11 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                 serviceResponseMapperBuilder);
     }
 
-    protected RestClientInputPluginBaseUnsafe(final Class<T> taskClass, final RestClientInputPluginDelegate<T> delegate) {
-        this(taskClass, delegate, delegate, delegate, delegate, delegate);
+    protected RestClientInputPluginBaseUnsafe(
+            final ConfigMapperFactory configMapperFactory,
+            final Class<T> taskClass,
+            final RestClientInputPluginDelegate<T> delegate) {
+        this(configMapperFactory, taskClass, delegate, delegate, delegate, delegate, delegate);
     }
 
     @Override
@@ -94,13 +102,13 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
                 .numberToSplitWithHintingInTask(task);
 
         final Schema schema = this.serviceResponseMapperBuilder.buildServiceResponseMapper(task).getEmbulkSchema();
-        return resume(task.dump(), schema, taskCount, control);
+        return resume(task.toTaskSource(), schema, taskCount, control);
     }
 
     @Override
     public ConfigDiff resume(
             final TaskSource taskSource, final Schema schema, final int taskCount, final InputPlugin.Control control) {
-        final T task = taskSource.loadTask(this.taskClass);
+        final T task = loadTask(taskSource, this.taskClass);
         final List<TaskReport> taskReports = control.run(taskSource, schema, taskCount);
         return this.configDiffBuilder.buildConfigDiff(task, schema, taskCount, taskReports);
     }
@@ -112,7 +120,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
     @Override
     public TaskReport run(final TaskSource taskSource, final Schema schema, final int taskIndex, final PageOutput output) {
-        final T task = taskSource.loadTask(this.taskClass);
+        final T task = loadTask(taskSource, this.taskClass);
         this.serviceDataSplitterBuilder
             .buildServiceDataSplitter(task)
             .hintInEachSplitTask(task, schema, taskIndex);
@@ -134,7 +142,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
 
     @Override
     public ConfigDiff guess(final ConfigSource config) {
-        return Exec.newConfigDiff();
+        return this.newConfigDiff();
     }
 
     private final Class<T> taskClass;

@@ -31,8 +31,8 @@ import org.embulk.config.TaskSource;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TestPageBuilderReader.MockPageOutput;
+import org.embulk.util.config.ConfigMapperFactory;
 
-import static org.embulk.spi.Exec.newConfigSource;
 import static org.junit.Assume.assumeNotNull;
 
 public class TestShopifyInputPlugin
@@ -98,4 +98,6 @@ public class TestShopifyInputPlugin
                 .set("password", shopifyPassword)
                 .set("store_name", shopifyStoreName);
     }
+
+    private static final ConfigMapperFactory CONFIG_MAPPER_FACTORY = ConfigMapperFactory.builder().addDefaultModules().build();
 }

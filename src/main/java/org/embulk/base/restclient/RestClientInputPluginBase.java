@@ -24,6 +24,7 @@ import org.embulk.config.TaskSource;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageOutput;
 import org.embulk.spi.Schema;
+import org.embulk.util.config.ConfigMapperFactory;
 
 /**
  * RestClientInputPluginBase is a base class of input plugin implementations.
@@ -40,13 +41,15 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase> extend
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
     protected RestClientInputPluginBase(
+            final ConfigMapperFactory configMapperFactory,
             final Class<T> taskClass,
             final ConfigDiffBuildable<T> configDiffBuilder,
             final InputTaskValidatable<T> inputTaskValidator,
             final ServiceDataIngestable<T> serviceDataIngester,
             final ServiceDataSplitterBuildable<T> serviceDataSplitterBuilder,
             final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
-        super(taskClass,
+        super(configMapperFactory,
+              taskClass,
               configDiffBuilder,
               inputTaskValidator,
               serviceDataIngester,
@@ -60,12 +63,14 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase> extend
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
     protected RestClientInputPluginBase(
+            final ConfigMapperFactory configMapperFactory,
             final Class<T> taskClass,
             final ConfigDiffBuildable<T> configDiffBuilder,
             final InputTaskValidatable<T> inputTaskValidator,
             final ServiceDataIngestable<T> serviceDataIngester,
             final ServiceResponseMapperBuildable<T> serviceResponseMapperBuilder) {
-        super(taskClass,
+        super(configMapperFactory,
+              taskClass,
               configDiffBuilder,
               inputTaskValidator,
               serviceDataIngester,
@@ -77,8 +82,11 @@ public class RestClientInputPluginBase<T extends RestClientInputTaskBase> extend
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
-    protected RestClientInputPluginBase(final Class<T> taskClass, final RestClientInputPluginDelegate<T> delegate) {
-        super(taskClass, delegate, delegate, delegate, delegate, delegate);
+    protected RestClientInputPluginBase(
+            final ConfigMapperFactory configMapperFactory,
+            final Class<T> taskClass,
+            final RestClientInputPluginDelegate<T> delegate) {
+        super(configMapperFactory, taskClass, delegate, delegate, delegate, delegate, delegate);
     }
 
     @Override
