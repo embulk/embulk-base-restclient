@@ -18,10 +18,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.embulk:embulk-api:0.10.5"
-    compileOnly "org.embulk:embulk-core:0.10.5"
+    compileOnly "org.embulk:embulk-api:0.10.18"
+    compileOnly "org.embulk:embulk-spi:0.10.18"
 
-    compile project(":")
+    compile(project(":")) {
+        exclude group: "org.msgpack", module: "msgpack-core"
+    }
     compile("org.embulk:embulk-util-retryhelper-jaxrs:0.8.0") {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
@@ -29,23 +31,16 @@ dependencies {
         exclude group: "javax.inject", module: "javax.inject"
     }
 
-    testCompile "org.embulk:embulk-api:0.10.5"
-    testCompile "org.embulk:embulk-core:0.10.5"
-    testCompile "org.embulk:embulk-core:0.10.5:tests"
-    testCompile "org.embulk:embulk-deps-buffer:0.10.5"
-    testCompile "org.embulk:embulk-deps-config:0.10.5"
+    testCompile "org.embulk:embulk-api:0.10.18"
+    testCompile "org.embulk:embulk-core:0.10.18"
+    testCompile "org.embulk:embulk-core:0.10.18:tests"
+    testCompile "org.embulk:embulk-deps:0.10.18"
 }
 
 embulkPlugin {
     mainClass = "org.embulk.input.example.ExampleInputPlugin"
     category = "input"
     type = "example"
-    ignoreConflicts = [
-        [ group: "com.fasterxml.jackson.core", module: "jackson-annotations" ],
-        [ group: "com.fasterxml.jackson.core", module: "jackson-core" ],
-        [ group: "com.fasterxml.jackson.core", module: "jackson-databind" ],
-        [ group: "org.msgpack", module: "msgpack-core" ],
-    ]
 }
 
 gem {

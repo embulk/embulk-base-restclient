@@ -24,4 +24,3 @@ org.glassfish.jersey.bundles.repackaged:jersey-guava:2.25.1
 org.glassfish.jersey.core:jersey-client:2.25.1
 org.glassfish.jersey.core:jersey-common:2.25.1
 org.javassist:javassist:3.20.0-GA
-org.msgpack:msgpack-core:0.8.11

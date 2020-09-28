@@ -50,7 +50,7 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase> implements
 
     @Override
     public void add(final Page page) {
-        final PageReader pageReader = new PageReader(this.embulkSchema);
+        final PageReader pageReader = getPageReader(this.embulkSchema);
         pageReader.setPage(page);
         while (pageReader.nextRecord()) {
             final SinglePageRecordReader singlePageRecordReader = new SinglePageRecordReader(pageReader);
@@ -77,6 +77,11 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase> implements
     @Override
     public TaskReport commit() {
         return this.recordBuffer.commitWithTaskReportUpdated(this.configMapperFactory.newTaskReport());
+    }
+
+    @SuppressWarnings("deprecation")  // https://github.com/embulk/embulk-base-restclient/issues/132
+    private static PageReader getPageReader(final Schema schema) {
+        return new PageReader(schema);
     }
 
     private final ConfigMapperFactory configMapperFactory;
