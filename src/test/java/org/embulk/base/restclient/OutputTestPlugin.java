@@ -16,8 +16,12 @@
 
 package org.embulk.base.restclient;
 
+import org.embulk.util.config.ConfigMapperFactory;
+
 class OutputTestPlugin extends RestClientOutputPluginBase<OutputTestPluginDelegate.PluginTask> {
-    OutputTestPlugin() {
-        super(OutputTestPluginDelegate.PluginTask.class, new OutputTestPluginDelegate(true));
+    OutputTestPlugin(final ConfigMapperFactory configMapperFactory) {
+        super(configMapperFactory,
+              OutputTestPluginDelegate.PluginTask.class,
+              new OutputTestPluginDelegate(true, configMapperFactory));
     }
 }

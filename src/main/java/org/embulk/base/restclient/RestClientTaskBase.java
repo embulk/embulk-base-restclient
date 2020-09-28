@@ -16,7 +16,7 @@
 
 package org.embulk.base.restclient;
 
-import org.embulk.config.Task;
+import org.embulk.util.config.Task;
 
 public interface RestClientTaskBase extends Task {
 }

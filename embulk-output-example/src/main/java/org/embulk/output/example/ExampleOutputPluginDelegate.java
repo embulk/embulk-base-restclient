@@ -29,11 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import org.embulk.config.Config;
-import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
-import org.embulk.spi.Exec;
 import org.embulk.spi.Schema;
 
 import org.embulk.base.restclient.RestClientOutputPluginDelegate;
@@ -46,7 +43,9 @@ import org.embulk.base.restclient.jackson.scope.JacksonAllInObjectScope;
 import org.embulk.base.restclient.jackson.scope.JacksonDirectIntegerScope;
 import org.embulk.base.restclient.jackson.scope.JacksonDirectStringScope;
 import org.embulk.base.restclient.record.RecordBuffer;
-
+import org.embulk.util.config.Config;
+import org.embulk.util.config.ConfigDefault;
+import org.embulk.util.config.ConfigMapperFactory;
 import org.embulk.util.retryhelper.jaxrs.JAXRSClientCreator;
 import org.embulk.util.retryhelper.jaxrs.JAXRSRetryHelper;
 import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
@@ -55,6 +54,10 @@ import org.embulk.util.retryhelper.jaxrs.StringJAXRSResponseEntityReader;
 public class ExampleOutputPluginDelegate
     implements RestClientOutputPluginDelegate<ExampleOutputPluginDelegate.PluginTask>
 {
+    public ExampleOutputPluginDelegate(final ConfigMapperFactory configMapperFactory) {
+        this.configMapperFactory = configMapperFactory;
+    }
+
     public interface PluginTask
             extends RestClientOutputTaskBase
     {
@@ -135,7 +138,7 @@ public class ExampleOutputPluginDelegate
             push(retryHelper, json, task.getEndpoint());
         }
 
-        return Exec.newConfigDiff();
+        return this.configMapperFactory.newConfigDiff();
     }
 
     private String push(JAXRSRetryHelper retryHelper, final JsonNode json, final String endpoint)
@@ -159,4 +162,6 @@ public class ExampleOutputPluginDelegate
     }
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private final ConfigMapperFactory configMapperFactory;
 }

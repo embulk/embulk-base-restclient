@@ -26,13 +26,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.client.api.ContentResponse;
 
-import org.embulk.config.Config;
-import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskSource;
 import org.embulk.config.TaskReport;
 import org.embulk.spi.DataException;
-import org.embulk.spi.Exec;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
@@ -45,7 +42,9 @@ import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.RecordImporter;
-
+import org.embulk.util.config.Config;
+import org.embulk.util.config.ConfigDefault;
+import org.embulk.util.config.ConfigMapperFactory;
 import org.embulk.util.retryhelper.jetty93.DefaultJetty93ClientCreator;
 import org.embulk.util.retryhelper.jetty93.Jetty93RetryHelper;
 import org.embulk.util.retryhelper.jetty93.Jetty93SingleRequester;
@@ -57,6 +56,10 @@ import org.slf4j.LoggerFactory;
 public class ExampleJetty93InputPluginDelegate
         implements RestClientInputPluginDelegate<ExampleJetty93InputPluginDelegate.PluginTask>
 {
+    public ExampleJetty93InputPluginDelegate(final ConfigMapperFactory configMapperFactory) {
+        this.configMapperFactory = configMapperFactory;
+    }
+
     public interface PluginTask
             extends RestClientInputTaskBase
     {
@@ -93,7 +96,7 @@ public class ExampleJetty93InputPluginDelegate
     {
         // should implement for incremental data loading
         // consider |incremental| config here
-        return Exec.newConfigDiff();
+        return this.configMapperFactory.newConfigDiff();
     }
 
     @Override  // Overridden from |ServiceDataSplitterBuildable|
@@ -130,7 +133,7 @@ public class ExampleJetty93InputPluginDelegate
             }
         }
 
-        return Exec.newTaskReport();
+        return this.configMapperFactory.newTaskReport();
     }
 
     private ArrayNode extractArrayField(String content)
@@ -169,4 +172,6 @@ public class ExampleJetty93InputPluginDelegate
     }
 
     private final Logger logger = LoggerFactory.getLogger(ExampleJetty93InputPluginDelegate.class);
+
+    private final ConfigMapperFactory configMapperFactory;
 }

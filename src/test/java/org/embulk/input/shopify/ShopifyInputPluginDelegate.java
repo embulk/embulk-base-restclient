@@ -33,16 +33,16 @@ import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.jackson.JacksonServiceResponseMapper;
 import org.embulk.base.restclient.jackson.StringJsonParser;
 import org.embulk.base.restclient.record.RecordImporter;
-import org.embulk.config.Config;
-import org.embulk.config.ConfigDefault;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigException;
 import org.embulk.config.TaskReport;
 import org.embulk.spi.DataException;
-import org.embulk.spi.Exec;
 import org.embulk.spi.PageBuilder;
 import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
+import org.embulk.util.config.Config;
+import org.embulk.util.config.ConfigDefault;
+import org.embulk.util.config.ConfigMapperFactory;
 import org.embulk.util.retryhelper.jaxrs.JAXRSClientCreator;
 import org.embulk.util.retryhelper.jaxrs.JAXRSRetryHelper;
 import org.embulk.util.retryhelper.jaxrs.JAXRSSingleRequester;
@@ -52,6 +52,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate<ShopifyInputPluginDelegate.PluginTask> {
+    public ShopifyInputPluginDelegate(final ConfigMapperFactory configMapperFactory) {
+        this.configMapperFactory = configMapperFactory;
+    }
+
     public interface PluginTask extends RestClientInputTaskBase {
         // client retry setting
         @Config("retry_limit")
@@ -139,7 +143,7 @@ public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate
     public ConfigDiff buildConfigDiff(
             final PluginTask task, final Schema schema, final int taskCount, final List<TaskReport> taskReports) {
         // should implement for incremental data loading
-        return Exec.newConfigDiff();
+        return this.configMapperFactory.newConfigDiff();
     }
 
     @Override  // Overridden from |ServiceDataIngestable|
@@ -186,7 +190,7 @@ public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate
                 pageIndex++;
             }
         }
-        return Exec.newTaskReport();
+        return this.configMapperFactory.newTaskReport();
     }
 
     @Override  // Overridden from |ServiceDataSplitterBuildable|
@@ -239,4 +243,6 @@ public class ShopifyInputPluginDelegate implements RestClientInputPluginDelegate
     private static final int PAGE_LIMIT = 250;
 
     private final StringJsonParser jsonParser = new StringJsonParser();
+
+    private final ConfigMapperFactory configMapperFactory;
 }

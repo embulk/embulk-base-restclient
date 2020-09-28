@@ -24,6 +24,7 @@ import org.embulk.config.TaskSource;
 import org.embulk.spi.OutputPlugin;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TransactionalPageOutput;
+import org.embulk.util.config.ConfigMapperFactory;
 
 /**
  * RestClientOutputPluginBase is a base class of output plugin implementations.
@@ -40,12 +41,14 @@ public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase> exte
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
     protected RestClientOutputPluginBase(
+            final ConfigMapperFactory configMapperFactory,
             final Class<T> taskClass,
             final EmbulkDataEgestable<T> embulkDataEgester,
             final RecordBufferBuildable<T> recordBufferBuilder,
             final OutputTaskValidatable<T> outputTaskValidator,
             final ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder) {
-        super(taskClass,
+        super(configMapperFactory,
+              taskClass,
               embulkDataEgester,
               recordBufferBuilder,
               outputTaskValidator,
@@ -57,8 +60,11 @@ public class RestClientOutputPluginBase<T extends RestClientOutputTaskBase> exte
      *
      * This constructor is designed to be called like {@code super(...);} as this class is to be inherited.
      */
-    protected RestClientOutputPluginBase(final Class<T> taskClass, final RestClientOutputPluginDelegate<T> delegate) {
-        super(taskClass, delegate, delegate, delegate, delegate);
+    protected RestClientOutputPluginBase(
+            final ConfigMapperFactory configMapperFactory,
+            final Class<T> taskClass,
+            final RestClientOutputPluginDelegate<T> delegate) {
+        super(configMapperFactory, taskClass, delegate, delegate, delegate, delegate);
     }
 
     @Override

@@ -28,16 +28,20 @@ import org.embulk.base.restclient.jackson.JacksonServiceRecord;
 import org.embulk.base.restclient.record.RecordBuffer;
 import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.config.TaskReport;
-import org.embulk.spi.Exec;
+import org.embulk.util.config.ConfigMapperFactory;
 
 public class OutputTestRecordBuffer extends RecordBuffer {
-    OutputTestRecordBuffer(final String attributeName, final OutputTestPluginDelegate.PluginTask task) {
+    OutputTestRecordBuffer(
+            final String attributeName,
+            final OutputTestPluginDelegate.PluginTask task,
+            final ConfigMapperFactory configMapperFactory) {
         this.attributeName = attributeName;
         this.task = task;
         this.mapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, false);
         this.records = OBJECT_MAPPER.createArrayNode();
+        this.configMapperFactory = configMapperFactory;
     }
 
     @Override
@@ -67,7 +71,7 @@ public class OutputTestRecordBuffer extends RecordBuffer {
 
     @Override
     public TaskReport commitWithTaskReportUpdated(final TaskReport taskReport) {
-        return Exec.newTaskReport().set("inserted", this.totalCount);
+        return this.configMapperFactory.newTaskReport().set("inserted", this.totalCount);
     }
 
     @Override
@@ -87,4 +91,5 @@ public class OutputTestRecordBuffer extends RecordBuffer {
 
     private ArrayNode records;
     private long totalCount;
+    private final ConfigMapperFactory configMapperFactory;
 }

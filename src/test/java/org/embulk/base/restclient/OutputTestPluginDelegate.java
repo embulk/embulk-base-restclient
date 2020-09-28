@@ -24,14 +24,15 @@ import org.embulk.base.restclient.jackson.scope.JacksonAllInObjectScope;
 import org.embulk.base.restclient.record.RecordBuffer;
 import org.embulk.config.ConfigDiff;
 import org.embulk.config.TaskReport;
-import org.embulk.spi.Exec;
 import org.embulk.spi.Schema;
+import org.embulk.util.config.ConfigMapperFactory;
 import org.embulk.util.timestamp.TimestampFormatter;
 
 public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<OutputTestPluginDelegate.PluginTask> {
-    OutputTestPluginDelegate(final boolean outputNulls) {
+    OutputTestPluginDelegate(final boolean outputNulls, final ConfigMapperFactory configMapperFactory) {
         buffers = new ArrayList<>();
         this.outputNulls = outputNulls;
+        this.configMapperFactory = configMapperFactory;
     }
 
     public interface PluginTask extends RestClientOutputTaskBase {
@@ -53,7 +54,7 @@ public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<
 
     @Override  // Overridden from |RecordBufferBuildable|
     public RecordBuffer buildRecordBuffer(final PluginTask task, final Schema schema, final int taskIndex) {
-        final OutputTestRecordBuffer buffer = new OutputTestRecordBuffer("records", task);
+        final OutputTestRecordBuffer buffer = new OutputTestRecordBuffer("records", task, this.configMapperFactory);
         OutputTestPluginDelegate.buffers.add(buffer);
         return buffer;
     }
@@ -64,7 +65,7 @@ public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<
             final Schema schema,
             final int taskIndex,
             final List<TaskReport> taskReports) {
-        return Exec.newConfigDiff();
+        return this.configMapperFactory.newConfigDiff();
     }
 
     static ArrayList<OutputTestRecordBuffer> getBuffers() {
@@ -74,4 +75,6 @@ public class OutputTestPluginDelegate implements RestClientOutputPluginDelegate<
     private static ArrayList<OutputTestRecordBuffer> buffers;
 
     private final boolean outputNulls;
+
+    private final ConfigMapperFactory configMapperFactory;
 }

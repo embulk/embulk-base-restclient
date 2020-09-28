@@ -25,16 +25,19 @@ import org.embulk.config.TaskSource;
 import org.embulk.spi.OutputPlugin;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TransactionalPageOutput;
+import org.embulk.util.config.ConfigMapperFactory;
 
 public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase>
         extends RestClientPluginBase<T>
         implements OutputPlugin {
     protected RestClientOutputPluginBaseUnsafe(
+            final ConfigMapperFactory configMapperFactory,
             final Class<T> taskClass,
             final EmbulkDataEgestable<T> embulkDataEgester,
             final RecordBufferBuildable<T> recordBufferBuilder,
             final OutputTaskValidatable<T> outputTaskValidator,
             final ServiceRequestMapperBuildable<T> serviceRequestMapperBuilder) {
+        super(configMapperFactory);
         this.taskClass = taskClass;
         this.embulkDataEgester = embulkDataEgester;
         this.recordBufferBuilder = recordBufferBuilder;
@@ -42,8 +45,11 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
         this.serviceRequestMapperBuilder = serviceRequestMapperBuilder;
     }
 
-    protected RestClientOutputPluginBaseUnsafe(final Class<T> taskClass, final RestClientOutputPluginDelegate<T> delegate) {
-        this(taskClass, delegate, delegate, delegate, delegate);
+    protected RestClientOutputPluginBaseUnsafe(
+            final ConfigMapperFactory configMapperFactory,
+            final Class<T> taskClass,
+            final RestClientOutputPluginDelegate<T> delegate) {
+        this(configMapperFactory, taskClass, delegate, delegate, delegate, delegate);
     }
 
     @Override
@@ -51,13 +57,13 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
             final ConfigSource config, final Schema schema, final int taskCount, final OutputPlugin.Control control) {
         final T task = loadConfig(config, this.taskClass);
         this.outputTaskValidator.validateOutputTask(task, schema, taskCount);
-        return resume(task.dump(), schema, taskCount, control);
+        return resume(task.toTaskSource(), schema, taskCount, control);
     }
 
     @Override
     public ConfigDiff resume(
             final TaskSource taskSource, final Schema schema, final int taskCount, final OutputPlugin.Control control) {
-        final T task = taskSource.loadTask(this.taskClass);
+        final T task = loadTask(taskSource, this.taskClass);
         final List<TaskReport> taskReports = control.run(taskSource);
         return this.embulkDataEgester.egestEmbulkData(task, schema, taskCount, taskReports);
     }
@@ -69,10 +75,11 @@ public class RestClientOutputPluginBaseUnsafe<T extends RestClientOutputTaskBase
 
     @Override
     public TransactionalPageOutput open(final TaskSource taskSource, final Schema schema, final int taskIndex) {
-        final T task = taskSource.loadTask(this.taskClass);
+        final T task = loadTask(taskSource, this.taskClass);
         final ServiceRequestMapper<? extends ValueLocator> serviceRequestMapper =
                 this.serviceRequestMapperBuilder.buildServiceRequestMapper(task);
-        return new RestClientPageOutput<T>(this.taskClass,
+        return new RestClientPageOutput<T>(this.getConfigMapperFactory(),
+                                           this.taskClass,
                                            task,
                                            serviceRequestMapper.createRecordExporter(),
                                            this.recordBufferBuilder.buildRecordBuffer(task, schema, taskIndex),

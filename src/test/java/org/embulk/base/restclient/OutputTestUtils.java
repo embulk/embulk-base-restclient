@@ -20,18 +20,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.embulk.config.ConfigSource;
-import org.embulk.spi.Exec;
 import org.embulk.spi.Schema;
 import org.embulk.spi.type.Types;
+import org.embulk.util.config.ConfigMapperFactory;
 
 class OutputTestUtils {
+    OutputTestUtils(final ConfigMapperFactory configMapperFactory) {
+        this.configMapperFactory = configMapperFactory;
+    }
+
     void initializeConstant() {
         // noinspection ConstantConditions
         JSON_PATH_PREFIX = OutputTestUtils.class.getClassLoader().getResource("sample_01.json").getPath();
     }
 
     ConfigSource configJson() {
-        return Exec.newConfigSource()
+        return this.configMapperFactory.newConfigSource()
                 .set("in", inputConfigJson())
                 .set("parser", parserConfigJson());
     }
@@ -61,4 +65,6 @@ class OutputTestUtils {
     }
 
     private static String JSON_PATH_PREFIX;
+
+    private final ConfigMapperFactory configMapperFactory;
 }

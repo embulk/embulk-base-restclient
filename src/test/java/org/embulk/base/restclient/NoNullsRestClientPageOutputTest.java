@@ -27,13 +27,13 @@ import org.embulk.base.restclient.OutputTestPluginDelegate.PluginTask;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
 import org.embulk.config.TaskSource;
-import org.embulk.spi.Exec;
 import org.embulk.spi.OutputPlugin;
 import org.embulk.spi.Page;
 import org.embulk.spi.PageTestUtils;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TransactionalPageOutput;
 import org.embulk.spi.time.Timestamp;
+import org.embulk.util.config.ConfigMapperFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -49,14 +49,17 @@ public class NoNullsRestClientPageOutputTest {
 
     private OutputTestUtils utils;
     private NoNullsOutputTestPlugin plugin;
+    private ConfigMapperFactory configMapperFactory;
 
     @Before
     public void createResources() throws Exception {
-        utils = new OutputTestUtils();
-        utils.initializeConstant();
-        // PluginTask task = utils.configJson().loadConfig(PluginTask.class);
+        configMapperFactory = ConfigMapperFactory.builder().addDefaultModules().build();
 
-        plugin = new NoNullsOutputTestPlugin();
+        utils = new OutputTestUtils(configMapperFactory);
+        utils.initializeConstant();
+        // PluginTask task = configMapperFactory.createConfigMapper().map(utils.configJson(), PluginTask.class);
+
+        plugin = new NoNullsOutputTestPlugin(configMapperFactory);
     }
 
     @Test
@@ -67,16 +70,16 @@ public class NoNullsRestClientPageOutputTest {
     public void testOutputWithNullValues() throws Exception {
         final ConfigSource config = this.utils.configJson();
         final Schema schema = this.utils.jsonSchema();
-        final PluginTask task = config.loadConfig(PluginTask.class);
+        final PluginTask task = configMapperFactory.createConfigMapper().map(config, PluginTask.class);
         this.plugin.transaction(config, schema, 0, new OutputPlugin.Control() {
                 @Override
                 public List<TaskReport> run(final TaskSource taskSource) {
                     final ArrayList<TaskReport> newList = new ArrayList<>();
-                    newList.add(Exec.newTaskReport());
+                    newList.add(configMapperFactory.newTaskReport());
                     return newList;
                 }
             });
-        final TransactionalPageOutput output = this.plugin.open(task.dump(), schema, 0);
+        final TransactionalPageOutput output = this.plugin.open(task.toTaskSource(), schema, 0);
 
         // id, long, timestamp, boolean, double, string
         final List<Page> pages =
@@ -100,16 +103,16 @@ public class NoNullsRestClientPageOutputTest {
     public void testOutputWithRegularValues() throws Exception {
         final ConfigSource config = this.utils.configJson();
         final Schema schema = this.utils.jsonSchema();
-        final PluginTask task = config.loadConfig(PluginTask.class);
+        final PluginTask task = configMapperFactory.createConfigMapper().map(config, PluginTask.class);
         this.plugin.transaction(config, schema, 0, new OutputPlugin.Control() {
                 @Override
                 public List<TaskReport> run(final TaskSource taskSource) {
                     final ArrayList<TaskReport> newList = new ArrayList<>();
-                    newList.add(Exec.newTaskReport());
+                    newList.add(configMapperFactory.newTaskReport());
                     return newList;
                 }
             });
-        final TransactionalPageOutput output = this.plugin.open(task.dump(), schema, 0);
+        final TransactionalPageOutput output = this.plugin.open(task.toTaskSource(), schema, 0);
 
         // id, long, timestamp, boolean, double, string
         final List<Page> pages = PageTestUtils.buildPage(

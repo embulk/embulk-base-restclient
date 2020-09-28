@@ -16,15 +16,44 @@
 
 package org.embulk.base.restclient;
 
+import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
+import org.embulk.config.TaskReport;
 import org.embulk.config.TaskSource;
+import org.embulk.util.config.ConfigMapperFactory;
 
 public abstract class RestClientPluginBase<T extends RestClientTaskBase> {
+    public RestClientPluginBase(final ConfigMapperFactory configMapperFactory) {
+        this.configMapperFactory = configMapperFactory;
+    }
+
+    protected final ConfigMapperFactory getConfigMapperFactory() {
+        return this.configMapperFactory;
+    }
+
     protected final T loadConfig(final ConfigSource config, final Class<T> taskClass) {
-        return config.loadConfig(taskClass);
+        return this.configMapperFactory.createConfigMapper().map(config, taskClass);
     }
 
     protected final T loadTask(final TaskSource taskSource, final Class<T> taskClass) {
-        return taskSource.loadTask(taskClass);
+        return this.configMapperFactory.createTaskMapper().map(taskSource, taskClass);
     }
+
+    protected final ConfigDiff newConfigDiff() {
+        return this.configMapperFactory.newConfigDiff();
+    }
+
+    protected final ConfigSource newConfigSource() {
+        return this.configMapperFactory.newConfigSource();
+    }
+
+    protected final TaskReport newTaskReport() {
+        return this.configMapperFactory.newTaskReport();
+    }
+
+    protected final TaskSource newTaskSource() {
+        return this.configMapperFactory.newTaskSource();
+    }
+
+    private final ConfigMapperFactory configMapperFactory;
 }
