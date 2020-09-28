@@ -76,12 +76,26 @@ public class SinglePageRecordReader {
 
     @SuppressWarnings("deprecation")  // org.embulk.spi.time.Timestamp
     public Instant getTimestamp(final Column column) {
-        return this.pageReader.getTimestamp(column).getInstant();
+        if (HAS_GET_TIMESTAMP_INSTANT_COLUMN) {
+            return this.pageReader.getTimestampInstant(column);
+        } else if (HAS_GET_TIMESTAMP_COLUMN) {
+            return this.pageReader.getTimestamp(column).getInstant();
+        } else {
+            throw new IllegalStateException(
+                    "Neither PageReader#getTimestamp(Column) nor PageReader#getTimestampInstant(Column) found.");
+        }
     }
 
     @SuppressWarnings("deprecation")  // org.embulk.spi.time.Timestamp
     public Instant getTimestamp(final int columnIndex) {
-        return this.pageReader.getTimestamp(columnIndex).getInstant();
+        if (HAS_GET_TIMESTAMP_INSTANT_INT) {
+            return this.pageReader.getTimestampInstant(columnIndex);
+        } else if (HAS_GET_TIMESTAMP_INT) {
+            return this.pageReader.getTimestamp(columnIndex).getInstant();
+        } else {
+            throw new IllegalStateException(
+                    "Neither PageReader#getTimestamp(int) nor PageReader#getTimestampInstant(int) found.");
+        }
     }
 
     public Value getJson(final Column column) {
@@ -91,6 +105,50 @@ public class SinglePageRecordReader {
     public Value getJson(final int columnIndex) {
         return this.pageReader.getJson(columnIndex);
     }
+
+    private static boolean hasGetTimestampColumn() {
+        try {
+            PageReader.class.getMethod("getTimestamp", Column.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean hasGetTimestampInt() {
+        try {
+            PageReader.class.getMethod("getTimestamp", int.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean hasGetTimestampInstantColumn() {
+        try {
+            PageReader.class.getMethod("getTimestampInstant", Column.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean hasGetTimestampInstantInt() {
+        try {
+            PageReader.class.getMethod("getTimestampInstant", int.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static final boolean HAS_GET_TIMESTAMP_COLUMN = hasGetTimestampColumn();
+
+    private static final boolean HAS_GET_TIMESTAMP_INT = hasGetTimestampInt();
+
+    private static final boolean HAS_GET_TIMESTAMP_INSTANT_COLUMN = hasGetTimestampInstantColumn();
+
+    private static final boolean HAS_GET_TIMESTAMP_INSTANT_INT = hasGetTimestampInstantInt();
 
     private final PageReader pageReader;
 }
