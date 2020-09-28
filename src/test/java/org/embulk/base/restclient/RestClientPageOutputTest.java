@@ -32,7 +32,6 @@ import org.embulk.spi.Page;
 import org.embulk.spi.PageTestUtils;
 import org.embulk.spi.Schema;
 import org.embulk.spi.TransactionalPageOutput;
-import org.embulk.spi.time.Timestamp;
 import org.embulk.util.config.ConfigMapperFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -121,7 +120,7 @@ public class RestClientPageOutputTest {
                 schema,
                 2L,
                 42L,
-                Timestamp.ofInstant(Instant.ofEpochSecond(1509738161)),
+                getTimestampFromInstant(Instant.ofEpochSecond(1509738161)),
                 true,
                 123.45,
                 "embulk");
@@ -139,5 +138,10 @@ public class RestClientPageOutputTest {
 
         assertThat(res, is(
                 "[{\"id\":2,\"long\":42,\"timestamp\":\"2017-11-03T19:42:41.000+0000\",\"boolean\":true,\"double\":123.45,\"string\":\"embulk\"}]"));
+    }
+
+    @SuppressWarnings("deprecation")  // org.embulk.spi.time.Timestamp
+    private static org.embulk.spi.time.Timestamp getTimestampFromInstant(final Instant instant) {
+        return org.embulk.spi.time.Timestamp.ofInstant(instant);
     }
 }

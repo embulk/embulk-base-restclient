@@ -16,6 +16,7 @@
 
 package org.embulk.base.restclient.record.values;
 
+import java.time.Instant;
 import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.ServiceValue;
 import org.embulk.base.restclient.record.ValueImporter;
@@ -23,7 +24,6 @@ import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.spi.Column;
 import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
-import org.embulk.spi.time.Timestamp;
 import org.embulk.util.timestamp.TimestampFormatter;
 
 public class TimestampValueImporter extends ValueImporter {
@@ -40,7 +40,7 @@ public class TimestampValueImporter extends ValueImporter {
             if (value == null || value.isNull()) {
                 pageBuilder.setNull(getColumnToImport());
             } else {
-                pageBuilder.setTimestamp(getColumnToImport(), Timestamp.ofInstant(value.timestampValue(timestampFormatter)));
+                setTimestampToPageBuilder(pageBuilder, getColumnToImport(), value.timestampValue(timestampFormatter));
             }
         } catch (final Exception ex) {
             throw new DataException(
@@ -48,6 +48,11 @@ public class TimestampValueImporter extends ValueImporter {
                     + " (" + getColumnToImport().getType().getName() + ")",
                     ex);
         }
+    }
+
+    @SuppressWarnings("deprecation")  // org.embulk.spi.time.Timestamp
+    private static void setTimestampToPageBuilder(final PageBuilder pageBuilder, final Column column, final Instant instant) {
+        pageBuilder.setTimestamp(column, org.embulk.spi.time.Timestamp.ofInstant(instant));
     }
 
     private final TimestampFormatter timestampFormatter;

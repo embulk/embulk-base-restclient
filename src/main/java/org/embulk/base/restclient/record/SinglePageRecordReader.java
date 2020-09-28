@@ -74,10 +74,12 @@ public class SinglePageRecordReader {
         return this.pageReader.getString(columnIndex);
     }
 
+    @SuppressWarnings("deprecation")  // org.embulk.spi.time.Timestamp
     public Instant getTimestamp(final Column column) {
         return this.pageReader.getTimestamp(column).getInstant();
     }
 
+    @SuppressWarnings("deprecation")  // org.embulk.spi.time.Timestamp
     public Instant getTimestamp(final int columnIndex) {
         return this.pageReader.getTimestamp(columnIndex).getInstant();
     }
