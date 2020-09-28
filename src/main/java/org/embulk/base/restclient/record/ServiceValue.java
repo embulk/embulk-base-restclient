@@ -17,7 +17,7 @@
 package org.embulk.base.restclient.record;
 
 import java.time.Instant;
-import org.embulk.spi.json.JsonParser;
+import org.embulk.util.json.JsonParser;
 import org.embulk.util.timestamp.TimestampFormatter;
 import org.msgpack.value.Value;
 

@@ -32,9 +32,9 @@ import org.embulk.base.restclient.record.values.LongValueImporter;
 import org.embulk.base.restclient.record.values.StringValueImporter;
 import org.embulk.base.restclient.record.values.TimestampValueImporter;
 import org.embulk.spi.Column;
-import org.embulk.spi.json.JsonParser;
 import org.embulk.spi.type.Type;
 import org.embulk.spi.type.Types;
+import org.embulk.util.json.JsonParser;
 import org.embulk.util.timestamp.TimestampFormatter;
 
 /**

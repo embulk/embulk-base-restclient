@@ -23,7 +23,7 @@ import org.embulk.base.restclient.record.ValueLocator;
 import org.embulk.spi.Column;
 import org.embulk.spi.DataException;
 import org.embulk.spi.PageBuilder;
-import org.embulk.spi.json.JsonParser;
+import org.embulk.util.json.JsonParser;
 
 public class JsonValueImporter extends ValueImporter {
     public JsonValueImporter(final Column column, final ValueLocator valueLocator, final JsonParser jsonParser) {
