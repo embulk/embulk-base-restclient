@@ -28,15 +28,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.embulk:embulk-api:0.10.12") {
-        exclude group: "*"
-    }
-    compileOnly("org.embulk:embulk-spi:0.10.12") {
-        exclude group: "*"
-    }
-    compileOnly("org.embulk:embulk-core:0.10.12") {
-        exclude group: "*"
-    }
+    compileOnly("org.embulk:embulk-api:0.10.18")
+    compileOnly("org.embulk:embulk-spi:0.10.18")
 
     // Excluding all transitive dependencies from embulk-api and embulk-core,
     // and declaring necessary dependencies explicitly.
@@ -46,13 +39,12 @@ dependencies {
     api "com.fasterxml.jackson.core:jackson-annotations:2.6.7"
     api "com.fasterxml.jackson.core:jackson-core:2.6.7"
     api "com.fasterxml.jackson.core:jackson-databind:2.6.7"
-    api "org.msgpack:msgpack-core:0.8.11"
 
     testImplementation "junit:junit:4.13"
-    testImplementation "org.embulk:embulk-api:0.10.12"
-    testImplementation "org.embulk:embulk-core:0.10.12"
-    testImplementation "org.embulk:embulk-core:0.10.12:tests"
-    testImplementation "org.embulk:embulk-deps:0.10.12"
+    testImplementation "org.embulk:embulk-api:0.10.18"
+    testImplementation "org.embulk:embulk-core:0.10.18"
+    testImplementation "org.embulk:embulk-core:0.10.18:tests"
+    testImplementation "org.embulk:embulk-deps:0.10.18"
     testImplementation "org.embulk:embulk-util-retryhelper-jaxrs:0.8.0"
 
     // RESTEasy JAX-RS implementation is required only for testing.

@@ -21,6 +21,7 @@ import org.embulk.base.restclient.record.RecordExporter;
 import org.embulk.base.restclient.record.ServiceRecord;
 import org.embulk.base.restclient.record.SinglePageRecordReader;
 import org.embulk.config.TaskReport;
+import org.embulk.spi.Exec;
 import org.embulk.spi.Page;
 import org.embulk.spi.PageReader;
 import org.embulk.spi.Schema;
@@ -50,7 +51,7 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase> implements
 
     @Override
     public void add(final Page page) {
-        final PageReader pageReader = new PageReader(this.embulkSchema);
+        final PageReader pageReader = getPageReader(this.embulkSchema);
         pageReader.setPage(page);
         while (pageReader.nextRecord()) {
             final SinglePageRecordReader singlePageRecordReader = new SinglePageRecordReader(pageReader);
@@ -78,6 +79,26 @@ public class RestClientPageOutput<T extends RestClientOutputTaskBase> implements
     public TaskReport commit() {
         return this.recordBuffer.commitWithTaskReportUpdated(this.configMapperFactory.newTaskReport());
     }
+
+    @SuppressWarnings("deprecation")  // https://github.com/embulk/embulk-base-restclient/issues/132
+    private static PageReader getPageReader(final Schema schema) {
+        if (HAS_EXEC_GET_PAGE_READER) {
+            return Exec.getPageReader(schema);
+        } else {
+            return new PageReader(schema);
+        }
+    }
+
+    private static boolean hasExecGetPageReader() {
+        try {
+            Exec.class.getMethod("getPageReader", Schema.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static final boolean HAS_EXEC_GET_PAGE_READER = hasExecGetPageReader();
 
     private final ConfigMapperFactory configMapperFactory;
     private final Class<T> taskClass;

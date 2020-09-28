@@ -22,6 +22,7 @@ import org.embulk.config.ConfigDiff;
 import org.embulk.config.ConfigSource;
 import org.embulk.config.TaskReport;
 import org.embulk.config.TaskSource;
+import org.embulk.spi.BufferAllocator;
 import org.embulk.spi.Exec;
 import org.embulk.spi.InputPlugin;
 import org.embulk.spi.PageBuilder;
@@ -128,7 +129,7 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
         final ServiceResponseMapper<? extends ValueLocator> serviceResponseMapper =
                 this.serviceResponseMapperBuilder.buildServiceResponseMapper(task);
 
-        try (final PageBuilder pageBuilder = new PageBuilder(Exec.getBufferAllocator(), schema, output)) {
+        try (final PageBuilder pageBuilder = getPageBuilder(Exec.getBufferAllocator(), schema, output)) {
             // When failing around |PageBuidler| in |ingestServiceData|, |pageBuilder.finish()| should not be called.
             final TaskReport taskReport = this.serviceDataIngester.ingestServiceData(
                     task, serviceResponseMapper.createRecordImporter(), taskIndex, pageBuilder);
@@ -144,6 +145,26 @@ public class RestClientInputPluginBaseUnsafe<T extends RestClientInputTaskBase>
     public ConfigDiff guess(final ConfigSource config) {
         return this.newConfigDiff();
     }
+
+    @SuppressWarnings("deprecation")  // https://github.com/embulk/embulk-base-restclient/issues/132
+    private static PageBuilder getPageBuilder(final BufferAllocator bufferAllocator, final Schema schema, final PageOutput output) {
+        if (HAS_EXEC_GET_PAGE_BUILDER) {
+            return Exec.getPageBuilder(bufferAllocator, schema, output);
+        } else {
+            return new PageBuilder(bufferAllocator, schema, output);
+        }
+    }
+
+    private static boolean hasExecGetPageBuilder() {
+        try {
+            Exec.class.getMethod("getPageBuilder", BufferAllocator.class, Schema.class, PageOutput.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static final boolean HAS_EXEC_GET_PAGE_BUILDER = hasExecGetPageBuilder();
 
     private final Class<T> taskClass;
     private final ConfigDiffBuildable<T> configDiffBuilder;

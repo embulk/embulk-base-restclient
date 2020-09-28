@@ -52,8 +52,38 @@ public class TimestampValueImporter extends ValueImporter {
 
     @SuppressWarnings("deprecation")  // org.embulk.spi.time.Timestamp
     private static void setTimestampToPageBuilder(final PageBuilder pageBuilder, final Column column, final Instant instant) {
-        pageBuilder.setTimestamp(column, org.embulk.spi.time.Timestamp.ofInstant(instant));
+        if (HAS_SET_TIMESTAMP_INSTANT) {
+            pageBuilder.setTimestamp(column, instant);
+        } else if (HAS_SET_TIMESTAMP_TIMESTAMP) {
+            pageBuilder.setTimestamp(column, org.embulk.spi.time.Timestamp.ofInstant(instant));
+        } else {
+            throw new IllegalStateException(
+                    "Neither PageBuilder#setTimestamp(Column, Instant) nor PageBuilder#setTimestamp(Column, Timestamp) found.");
+        }
     }
+
+    @SuppressWarnings("deprecation")
+    private static boolean hasSetTimestampTimestamp() {
+        try {
+            PageBuilder.class.getMethod("setTimestamp", Column.class, org.embulk.spi.time.Timestamp.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean hasSetTimestampInstant() {
+        try {
+            PageBuilder.class.getMethod("setTimestamp", Column.class, Instant.class);
+        } catch (final NoSuchMethodException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    private static final boolean HAS_SET_TIMESTAMP_INSTANT = hasSetTimestampInstant();
+
+    private static final boolean HAS_SET_TIMESTAMP_TIMESTAMP = hasSetTimestampTimestamp();
 
     private final TimestampFormatter timestampFormatter;
 }
