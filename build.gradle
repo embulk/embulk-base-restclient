@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "org.embulk"
-version = "0.10.1-SNAPSHOT"
+version = "0.10.1"
 description = "Alternative base classes for Embulk plugins to access RESTful services"
 
 sourceCompatibility = 1.8
