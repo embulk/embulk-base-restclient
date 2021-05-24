@@ -8,8 +8,8 @@ com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.6.7
 javax.annotation:javax.annotation-api:1.2
 javax.validation:validation-api:1.1.0.Final
 javax.ws.rs:javax.ws.rs-api:2.0.1
-org.embulk:embulk-util-config:0.1.3
-org.embulk:embulk-util-json:0.1.0
+org.embulk:embulk-util-config:0.3.0
+org.embulk:embulk-util-json:0.1.1
 org.embulk:embulk-util-retryhelper-jaxrs:0.8.0
 org.embulk:embulk-util-retryhelper:0.8.0
 org.embulk:embulk-util-rubytime:0.3.2
